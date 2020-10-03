@@ -11,8 +11,8 @@
 #' @param gene        character string or vector of character string. The gene for which to find the sequence region.
 #' @param codon_start logical. Must be set to T if the gene has reading frames so it can adjust the region start accordingly. Default is false.
 #' @param full_seq    logical. Whether to fetch the full sequence or only the gene region. Default is FALSE, gets the gene region.
-#' @param save2csv    logical. Whether to save returned data.frame of the parsed records to a csv file or not. Done using \code\link{write_parsed2csv}.
-#' @param outFile     character string. The path to the csv file to be written. Optional. If save2csv is set to TRUE and outFile is missing, the file will be saved to './db_downloads/parsedRecords/parsedRecords_[Sys.Date()]_[###].csv'
+#' @param save2csv    logical. Whether to save returned data.frame of the parsed records to a csv file or not. Done using \code{\link{write_parsed2csv}}.
+#' @param outFile     character string. The path to the csv file to be written. Optional. If save2csv is set to TRUE and outFile is missing, the file will be saved to './db_downloads/parsedRecords/parsedRecords.Sys.Date.###.csv'
 #' @export
 #' @seealso \code{\link{parse_EMBLxml}}, \code{\link{parse_flatFile}}, \code{\link{get_enaFasta}}
 parse_INSDxml <- function(URL, gene, codon_start = F, full_seq = F, save2csv = F, outCsv = NULL){
@@ -84,8 +84,8 @@ parse_INSDxml <- function(URL, gene, codon_start = F, full_seq = F, save2csv = F
 #' @param gene        character string or vector of character string. The gene for which to find the sequence region.
 #' @param codon_start logical. Must be set to T if the gene has reading frames so it can adjust the region start accordingly. Default is false.
 #' @param full_seq    logical. Whether to fetch the full sequence or only the gene region. Default is FALSE, gets the gene region.
-#' @param save2csv    logical. Whether to save returned data.frame of the parsed records to a csv file or not. Done using \code\link{write_parsed2csv}.
-#' @param outFile     character string. The path to the csv file to be written. Optional. If save2csv is set to TRUE and outFile is missing, the file will be saved to './db_downloads/parsedRecords/parsedRecords_[Sys.Date()]_[###].csv'
+#' @param save2csv    logical. Whether to save returned data.frame of the parsed records to a csv file or not. Done using \code{\link{write_parsed2csv}}.
+#' @param outFile     character string. The path to the csv file to be written. Optional. If save2csv is set to TRUE and outFile is missing, the file will be saved to './db_downloads/parsedRecords/parsedRecords.Sys.Date.###.csv'
 #' @export
 #' @seealso \code{\link{parse_INSDxml}}, \code{\link{parse_flatFile}}, \code{\link{get_enaFasta}}
 parse_EMBLxml <- function(URL, gene, codon_start = F, full_seq = F, save2csv = F, outCsv = NULL){
@@ -153,8 +153,8 @@ parse_EMBLxml <- function(URL, gene, codon_start = F, full_seq = F, save2csv = F
 #' @param gene        character string or vector of character string. The gene for which to find the sequence region.
 #' @param codon_start logical. Must be set to T if the gene has reading frames so it can adjust the region start accordingly. Default is false.
 #' @param full_seq    logical. Whether to fetch the full sequence or only the gene region. Default is FALSE, gets the gene region.
-#' @param save2csv    logical. Whether to save returned data.frame of the parsed records to a csv file or not. Done using \code\link{write_parsed2csv}.
-#' @param outFile     character string. The path to the csv file to be written. Optional. If save2csv is set to TRUE and outFile is missing, the file will be saved to './db_downloads/parsedRecords/parsedRecords_[Sys.Date()]_[###].csv'
+#' @param save2csv    logical. Whether to save returned data.frame of the parsed records to a csv file or not. Done using \code{\link{write_parsed2csv}}.
+#' @param outFile     character string. The path to the csv file to be written. Optional. If save2csv is set to TRUE and outFile is missing, the file will be saved to './db_downloads/parsedRecords/parsedRecords.Sys.Date.###.csv'
 #' @export
 #' @seealso \code{\link{parse_INSDxml}}, \code{\link{parse_EMBLxml}}, \code{\link{get_enaFasta}}
 parse_flatFile <- function(URL, gene, codon_start = F, full_seq = F, save2csv = F, outCsv = NULL){
