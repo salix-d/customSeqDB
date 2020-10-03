@@ -1,0 +1,46 @@
+---
+output: github_document
+---
+
+<!-- README.md is generated from README.Rmd. Please edit that file -->
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>",
+  fig.path = "man/figures/README-",
+  out.width = "100%"
+)
+```
+
+# customSeqDB
+
+<!-- badges: start -->
+<!-- badges: end -->
+
+The goal of customSeqDB is to help make custom sequences databases from open source database like NCBI and ENA. Functions allow to search and fetch records on their API and parse these records for relevant information. It can also make a taxonomy SQLite file to allow to fetch taxonomic information for the records used to make the custom database.
+
+## Installation
+
+And the development version from [GitHub](https://github.com/) with:
+
+``` r
+# install.packages("devtools")
+devtools::install_github("salix-d/customSeqDB")
+```
+## Example
+
+### Getting the sequences details from NCBI
+This gets the ESummary of all records in the NCBI nucleotide database matching these taxa and gene which have the word 'complete' in the 'title' fields but don't have 'UNVERIFIED' in the 'keyword' fields. The query isn't case sensitive. For the usable fields and their name see : https://www.ncbi.nlm.nih.gov/books/NBK49540/
+
+It then parse the data and returns a list with history server information in case we want to look at the records again and a list of details including the accession numbers, the taxonomic ids and the description. The ESearch can return up to 100k results. This part may take a while.
+
+```{r}
+library(customSeqDB)
+taxa <- c("Trombidiformes", "Holothyrida")
+gene <- c("COI", "CO1", "COXI", "COX1") # ncbi includes 6 orders and the COI gene can be written 4 ways
+ncbi <- get_ncbiDetails(taxa = taxa, gene = gene, customTerm = "AND complete [TITL] NOT unverfified[KYWD]")
+head(ncbi$details)
+```
+
+More examples will be added.

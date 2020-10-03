@@ -5,7 +5,7 @@ Version: 0.1.0
 Author: Salix Dubois
 Maintainer: Salix Dubois <salixdubois-git@gmail.com>
 Description: Contains function to use with the api of ENA and the EUtils of NCBI which search for records matchin a query, get descriptions data and download fasta files.\nCan also be used to make an SQLite database from the NCBI taxonomy database which can be used to get the taxonomic information from taxId. Functions for that are based on the Taxonomizr package. \nTogether the fasta files and taxonomic data can be formated to make a dada2 fasta file used with the dada2::assignTaxonomy() function. It could easily be adapted to other format.
-License: GPL (>= 2)
+License: GPL-3
 Encoding: UTF-8
 LazyData: true
 Imports:
