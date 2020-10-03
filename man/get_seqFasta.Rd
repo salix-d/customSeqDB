@@ -2,8 +2,7 @@
 % Please edit documentation in R/makingDB_ncbiFuns.R
 \name{get_seqFasta}
 \alias{get_seqFasta}
-\title{--------------------------------------------------------------------------------
-Get the fasta files from a list of ids with EFetch}
+\title{Get the fasta files from a list of ids with EFetch -------------------------------------------------------------------}
 \usage{
 get_seqFasta(
   idList,
@@ -15,6 +14,10 @@ get_seqFasta(
 )
 }
 \arguments{
+\item{idList}{list of taxa to search for; Optional if using the arguments WebEnv, Query_key and nIDs.}
+
+\item{outDir}{list of the genes/variations of a gene names; Optional if using the arguments WebEnv, Query_key and nIDs.}
+
 \item{db}{ncbi db to search. Default is 'nucleotide'.}
 
 \item{rettype}{return type of the results; Default is 'fasta_cds_na' which gets only the CDS. Could be set to fasta to get whole sequences. Note: to get only the gene region, the whole gb file should be fetched and parsed similarly to how it's done for the ENA db;}
@@ -22,28 +25,29 @@ get_seqFasta(
 \item{WebEnv}{string indicating the Web Environment that contains the id list to be provided as input to EFetch (to be implemented).}
 
 \item{Query_key}{integer specifying which of the id lists attached to the given Web Environment will be used as input to EFetch (to be implemented).}
-
-\item{taxa}{list of taxa to search for; Optional if using the arguments WebEnv, Query_key and nIDs.}
-
-\item{gene}{list of the genes/variations of a gene names; Optional if using the arguments WebEnv, Query_key and nIDs.}
-
-\item{customTerm}{string of terms to add to the eSearch query; Optional if using the arguments WebEnv, Query_key and nIDs.}
-}
-\value{
-a vector of the paths to the downloaded fasta files
 }
 \description{
-Download EFetched fasta files and returns a vector of their paths.
-Could use the ncbi history server info if all the sequences were wanted. (To be implemented)
-NOTE : This can only get full sequences or CDS region, function for other gene region will be added.
+`get_seqFasta` returns a vector of the paths to the downloaded fasta files.
+}
+\details{
+Download EFetched fasta files of the records matching the idList argument and returns a vector of their paths.
+History server information could also be use, but has not been implemented yet.
+}
+\note{
+This can only get full sequences or CDS region.
 }
 \references{
 \url{https://www.ncbi.nlm.nih.gov/books/NBK25499/#_chapter4_EFetch_}
-makes the ranges of sequences to download (200 at a time)
-makes file names
-make a list of URL to EFetch the fasta files
-downloads the EFetched fasta files
+makes the ranges of sequences to download (200 at a time) -------------------------------------------------------------
+makes file names ------------------------------------------------------------------------------------------------------
+make a list of URL to EFetch the fasta files --------------------------------------------------------------------------
+downloads the EFetched fasta files ------------------------------------------------------------------------------------
 }
 \seealso{
-\code{\link{get_idListDetails}}
+\code{\link{get_ncbiDetails}}
+
+Other ncbi-db: 
+\code{\link{get_ncbiAcc}()},
+\code{\link{get_ncbiDetails}()}
 }
+\concept{ncbi-db}

@@ -2,9 +2,7 @@
 % Please edit documentation in R/makingDB_miscFuns.R
 \name{mk_printDF}
 \alias{mk_printDF}
-\title{--------------------------------------------------------------------------------
-Makes the matrix returned from dada2::assignedTaxonomy() printable
---------------------------------------------------------------------------------}
+\title{Makes the matrix with long row names (like RNA sequences) printable.}
 \usage{
 mk_printDF(mat, na2char = TRUE, naString = "unidentified")
 }
@@ -15,10 +13,9 @@ mk_printDF(mat, na2char = TRUE, naString = "unidentified")
 
 \item{naString}{String to use to replace the NA if na2char is set to TRUE; Default is "unidentified"}
 }
-\value{
-a data.frame without named rows and, optionnaly, without NAs
-}
 \description{
-Convert matrix to dataframe and remove rownames.
-Optionnaly, replace the NA by "NA" to be able to compare between tables
+`mk_printDF` returns a data.frame without named rows. Optionally, also replaces NAs for a value.
+}
+\details{
+Convert matrix to data.frame and remove row names. Can replace the NA by "NA" or custom value make comparison between tables easier.
 }

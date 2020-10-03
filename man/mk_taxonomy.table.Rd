@@ -2,8 +2,6 @@
 % Please edit documentation in R/makingDB_ncbiSQLiteFuns.R
 \name{mk_taxonomy.table}
 \alias{mk_taxonomy.table}
-\alias{get_namesNodes}
-\alias{mk_tax.dmp}
 \title{Make a taxonomy SQL tables from NCBI nodes.dmp and names.dmp file}
 \usage{
 mk_taxonomy.table(
@@ -12,10 +10,6 @@ mk_taxonomy.table(
   overwrite = FALSE,
   rmTaxDmp = TRUE
 )
-
-get_namesNodes(outDir = ".")
-
-mk_tax.dmp(namesDmp, nodesDmp)
 }
 \arguments{
 \item{dmpDir}{character string. The path to the directory where to find or download the names.dmp and nodes.dmp files. If directory doesn't exist, it will be created. If the directory is empty, it will ask if you want to download the files.}
@@ -25,31 +19,14 @@ mk_tax.dmp(namesDmp, nodesDmp)
 \item{overwrite}{logical. If TRUE, overwrites the taxonomy table. Default is FALSE.}
 
 \item{rmTaxDmp}{logical. If FALSE, the merged file created (tax.dmp) won't be removed after the table is created. Default is TRUE.}
-
-\item{outDir}{the directory to put names.dmp and nodes.dmp in. Required. If directory doesn't exist, it will be created.}
-
-\item{namesDmp}{character string. The path to the names.dmp file.}
-
-\item{nodesDmp}{character string. The path to the nodes.dmp file.}
 }
 \description{
 `mk_taxonomyTable` returns a character string of the path to the SQLite file in which the table was created.
-
-`get_namesNodes` returns a vector of file path strings of the locations of the output files
-
-`mk_tax.dmp` returns a character string of the path to the merged file (tax.dmp).
 }
 \details{
 If the files needed aren't already downloaded, it will download a taxdump.tar.gz file from NCBI servers and extract the names.dmp and nodes.dmp files from it.
 The files will then be merged into one temporary .dmp file keeping only the required data (id, scientific name, rank and parentId).
 This file is then used to create a SQLite table for easy taxonomy assignment with \code{\link{get_taxonomy}}.
-
-Download a taxdump.tar.gz file from NCBI servers and extract the names.dmp and nodes.dmp files from it.
-These can then be used to create a SQLite database with \code{\link{mk_taxonomy.table}}.
-
-Helper function for \code{\link{mk_taxonomy.table}}.
-Merge names.dmp and nodes.dmp files from NCBI into one tax.dmp file keeping only the columns required (id, name, rank and parentId)
-For names.dmp, also only keeps the rows containing the scientific names so there's only one name per id.
 }
 \references{
 \url{ftp://ftp.ncbi.nih.gov/pub/taxonomy/}, \url{https://www.ncbi.nlm.nih.gov/Taxonomy/taxonomyhome.html/}
@@ -57,4 +34,3 @@ For names.dmp, also only keeps the rows containing the scientific names so there
 \seealso{
 \code{\link{get_namesNodes}}, \code{\link{get_taxonomy}}
 }
-\keyword{internal}

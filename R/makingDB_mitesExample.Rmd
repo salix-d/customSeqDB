@@ -1,0 +1,332 @@
+---
+title: "Making a custom database - ncbi Example"
+author: "Salix Dubois"
+date: "30/09/2020"
+output: html_notebook
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+## Prep
+These packages will be needed.
+The code of the custom functions I used for this is here : https://github.com/salix-d/customSeqDB
+```{r}
+if (!requireNamespace("BiocManager", quietly = TRUE))
+    install.packages("BiocManager")
+BiocManager::install("ShortRead")
+
+install.packages("jsonlite")
+install.packages("xml2")
+
+#these are the function I made for this specifically
+if (!requireNamespace("devtools", quietly = TRUE))
+    install.packages("devtools")
+devtools::install_github("salix-d/customSeqDB")
+
+```
+
+# NCBI database
+Functions specific to this db are here : https://github.com/salix-d/customSeqDB/blob/master/R/makingDB_ncbiFuns.R
+## Getting the sequences details
+This gets the ESummary of all records in the NCBI nucleotide database matching these taxa and gene which don't have 'UNVERIFIED' in the keyword fields.
+It then parse the data and returns a list with history server info in case we want to look at the records again and a list of details including the accession numbers, the taxonomic ids and the description. The ESearch can return up to 100k results. This part may take a while.
+
+ncbi includes 6 orders and the COI gene can be written 4 ways.
+```{r}
+ncbi <- get_ncbiDetails(c("Opilioacarida", "Holothyrida", "Ixodida", "Mesostigmata", "Trombidiformes", "Sarcoptiformes"), c("COI", "CO1", "COXI", "COX1"), customTerm = "NOT UNVERIFIED[KYWD]")
+```
+If you want to separate your queries by taxon to see how many you get from each, you can also use get_ncbiAcc the same way and then use the history server information that it returns to store the next queries in the same WebEnv and then use those to get the details.
+```{r}
+ncbi <- list(Opilioacarida = get_ncbiDetails("Opilioacarida", c("COI", "CO1", "COXI", "COX1"), customTerm = "AND complete[ALLl] NOT UNVERIFIED[KYWD]"))
+for(o in c("Holothyrida", "Ixodida", "Mesostigmata", "Trombidiformes", "Sarcoptiformes")){
+  ncbi[[o]] <- get_ncbiDetails(o, c("COI", "CO1", "COXI", "COX1"), customTerm = "AND complete[ALLl] NOT UNVERIFIED[KYWD]", query = ncbi$Opilioacarida$query)
+}
+```
+Sometimes it return 'Error in parse_con(txt, bigint_as_char) : parse error: premature EOF', but rerunning fixes it... I'm not sure why.
+
+## Filtering the details to get only "complete" COI
+<i>This step will need to be adapted depending on your query.</i>
+The fltr string looks for the word 'complete' a maximum of two commas after the gene (because farther than that it's not the COI gene that is complete based on these descriptions). Some sequences won't have the word for the gene but will be complete genome/sequence and can have a complete gene, so they are included. The gene is looked for with COx?[I1] because sometimes there's an X but not always and the one can be arabic or roman. ignore.case = T because the gene can be in all caps or not.
+<i>some sequences will still be partial sequences and so, they will be filtered again once we have the fasta files</i>
+```{r}
+ncbi$details <- do.call(rbind, lapply(ncbi[1:6], function(x) x$details))
+sapply(ncbi$details, ncol)
+ncbi$Opilioacarida$details <- t(ncbi$Opilioacarida$details)
+ncbi$Holothyrida$details <- t(ncbi$Holothyrida$details)
+ncbi$details <- NULL
+ncbi$details <- do.call(rbind, lapply(ncbi[1:6], function(x) x$details))
+nrow(ncbi$details)
+fltr <- "COX?[I1]\\)?[[:alnum:] \\(\\);]*,?[[:alnum:] \\(\\);]*, complete|complete genome|complete sequence"
+ncbi$complete$details <- ncbi$details[grep(fltr, ncbi$details$description, ignore.case = T),]
+nrow(ncbi$complete$details)
+```
+## Getting the "complete" sequences fasta files
+This will download the CDS fasta files from NCBI. If a record has more than one CDS, it returns all of them so we will have to filter for the gene again.
+The outDir can be changed to the desired folder.
+```{r}
+ncbi$complete$files <- get_ncbiFasta(ncbi$complete$details$accession, outDir = "./eFetch_completeCDS/")
+```
+
+## Filtering the "complete" sequences fasta files
+### Read the fasta file and make a data.frame out of it.
+```{r}
+ncbi$complete$fasta <- ShortRead::readFasta(ncbi$complete$files)
+ncbi$complete$id <- as.vector(ShortRead::id(ncbi$complete$fasta))
+# reformat the string to be able to parse with jsonlite
+ncbi$complete$df <- jsonlite::fromJSON(paste0('[{"', paste(paste0('accession":"', gsub("_cds_[[:alnum:]_\\.]*", "", gsub(" ([[:alnum:]_]*)=", '","\\1":"', gsub("^.*\\||\\[|\\]", "",  ncbi$complete$id)))), collapse='"},{"'),'"}]'))
+# add sequences to the df
+ncbi$complete$df$seq <- as.vector(ShortRead::sread(ncbi$complete$fasta))
+# to save memory, ncbi$complete$fasta can be removed since it might be an heavy object
+# ncbi$complete$fasta <- NULL
+nrow(ncbi$complete$df)
+```
+There more rows than accession because it fetch all cds and not just the COI cds.
+
+### Take only the sequences for the COI genes
+Since records are all filled differently, some may have the gene field or the protein field empty but not the other.
+So we look in both fo the desired gene/protein.
+```{r}
+ncbi$complete$COI <- ncbi$complete$df[unique(grep("COX?[I1]$", ncbi$complete$df$gene, ignore.case = T), grep("cytochrome c? ?oxidase (subunit )?[I1]$", ncbi$complete$df$protein, ignore.case = T)),]
+nrow(ncbi$complete$COI)
+```
+
+### Making sure sequences are actually complete
+Some sequences will have the information in the column 'partial' but not all of them.
+The start and end codons might vary depending on the taxa. See : https://www.ncbi.nlm.nih.gov/Taxonomy/Utils/wprintgc.cgi
+This example uses transl_table5.
+```{r}
+start_codons <- c("TTG","ATT","ATC","ATA","ATG","GTG")
+end_codons <- c("TAA", "TAG")
+has.start <- grep(paste0("^", paste(start_codons, collapse = "|^")), ncbi$complete$COI$seq, ignore.case = T)
+has.end <- grep(paste0(paste(end_codons, collapse = "$|"), "$"), ncbi$complete$COI$seq, ignore.case = T)
+ncbi$complete$COI <- ncbi$complete$COI[intersect(has.start, has.end),]
+nrow(ncbi$complete$COI)
+```
+
+Some accession numbers might be duplicated. Usually because the gene is present twice in the genome. Records should be checked manually.
+In this case, since sequences were the same for each pair, deleted the duplicates.
+```{r}
+sum(duplicated(ncbi$complete$COI$accession))
+ncbi$complete$COI[ncbi$complete$COI$accession %in% ncbi$complete$COI$accession[duplicated(ncbi$complete$COI$accession)],]
+ncbi$complete$COI <- ncbi$complete$COI[!duplicated(ncbi$complete$COI$accession), ]
+nrow(ncbi$complete$COI)
+```
+Then there will be duplicated sequences with the same taxId which should be removed.
+
+```{r}
+ncbi$complete$COI$taxId <- ncbi$complete$details[ncbi$complete$details$accession %in% ncbi$complete$COI$accession,]$taxid
+#find the row names of the duplicated sequences for each taxId.
+dups <- lapply(unique(ncbi$complete$COI$taxId), function(id) rownames(ncbi$complete$COI[ncbi$complete$COI$taxId == id,])[duplicated(ncbi$complete$COI[ncbi$complete$COI$taxId == id,]$seq)])
+length(dups)
+#keep only the rows not in that list of duplicated sequences.
+ncbi$complete$COI <- ncbi$complete$COI[!rownames(ncbi$complete$COI) %in% unlist(dups),]
+nrow(ncbi$complete$COI)
+```
+
+## Getting the taxonomy for the remaining sequences
+### Making the taxonomy sql table
+The function will download a taxdump.tar.gz file from NCBI servers and extract the names.dmp and nodes.dmp files from it.
+Then thes files will be merged into one tax.dmp file keeping only the columns required (id, name, rank and parentId)
+For names.dmp, also only keeps the rows containing the scientific names so there's only one name per id.
+It will then use that file to create a SQLite database containing a taxonomy table from which we can get taxonomic information from taxIds with the get_taxonomy() function.
+get_taxonomy gets the the parentId of all parents of each taxIds and returns the names corresponding to the ranks desired a data frame with the taxids as row names and ranks as columns.
+```{r}
+db_path <- mk_taxonomy.table(dbFile = paste0('./ncbi-db_', Sys.Date()))
+ncbi$complete$tax <- get_taxonomy(ncbi$complete$COI$taxId, sqlFile = db_path, ranks = c("kingdom","phylum","class","order","family","genus","species"))
+#to see what taxa the db covers :
+apply(ncbi$complete$tax[4:7], 2, table)
+```
+
+## Writing the dada2 formated fasta file
+```{r}
+ncbi$complete$tax$id <- paste0(apply(ncbi$complete$tax[1:7], 1, paste0, collapse = ";"), ";")
+write.fasta(sequences = ncbi$complete$COI$seq, ids = ncbi$complete$tax$id, outFile = "ncbiCompleteCOI_ncbi.fasta")
+```
+
+## Testing the database
+```{r}
+ncbi$seqtab <- as.matrix(read.csv("./data/seqtab.nochim_ncbi.csv", row.names = 1))
+ncbi$taxa <- dada2::assignTaxonomy(ena$seqtab, "./ncbiCompleteCOI_ncbi.fasta", tryRC = T)
+ncbi$taxa.p = mk_printDF(ncbi$taxa, na2char = F)
+# To see how many sequences are assigned per ranks
+colSums(!is.na(ncbi$taxa.p))
+```
+
+# ENA database
+Functions specific to this db are here : https://github.com/salix-d/customSeqDB/blob/master/R/makingDB_enaFuns.R
+## Getting the taxIds
+The ENA API lets you find all records which have sequences for a taxonomic tree. So with a parent taxon you can find all children taxon which have sequences. But to do so, you can't use their name, you have to use their taxonomic id. 
+See : https://ena-docs.readthedocs.io/en/latest/retrieval/programmatic-access/taxon-based-search.html
+```{r}
+ena <- list(ids = get_enaTaxIds(names = c("Opilioacarida", "Holothyrida", "Ixodida", "Mesostigmata", "Trombidiformes", "Sarcoptiformes")))
+ena$ids
+```
+Ignore the 'incomplete final line found', it doesn't affect anything.
+
+Then we can get the details (Accession numbers and description) of the records matching the taxIds and a specified gene to pre-filter for which records have complete sequences. This may take a while.
+
+<i>The connection often times out the more criteria you add. So I modified the function to directly download the file instead of just reading it with jsonlite.
+And since it doesn't look for the genes in the records but only in the description, there will be record missing if only looking for the gene name because sometimes it's not abbreviated AND because it will miss the "whole genome" and "mitochondrial DNA, complete sequence" type of records.
+But, because this returns only accession and description pretty fast, all records associated with the taxa which have "complete" in the description can be downloaded and then sorted for the gene.</i>
+```{r}
+ena$details <- get_enaDetails(ena$ids$taxId, description = "complete")
+nrow(ena$details)
+```
+
+```{r}
+head(ena$details)
+```
+
+Now we have to filter for the records with our gene. ENA has COI written as COI, COX1 and CO1. We also want to keep the complete genome and  mitochondrial DNA.
+"[ [:punct:]]" means it must be preceded/followed by a space or a punctuation sign. This is to avoid to have records where COI is found in a string of uppercase letter (as in some voucher/code like BXMSCOIDJF) and the sequences for the COII and COIII genes.
+See https://rstudio.com/wp-content/uploads/2016/09/RegExCheatsheet.pdf for more details on r regexp.
+```{r}
+fltr <- "[ [:punct:]]COX?[I1][ [:punct:]][[:alnum:] \\(\\);]+,?[[:alnum:] \\(\\)]*,? complete|complete genome|DNA, complete"
+ena$complete$details <- ena$details[grep(fltr, ena$details$description, ignore.case = T),]
+nrow(ena$complete$details)
+```
+There might still be false positives, but they will be filtered out with the next step.
+
+Since the ENA api doesn't returns just CDS, the records will be downloaded in insdxml format (a format also available from ncbi) and then parsed them to get the accession number, the taxid and the COI gene sequence. To get the sequence it finds the gene field which has the name COI and then gets the location information to get the range of the gene which is used to substring the string in the sequence field.
+Since CDS have reading frames, the argument start_codon must be set to TRUE so it can adjust the start of gene range according to the reading frame.
+The INSDxml files can optionnaly be downloaded instead of read : add agruments saveXml = T. It will download as './ena_downloads/xml/[Sys.Date]_records_[###].xml. To specify path use arguement outXml.
+The resulting sequence can optionnaly be saved as fasta file (the ids will be the info merge in a json string to convert back to data.frame easily) : add agruments saveFasta = T. It will download as './ena_downloads/fasta/[Sys.Date]_sequences_[###].xml. To specify path use arguement outFasta.
+```{r}
+ena$complete$seq <- get_enaFasta(accList = ena$complete$details$accession, gene = "COX?[I1][[:space:]]", codon_start = T, saveXML = T)
+#getting an error because some accession are available in that format.
+# fix : 
+```
+
+```{bash}
+sed '/<INSDSeq_sequence>    <\/INSDSeq>/d' ../ena_downloads/xml/2020-10-02_records_001.xml > ../ena_downloads/xml/2020-10-02_records_002.xml
+```
+
+```{r}
+ena$complete$seq <- parse_INSDxml(URL = "./ena_downloads/xml/2020-10-02_records_002.xml", gene = "COX?[I1]<|cytochrome c? ?oxidase (subunit)? ?[I1]<", codon_start = T)
+```
+LN874269 and LN874270 are mitochondrial complete genome. TaxId : 52283
+
+```{r}
+sum(ena$complete$seq$taxId %in% "52283")
+```
+We have 13 other sequence for this taxId.
+
+Let's check which accession weren't available in that format :
+
+```{r}
+embl_acc <- ena$complete$details$accession[! ena$complete$details$accession %in% c(gsub("\\.[0-9]*$", "", ena$complete$seq$accession), "LN874269", "LN874270")]
+embl_acc
+```
+We can parse the rest with the EMBL format. This format is less consistent between records which is why I rather use INSDxml when possible.
+```{r}
+# Making URL manually
+URL <- paste0("http://www.ebi.ac.uk/Tools/dbfetch/dbfetch?db=ena_sequence;id=", paste(embl_acc, collapse = ","),";format=emblxml-1.2")
+#parsing it
+# embl is a bit different so there are space between text and next '<'
+ena$complete$seq <- rbind(ena$complete$seq, parse_EMBLxml(URL, gene = "COX?[I1][[:space:]]|cytochrome c? ?oxidase (subunit)? ?[I1][[:space:]]", codon_start = T))
+nrow(ena$complete$seq)
+```
+hmmm... Apparently we can't even... 
+```{r}
+noXml_acc <- ena$complete$details$accession[! ena$complete$details$accession %in% c(gsub("\\.[0-9]*$", "", ena$complete$seq$accession), "LN874269", "LN874270")]
+```
+These just don't have any xml forma available. Guess we'll have to parse the flat files...
+If it's not slower, we could have parse them all this way. To test out.
+Flat file are also different, so the limiter to not get COII/COIII is "
+```{r}
+URL <- paste0("http://www.ebi.ac.uk/Tools/dbfetch/dbfetch?db=ena_sequence&id=", paste(noXml_acc, collapse = ","),"&format=embl&style=raw")
+ena$complete$seq <- rbind(ena$complete$seq, parse_flatFile(URL, gene = "COX?[I1]\"|cytochrome c? ?oxidase (subunit)? ?[I1]\"", codon_start = T)) 
+nrow(ena$complete$seq)
+```
+WOO! now only the 2 records with no COI region ar missing
+```{r}
+
+```
+### Making sure sequences are actually complete
+The start and end codons might vary depending on the taxa. See : https://www.ncbi.nlm.nih.gov/Taxonomy/Utils/wprintgc.cgi
+This example uses transl_table5.
+```{r}
+start_codons <- c("TTG","ATT","ATC","ATA","ATG","GTG")
+end_codons <- c("TAA", "TAG")
+has.start <- grep(paste0("^", paste(start_codons, collapse = "|^")), ena$complete$seq$sequence, ignore.case = T)
+has.end <- grep(paste0(paste(end_codons, collapse = "$|"), "$"), ena$complete$seq$sequence, ignore.case = T)
+ena$complete$COI <- ena$complete$seq[intersect(has.start, has.end),]
+nrow(ena$complete$COI)
+```
+There will be duplicated sequences with the same taxId which should be removed.
+
+```{r}
+#find the row names of the duplicated sequences for each taxId.
+dups <- lapply(unique(ena$complete$COI$taxId), function(id) rownames(ena$complete$COI[ena$complete$COI$taxId == id,])[duplicated(ena$complete$COI[ena$complete$COI$taxId == id,]$sequence)])
+#keep only the rows not in that list of duplicated sequences.
+ena$complete$COI <- ena$complete$COI[!rownames(ena$complete$COI) %in% unlist(dups),]
+nrow(ena$complete$COI)
+```
+
+## Getting the taxonomy for the remaining sequences
+
+```{r}
+db_path <- "../../MitesDB/ncbi-db_2020-09-29.sqlite"
+dir(dirname(db_path))
+ena$complete$tax <- get_taxonomy(as.numeric(ena$complete$COI$taxId), sqlFile = db_path, ranks = c("kingdom","phylum","class","order","family","genus","species"))
+#to see what taxa the db covers :
+apply(ena$complete$tax[4:7], 2, table)
+```
+
+## Writing the dada2 formated fasta file
+```{r}
+ena$complete$tax$id <- paste0(apply(ena$complete$tax[1:7], 1, paste0, collapse = ";"), ";")
+write.fasta(sequences = ena$complete$COI$seq, ids = ena$complete$tax$id, outFile = "enaCompleteCOI_ena.fasta")
+```
+
+## Testing the database
+```{r}
+ena$seqtab <- as.matrix(read.csv("../../MitesDB/data/seqtab.nochim_MITES.csv", row.names = 1))
+ena$taxa <- dada2::assignTaxonomy(ena$seqtab, "./enaCompleteCOI_ena.fasta", tryRC = T)
+ena$taxa.p = mk_printDF(ena$taxa, na2char = F)
+# To see how many sequences are assigned per ranks
+colSums(!is.na(ena$taxa.p))
+```
+## MERGING the dbs
+```{r}
+same_acc <- intersect(ncbi$complete$COI$accession, ena$complete$COI$accession)
+length(same_acc)
+
+ncbi_ena <- ncbi$complete$COI[c("accession", "taxId", "seq")]
+colnames(ncbi_ena)[3] <- "sequence"
+ncbi_ena <- rbind(ncbi_ena, ena$complete$COI[!ena$complete$COI$accession %in% same_acc,c("accession", "taxId", "sequence")])
+nrow(ncbi_ena)
+ncbi_ena_dups <- lapply(unique(ncbi_ena$taxId), function(id) rownames(ncbi_ena[ncbi_ena$taxId == id,])[duplicated(ncbi_ena[ncbi_ena$taxId == id, "sequence"])])
+nrow(ncbi_ena) - length(unlist(ncbi_ena_dups))
+length(unlist(ncbi_ena_dups))
+ncbi_ena <- ncbi_ena[! rownames(ncbi_ena) %in% unlist(ncbi_ena_dups),]
+nrow(ncbi_ena)
+
+sum(ena$complete$COI$accession %in% ncbi_ena$accession) - sum(ena$complete$COI$accession %in% same_acc)
+sum(ncbi$complete$COI$accession %in% ncbi_ena$accession) - sum(ncbi$complete$COI$accession %in% same_acc)
+```
+
+## Getting the taxonomy for the remaining sequences
+
+```{r}
+db_path <- "../../MitesDB/ncbi-db_2020-09-29.sqlite"
+ncbi_ena.tax <- get_taxonomy(as.numeric(ncbi_ena$taxId), sqlFile = db_path, ranks = c("kingdom","phylum","class","order","family","genus","species"))
+#to see what taxa the db covers :
+apply(ncbi_ena.tax[4:5], 2, table)
+```
+
+## Writing the dada2 formated fasta file
+```{r}
+ncbi_ena.tax$id <- paste0(apply(ncbi_ena.tax[1:7], 1, paste0, collapse = ";"), ";")
+write.fasta(sequences = ncbi_ena$sequence, ids = ncbi_ena.tax$id, outFile = "completeCOI_ncbi_ena.fasta")
+```
+
+## Testing the database
+```{r}
+ena$seqtab <- as.matrix(read.csv("../../MitesDB/data/seqtab.nochim_MITES.csv", row.names = 1))
+ncbi_ena.taxa <- dada2::assignTaxonomy(ena$seqtab, "./completeCOI_ncbi_ena.fasta", tryRC = T)
+ncbi_ena.taxa.p = mk_printDF(ncbi_ena.taxa, na2char = F)
+# To see how many sequences are assigned per ranks
+colSums(!is.na(ncbi_ena.taxa.p))
+```
