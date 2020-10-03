@@ -22,7 +22,7 @@ The goal of customSeqDB is to help make custom sequences databases from open sou
 
 ## Installation
 
-And the development version from [GitHub](https://github.com/) with:
+The development version can be installed from [GitHub](https://github.com/) with:
 
 ``` r
 # install.packages("devtools")

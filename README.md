@@ -15,7 +15,8 @@ taxonomic information for the records used to make the custom database.
 
 ## Installation
 
-And the development version from [GitHub](https://github.com/) with:
+The development version can be installed from
+[GitHub](https://github.com/) with:
 
 ``` r
 # install.packages("devtools")
