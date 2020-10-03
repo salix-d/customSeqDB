@@ -141,7 +141,7 @@ apply(ncbi$complete$tax[4:7], 2, table)
 ## Writing the dada2 formated fasta file
 ```{r}
 ncbi$complete$tax$id <- paste0(apply(ncbi$complete$tax[1:7], 1, paste0, collapse = ";"), ";")
-write.fasta(sequences = ncbi$complete$COI$seq, ids = ncbi$complete$tax$id, outFile = "ncbiCompleteCOI_ncbi.fasta")
+write_fasta(sequences = ncbi$complete$COI$seq, ids = ncbi$complete$tax$id, outFile = "ncbiCompleteCOI_ncbi.fasta")
 ```
 
 ## Testing the database
@@ -277,7 +277,7 @@ apply(ena$complete$tax[4:7], 2, table)
 ## Writing the dada2 formated fasta file
 ```{r}
 ena$complete$tax$id <- paste0(apply(ena$complete$tax[1:7], 1, paste0, collapse = ";"), ";")
-write.fasta(sequences = ena$complete$COI$seq, ids = ena$complete$tax$id, outFile = "enaCompleteCOI_ena.fasta")
+write_fasta(sequences = ena$complete$COI$seq, ids = ena$complete$tax$id, outFile = "enaCompleteCOI_ena.fasta")
 ```
 
 ## Testing the database
@@ -319,7 +319,7 @@ apply(ncbi_ena.tax[4:5], 2, table)
 ## Writing the dada2 formated fasta file
 ```{r}
 ncbi_ena.tax$id <- paste0(apply(ncbi_ena.tax[1:7], 1, paste0, collapse = ";"), ";")
-write.fasta(sequences = ncbi_ena$sequence, ids = ncbi_ena.tax$id, outFile = "completeCOI_ncbi_ena.fasta")
+write_fasta(sequences = ncbi_ena$sequence, ids = ncbi_ena.tax$id, outFile = "completeCOI_ncbi_ena.fasta")
 ```
 
 ## Testing the database

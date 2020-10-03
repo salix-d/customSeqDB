@@ -14,7 +14,7 @@
 #' @param open      character string. A description of how to open the connection. Default is "w" for write, could be set to a to append the sequences.
 #' @return returns a string with the path to the fasta file.
 #' @export
-write.fasta <- function(sequences,
+write_fasta <- function(sequences,
                         ids = NULL,
                         outDir = ".",
                         outFile = paste0("sequences", Sys.Date(), ".fasta"),
@@ -79,7 +79,7 @@ write_parsed2csv <- function(parsedInfo, outFile){
 #' Download the fetched records instead of reading them directly
 #'
 #' @description
-#' `saveRecords` downloads a file from a URL and returns a character string of its path.
+#' `save_records` downloads a file from a URL and returns a character string of its path.
 #'
 #' @details
 #' Downloads a file from a URL and returns a character string of its path.
@@ -89,7 +89,7 @@ write_parsed2csv <- function(parsedInfo, outFile){
 #' @param parsedInfo  data.frame. The data.frame returned from \code{\link{parse_EMBLxml}}, \code{\link{parse_flatFile}} or \code{\link{parse_INSDxml}}.
 #' @param outFile     character string. The path to the csv file to be written. Optional. If missing, the file will be saved to './db_downloads/records/records_[Sys.Date()]_[###].csv'
 #' @export
-saveRecords <- function(URL, outFile, ext = c("xml", "txt")){
+save_records <- function(URL, outFile, ext = c("xml", "txt")){
   if(missing(outFile)){
     mainDir <- "./db_downloads"
     subDir <- "records"

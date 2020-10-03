@@ -100,7 +100,7 @@ get_enaFasta <- function(accList, db="ena_sequence", format = c('embl', 'emblxml
     style  = "raw"
   )
   URL <- paste0(baseURL, paste(names(params), "=", params), collapse = "&")
-  if(saveRec) URL <- saveRecords(URL, outFile = outRec, ext = iselse(format=="embl", "txt", "xml"))
+  if(saveRec) URL <- save_records(URL, outFile = outRec, ext = iselse(format=="embl", "txt", "xml"))
 
   if(format == "emblxml-1.1") format <- "emblxml"
   parseFuns <- list(
