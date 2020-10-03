@@ -27,14 +27,18 @@ devtools::install_github("salix-d/customSeqDB")
 ```
 
 # NCBI database
-Functions specific to this db are here : https://github.com/salix-d/customSeqDB/blob/master/R/makingDB_ncbiFuns.R
-## Getting the sequences details
-This gets the ESummary of all records in the NCBI nucleotide database matching these taxa and gene which don't have 'UNVERIFIED' in the keyword fields.
-It then parse the data and returns a list with history server info in case we want to look at the records again and a list of details including the accession numbers, the taxonomic ids and the description. The ESearch can return up to 100k results. This part may take a while.
+Functions specific to this db are here : https://github.com/salix-d/customSeqDB/blob/master/R/ncbi-db.R
+### Getting the sequences details from NCBI
+This gets the ESummary of all records in the NCBI nucleotide database matching these taxa and gene which have the word 'complete' in the 'title' fields but don't have 'UNVERIFIED' in the 'keyword' fields. The query isn't case sensitive. For the usable fields and their name see : https://www.ncbi.nlm.nih.gov/books/NBK49540/
 
-ncbi includes 6 orders and the COI gene can be written 4 ways.
+It then parse the data and returns a list with history server information in case we want to look at the records again and a list of details including the accession numbers, the taxonomic ids and the description. The ESearch can return up to 100k results. This part may take a while.
+
 ```{r}
-ncbi <- get_ncbiDetails(c("Opilioacarida", "Holothyrida", "Ixodida", "Mesostigmata", "Trombidiformes", "Sarcoptiformes"), c("COI", "CO1", "COXI", "COX1"), customTerm = "NOT UNVERIFIED[KYWD]")
+library(customSeqDB)
+taxa <- c("Trombidiformes", "Holothyrida")
+gene <- c("COI", "CO1", "COXI", "COX1") # ncbi includes 6 orders and the COI gene can be written 4 ways
+ncbi <- get_ncbiDetails(taxa = taxa, gene = gene, customTerm = "AND complete [TITL] NOT unverfified[KYWD]")
+head(ncbi$details)
 ```
 If you want to separate your queries by taxon to see how many you get from each, you can also use get_ncbiAcc the same way and then use the history server information that it returns to store the next queries in the same WebEnv and then use those to get the details.
 ```{r}
@@ -154,7 +158,7 @@ colSums(!is.na(ncbi$taxa.p))
 ```
 
 # ENA database
-Functions specific to this db are here : https://github.com/salix-d/customSeqDB/blob/master/R/makingDB_enaFuns.R
+Functions specific to this db are here : https://github.com/salix-d/customSeqDB/blob/master/R/ena-db.R
 ## Getting the taxIds
 The ENA API lets you find all records which have sequences for a taxonomic tree. So with a parent taxon you can find all children taxon which have sequences. But to do so, you can't use their name, you have to use their taxonomic id. 
 See : https://ena-docs.readthedocs.io/en/latest/retrieval/programmatic-access/taxon-based-search.html
