@@ -48,9 +48,9 @@ get_ncbiAcc <- function(taxa,
   URL <- paste0(baseURL, paste(paste0(names(params), "=", params), collapse = "&"))
   message("\n    searching for records matching :", term)
 
-  #' parsing the data for the idList (accessions) -------------------------------------------------------------------
+  #' parsing the data for the accList (accessions) -------------------------------------------------------------------
   dat <- jsonlite::fromJSON(URL)
-  out <- list(accession  = dat$esearchresult$idlist,
+  out <- list(accession  = dat$esearchresult$accList,
               WebEnv = dat$esearchresult$webenv,
               Query_key = dat$esearchresult$querykey)
 
@@ -161,11 +161,11 @@ get_ncbiDetails <-function(taxa,
 #' `get_ncbiFasta` returns a vector of the paths to the downloaded fasta files.
 #'
 #' @details
-#' Download EFetched fasta files of the records matching the idList argument and returns a vector of their paths.
+#' Download EFetched fasta files of the records matching the accList argument and returns a vector of their paths.
 #' History server information could also be use, but has not been implemented yet.
 #'
 #' @note This can only get full sequences or CDS region.
-#' @param idList     list of taxa to search for; Optional if using the arguments WebEnv, Query_key and nIDs.
+#' @param accList     list of taxa to search for; Optional if using the arguments WebEnv, Query_key and nIDs.
 #' @param outDir     list of the genes/variations of a gene names; Optional if using the arguments WebEnv, Query_key and nIDs.
 #' @param db         ncbi db to search. Default is 'nucleotide'.
 #' @param rettype    return type of the results; Default is 'fasta_cds_na' which gets only the CDS. Could be set to fasta to get whole sequences. Note: to get only the gene region, the whole gb file should be fetched and parsed similarly to how it's done for the ENA db;
@@ -175,7 +175,7 @@ get_ncbiDetails <-function(taxa,
 #' @export
 #' @seealso \code{\link{get_ncbiDetails}}
 #' @references \url{https://www.ncbi.nlm.nih.gov/books/NBK25499/#_chapter4_EFetch_}
-get_ncbiFasta <- function(idList,
+get_ncbiFasta <- function(accList,
                          outDir=".",
                          db="nucleotide",
                          rettype = "fasta_cds_na",
@@ -183,7 +183,7 @@ get_ncbiFasta <- function(idList,
                          Query_key = NULL){
 
   #' makes the ranges of sequences to download (200 at a time) -------------------------------------------------------------
-  len <- length(idList)
+  len <- length(accList)
   n <- floor(len/200)
   r = list(start = 0:n * 200 + 1, end = c(1:n * 200, len))
   ranges <- lapply(seq_len(n+1), function(i) c(r$start[i]:r$end[i]))
@@ -194,7 +194,7 @@ get_ncbiFasta <- function(idList,
   outFiles<-file.path(outDir, paste0(fileNames, ".fasta"))
 
   #' make a list of URL to EFetch the fasta files --------------------------------------------------------------------------
-  URLs <- sapply(ranges, function(r) paste0("https://eutils.ncbi.nlm.nih.gov/entrez/eutils/efetch.fcgi?db=", db,"&id=", paste(idList[r], collapse = ","), "&rettype=", rettype, "&retmode=text"))
+  URLs <- sapply(ranges, function(r) paste0("https://eutils.ncbi.nlm.nih.gov/entrez/eutils/efetch.fcgi?db=", db,"&id=", paste(accList[r], collapse = ","), "&rettype=", rettype, "&retmode=text"))
 
   #' downloads the EFetched fasta files ------------------------------------------------------------------------------------
   mapply(utils::download.file, URLs, outFiles)
@@ -207,32 +207,50 @@ get_ncbiFasta <- function(idList,
 #' `fetch_ncbiSeq` returns a data.frame with the accession number, the taxid and the region of the sequence for the specified gene (as columns) for the provided accession numbers (as rows).
 #'
 #' @details
-#' Uses DBFetch to fetch the records for all provided accession numbers in insdxml format and parse them to return the accession number, the taxid and the region of the sequence for the specified gene.
+#' Uses EFetch to fetch the records for all provided accession numbers in specified format and parse them to return the accession number, the taxid and the region of the sequence for the specified gene(s).
 #'
 #' @param accList     character string, integer or vector of character string or integer. The accession numbers used to fetch the records.
 #' @param gene        character string or vector of character string. The gene for which to find the sequence region.
 #' @param codon_start logical. Must be set to T if the gene has reading frames so it can adjust the region start accordingly. Default is false.
 #' @param full_seq    logical. Whether to fetch the full sequence or only the gene region. Default is FALSE, gets the gene region.
-#' @param format      character string. The format of the fetched file. Supported choice for parsing : 'gb'(flat file) or 'gbc' (INSDSeq XML).
+#' @param rettype     character string. The format of the fetched file. Supported choice for parsing : 'gb'(flat file) or 'gbc' (INSDSeq XML).
 #' @family ncbi-db
 #' @export
 #' @references \url{https://www.ncbi.nlm.nih.gov/books/NBK25499/#_chapter4_EFetch_}, \url{https://www.ncbi.nlm.nih.gov/books/NBK25499/table/chapter4.T._valid_values_of__retmode_and/?report=objectonly}
-fetch_ncbiSeq <- function(accList, db="nucleotide", rettype = c('gb', 'gbc'), saveRec = F, outRec = NULL, saveParsedRec = F, outParsedRec = NULL){
+fetch_ncbiSeq <- function(accList, gene = gene, codon_start = codon_start, full_seq = F, db="nucleotide", rettype = c('gb', 'gbc'), saveRec = F, outRec = NULL, saveParsedRec = F, outParsedRec = NULL){
+  if(missing(rettype)) rettype <- "gb"
+  retmode = ifelse(rettype=="gb", "txt", "xml")
+
+  # Separating the accLi in groups of 200 so the URLs can be opened.
+  len <- length(accList)
+  if(len > 200){
+    n <- floor(len/200)
+    r = list(start = 0:n * 200 + 1, end = c(1:n * 200, len))
+    ranges <- lapply(seq_along(r$start), function(i) c(r$start[i]:r$end[i]))
+  } else {
+    ranges <- list(1:len)
+  }
+
+  # make a list of URL to EFetch the fasta files
   baseURL <- "https://eutils.ncbi.nlm.nih.gov/entrez/eutils/efetch.fcgi?"
-  if(missing(format)) format <- "embl"
-  params <- list(
-    db      = db,
-    id      = paste(accList, collapse = ","),
-    rettype = rettype,
-    retmode = if(format == 'gb') 'text' else 'xml'
-  )
-  URL <- paste0(baseURL, paste(names(params), "=", params), collapse = "&")
-  if(saveRec) URL <- save_records(URL, outFile = outRec, ext = iselse(format=="gb", "txt", "xml"))
+  URLs <- sapply(ranges, function(r){
+    params <- list(
+      db      = db,
+      id      = paste(accList[r], collapse = ","),
+      rettype = rettype,
+      retmode = retmode
+    )
+    return(paste0(baseURL, paste(paste0(names(params), "=", params), collapse = "&")))
+    })
+
+  if(saveRec){
+    print(T)
+    URLs <- sapply(URLs, save_records, outFile = outRec, ext = retmode)}
 
   parseFuns <- list(
     gb  = parse_flatFile,
     gbc = parse_INSDxml
   )
-  out <- parseFuns[[format]](URL = URL, gene = gene, codon_start = codon_start, full_seq = full_seq, save2csv = saveParsedRec, outFile = outParsedRec)
+  out <- do.call(rbind, lapply(URLs, function(URL) parseFuns[[rettype]](URL = URL, gene = gene, codon_start = codon_start, full_seq = full_seq, save2csv = saveParsedRec, outCsv = outParsedRec)))
   return(out)
 }

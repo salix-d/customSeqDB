@@ -80,7 +80,7 @@ get_enaDetails <- function(taxIds,
 #' `fetch_enaSeq` returns a data.frame with the accession number, the taxid and the region of the sequence for the specified gene (as columns) for the provided accession numbers (as rows).
 #'
 #' @details
-#' Uses DBFetch to fetch the records for all provided accession numbers in insdxml format and parse them to return the accession number, the taxid and the region of the sequence for the specified gene.
+#' Uses DBFetch to fetch the records for all provided accession numbers in specified format and parse them to return the accession number, the taxid and the region of the sequence for the specified gene(s).
 #'
 #' @param accList     character string, integer or vector of character string or integer. The accession numbers used to fetch the records.
 #' @param gene        character string or vector of character string. The gene for which to find the sequence region.
@@ -90,7 +90,7 @@ get_enaDetails <- function(taxIds,
 #' @family ena-db
 #' @export
 #' @references \url{http://www.ebi.ac.uk/Tools/dbfetch/dbfetch/dbfetch.databases#ena_sequence}, \url{http://www.ebi.ac.uk/Tools/dbfetch/dbfetch/dbfetch}
-fetch_enaSeq <- function(accList, db="ena_sequence", format = c('embl', 'emblxml-1.1', 'insdxml'), saveRec = F, outRec = NULL, saveParsedRec = F, outParsedRec = NULL){
+fetch_enaSeq <- function(accList, gene = gene, codon_start = codon_start, full_seq = F, db="ena_sequence", format = c('embl', 'emblxml-1.1', 'insdxml'), saveRec = F, outRec = NULL, saveParsedRec = F, outParsedRec = NULL){
   baseURL <- "http://www.ebi.ac.uk/Tools/dbfetch/dbfetch?"
   if(missing(format)) format <- "embl"
   params <- list(
@@ -99,8 +99,8 @@ fetch_enaSeq <- function(accList, db="ena_sequence", format = c('embl', 'emblxml
     format = format,
     style  = "raw"
   )
-  URL <- paste0(baseURL, paste(names(params), "=", params), collapse = "&")
-  if(saveRec) URL <- save_records(URL, outFile = outRec, ext = iselse(format=="embl", "txt", "xml"))
+  URL <- paste0(baseURL, paste(paste0(names(params), "=", params), collapse = "&"))
+  if(saveRec) URL <- save_records(URL, outFile = outRec, ext = ifelse(format=="embl", "txt", "xml"))
 
   if(format == "emblxml-1.1") format <- "emblxml"
   parseFuns <- list(
@@ -108,6 +108,6 @@ fetch_enaSeq <- function(accList, db="ena_sequence", format = c('embl', 'emblxml
     indsxml = parse_INSDxml,
     emblxml = parse_EMBLxml
   )
-  out <- parseFuns[[format]](URL = URL, gene = gene, codon_start = codon_start, full_seq = full_seq, save2csv = saveParsedRec, outFile = outParsedRec)
+  out <- parseFuns[[format]](URL = URL, gene = gene, codon_start = codon_start, full_seq = full_seq, save2csv = saveParsedRec, outCsv = outParsedRec)
   return(out)
 }
