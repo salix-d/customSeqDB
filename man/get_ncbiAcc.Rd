@@ -41,13 +41,14 @@ The ESearch can return up to 100k results. (Will update function to deal with bi
 \url{https://www.ncbi.nlm.nih.gov/books/NBK25499/}, \url{https://www.ncbi.nlm.nih.gov/books/NBK49540/#_chapter4_ESearch_}
 arguments check ------------------------------------------------------------------------------------------------
 making the eSearch URL : ---------------------------------------------------------------------------------------
-parsing the data for the idList (accessions) -------------------------------------------------------------------
+parsing the data for the accList (accessions) -------------------------------------------------------------------
 printing number of results -------------------------------------------------------------------------------------
 }
 \seealso{
 \code{\link{get_ncbiDetails}}
 
 Other ncbi-db: 
+\code{\link{fetch_ncbiSeq}()},
 \code{\link{get_ncbiDetails}()},
 \code{\link{get_ncbiFasta}()}
 }

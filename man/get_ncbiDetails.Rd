@@ -53,6 +53,7 @@ Could be tested with more than 5000.
 \code{\link{get_ncbiAcc}}
 
 Other ncbi-db: 
+\code{\link{fetch_ncbiSeq}()},
 \code{\link{get_ncbiAcc}()},
 \code{\link{get_ncbiFasta}()}
 }

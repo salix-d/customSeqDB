@@ -40,7 +40,7 @@ Uses the ENA Portal API to look up the records from each taxIds taxonomic tree t
 }
 \seealso{
 Other ena-db: 
-\code{\link{get_enaFasta}()},
+\code{\link{fetch_enaSeq}()},
 \code{\link{get_enaTaxIds}()}
 }
 \concept{ena-db}

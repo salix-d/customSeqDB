@@ -5,7 +5,7 @@
 \title{Get the fasta files from a list of ids with EFetch -------------------------------------------------------------------}
 \usage{
 get_ncbiFasta(
-  idList,
+  accList,
   outDir = ".",
   db = "nucleotide",
   rettype = "fasta_cds_na",
@@ -14,7 +14,7 @@ get_ncbiFasta(
 )
 }
 \arguments{
-\item{idList}{list of taxa to search for; Optional if using the arguments WebEnv, Query_key and nIDs.}
+\item{accList}{list of taxa to search for; Optional if using the arguments WebEnv, Query_key and nIDs.}
 
 \item{outDir}{list of the genes/variations of a gene names; Optional if using the arguments WebEnv, Query_key and nIDs.}
 
@@ -30,7 +30,7 @@ get_ncbiFasta(
 `get_ncbiFasta` returns a vector of the paths to the downloaded fasta files.
 }
 \details{
-Download EFetched fasta files of the records matching the idList argument and returns a vector of their paths.
+Download EFetched fasta files of the records matching the accList argument and returns a vector of their paths.
 History server information could also be use, but has not been implemented yet.
 }
 \note{
@@ -47,6 +47,7 @@ downloads the EFetched fasta files ---------------------------------------------
 \code{\link{get_ncbiDetails}}
 
 Other ncbi-db: 
+\code{\link{fetch_ncbiSeq}()},
 \code{\link{get_ncbiAcc}()},
 \code{\link{get_ncbiDetails}()}
 }

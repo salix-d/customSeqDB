@@ -24,7 +24,7 @@ Uses the ENA API to search the taxonomy database with taxon names and parse the 
 \code{\link{https://ena-docs.readthedocs.io/en/latest/retrieval/programmatic-access/taxon-based-search.html}}
 
 Other ena-db: 
-\code{\link{get_enaDetails}()},
-\code{\link{get_enaFasta}()}
+\code{\link{fetch_enaSeq}()},
+\code{\link{get_enaDetails}()}
 }
 \concept{ena-db}
