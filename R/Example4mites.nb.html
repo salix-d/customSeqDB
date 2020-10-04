@@ -1756,69 +1756,112 @@ summary {
 <!-- rnb-text-begin -->
 <div id="prep" class="section level2">
 <h2>Prep</h2>
-<p>These packages will be needed. The code of the custom functions I used for this is here : <a href="https://github.com/salix-d/customSeqDB" class="uri">https://github.com/salix-d/customSeqDB</a></p>
+<p>These packages will be needed. The code of the custom functions used for this is here : <a href="https://github.com/salix-d/customSeqDB" class="uri">https://github.com/salix-d/customSeqDB</a></p>
 <!-- rnb-text-end -->
 <!-- rnb-chunk-begin -->
-<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuaWYgKCFyZXF1aXJlTmFtZXNwYWNlKFwiQmlvY01hbmFnZXJcIiwgcXVpZXRseSA9IFRSVUUpKVxuICAgIGluc3RhbGwucGFja2FnZXMoXCJCaW9jTWFuYWdlclwiKVxuQmlvY01hbmFnZXI6Omluc3RhbGwoXCJTaG9ydFJlYWRcIilcblxuaW5zdGFsbC5wYWNrYWdlcyhcImpzb25saXRlXCIpXG5pbnN0YWxsLnBhY2thZ2VzKFwieG1sMlwiKVxuXG4jdGhlc2UgYXJlIHRoZSBmdW5jdGlvbiBJIG1hZGUgZm9yIHRoaXMgc3BlY2lmaWNhbGx5XG5pZiAoIXJlcXVpcmVOYW1lc3BhY2UoXCJkZXZ0b29sc1wiLCBxdWlldGx5ID0gVFJVRSkpXG4gICAgaW5zdGFsbC5wYWNrYWdlcyhcImRldnRvb2xzXCIpXG5kZXZ0b29sczo6aW5zdGFsbF9naXRodWIoXCJzYWxpeC1kL2N1c3RvbVNlcURCXCIpXG5cbmBgYCJ9 -->
-<pre class="r"><code>if (!requireNamespace(&quot;BiocManager&quot;, quietly = TRUE))
-    install.packages(&quot;BiocManager&quot;)
-BiocManager::install(&quot;ShortRead&quot;)
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuYGBgclxuaWYgKCFyZXF1aXJlTmFtZXNwYWNlKFxcQmlvY01hbmFnZXJcXCwgcXVpZXRseSA9IFRSVUUpKVxuICAgIGluc3RhbGwucGFja2FnZXMoXFxCaW9jTWFuYWdlclxcKVxuQmlvY01hbmFnZXI6Omluc3RhbGwoXFxTaG9ydFJlYWRcXClcblxuaW5zdGFsbC5wYWNrYWdlcyhcXGpzb25saXRlXFwpXG5pbnN0YWxsLnBhY2thZ2VzKFxceG1sMlxcKVxuXG4jdGhlc2UgYXJlIHRoZSBmdW5jdGlvbiBJIG1hZGUgZm9yIHRoaXMgc3BlY2lmaWNhbGx5XG5pZiAoIXJlcXVpcmVOYW1lc3BhY2UoXFxkZXZ0b29sc1xcLCBxdWlldGx5ID0gVFJVRSkpXG4gICAgaW5zdGFsbC5wYWNrYWdlcyhcXGRldnRvb2xzXFwpXG5kZXZ0b29sczo6aW5zdGFsbF9naXRodWIoXFxzYWxpeC1kL2N1c3RvbVNlcURCXFwpXG5cbmBgYFxuYGBgIn0= -->
+<pre class="r"><code>```r
+if (!requireNamespace(\BiocManager\, quietly = TRUE))
+    install.packages(\BiocManager\)
+BiocManager::install(\ShortRead\)
 
-install.packages(&quot;jsonlite&quot;)
-install.packages(&quot;xml2&quot;)
+install.packages(\jsonlite\)
+install.packages(\xml2\)
 
 #these are the function I made for this specifically
-if (!requireNamespace(&quot;devtools&quot;, quietly = TRUE))
-    install.packages(&quot;devtools&quot;)
-devtools::install_github(&quot;salix-d/customSeqDB&quot;)
+if (!requireNamespace(\devtools\, quietly = TRUE))
+    install.packages(\devtools\)
+devtools::install_github(\salix-d/customSeqDB\)
 </code></pre>
-<!-- rnb-source-end -->
-<!-- rnb-chunk-end -->
-<!-- rnb-text-begin -->
-</div>
-<div id="ncbi-database" class="section level1">
-<h1>NCBI database</h1>
-<p>Functions specific to this db are here : <a href="https://github.com/salix-d/customSeqDB/blob/master/R/ncbi-db.R" class="uri">https://github.com/salix-d/customSeqDB/blob/master/R/ncbi-db.R</a> ### Getting the sequences details from NCBI This gets the ESummary of all records in the NCBI nucleotide database matching these taxa and gene which have the word ‘complete’ in the ‘title’ fields but don’t have ‘UNVERIFIED’ in the ‘keyword’ fields. The query isn’t case sensitive. For the usable fields and their name see : <a href="https://www.ncbi.nlm.nih.gov/books/NBK49540/" class="uri">https://www.ncbi.nlm.nih.gov/books/NBK49540/</a></p>
-<p>It then parse the data and returns a list with history server information in case we want to look at the records again and a list of details including the accession numbers, the taxonomic ids and the description. The ESearch can return up to 100k results. This part may take a while.</p>
-<!-- rnb-text-end -->
-<!-- rnb-chunk-begin -->
-<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxubGlicmFyeShjdXN0b21TZXFEQilcbnRheGEgPC0gYyhcIlRyb21iaWRpZm9ybWVzXCIsIFwiSG9sb3RoeXJpZGFcIilcbmdlbmUgPC0gYyhcIkNPSVwiLCBcIkNPMVwiLCBcIkNPWElcIiwgXCJDT1gxXCIpICMgbmNiaSBpbmNsdWRlcyA2IG9yZGVycyBhbmQgdGhlIENPSSBnZW5lIGNhbiBiZSB3cml0dGVuIDQgd2F5c1xubmNiaSA8LSBnZXRfbmNiaURldGFpbHModGF4YSA9IHRheGEsIGdlbmUgPSBnZW5lLCBjdXN0b21UZXJtID0gXCJBTkQgY29tcGxldGUgW1RJVExdIE5PVCB1bnZlcmZpZmllZFtLWVdEXVwiKVxuaGVhZChuY2JpJGRldGFpbHMpXG5gYGAifQ== -->
-<pre class="r"><code>library(customSeqDB)
-taxa &lt;- c(&quot;Trombidiformes&quot;, &quot;Holothyrida&quot;)
-gene &lt;- c(&quot;COI&quot;, &quot;CO1&quot;, &quot;COXI&quot;, &quot;COX1&quot;) # ncbi includes 6 orders and the COI gene can be written 4 ways
-ncbi &lt;- get_ncbiDetails(taxa = taxa, gene = gene, customTerm = &quot;AND complete [TITL] NOT unverfified[KYWD]&quot;)
+<pre><code>
+&lt;!-- rnb-source-end --&gt;
+
+&lt;!-- rnb-chunk-end --&gt;
+
+
+&lt;!-- rnb-text-begin --&gt;
+
+
+# NCBI database
+Functions specific to this db are here : https://github.com/salix-d/customSeqDB/blob/master/R/ncbi-db.R
+### Getting the sequences details from NCBI
+This gets the ESummary of all records in the NCBI nucleotide database matching these taxa and gene which have the word &#39;complete&#39; in the &#39;title&#39; fields but don&#39;t have &#39;UNVERIFIED&#39; in the &#39;keyword&#39; fields. The query isn&#39;t case sensitive. For the usable fields and their name see : https://www.ncbi.nlm.nih.gov/books/NBK49540/
+
+It then parse the data and returns a list with history server information in case we want to look at the records again and a list of details including the accession numbers, the taxonomic ids and the description. The ESearch can return up to 100k results. This part may take a while.
+
+
+&lt;!-- rnb-text-end --&gt;
+
+
+&lt;!-- rnb-chunk-begin --&gt;
+
+
+&lt;!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuYGBgclxubGlicmFyeShjdXN0b21TZXFEQilcbnRheGEgPC0gYyhcXFRyb21iaWRpZm9ybWVzXFwsIFxcSG9sb3RoeXJpZGFcXClcbmdlbmUgPC0gYyhcXENPSVxcLCBcXENPMVxcLCBcXENPWElcXCwgXFxDT1gxXFwpICMgbmNiaSBpbmNsdWRlcyA2IG9yZGVycyBhbmQgdGhlIENPSSBnZW5lIGNhbiBiZSB3cml0dGVuIDQgd2F5c1xubmNiaSA8LSBnZXRfbmNiaURldGFpbHModGF4YSA9IHRheGEsIGdlbmUgPSBnZW5lLCBjdXN0b21UZXJtID0gXFxBTkQgY29tcGxldGUgW1RJVExdIE5PVCB1bnZlcmZpZmllZFtLWVdEXVxcKVxuaGVhZChuY2JpJGRldGFpbHMpXG5gYGBcbmBgYCJ9 --&gt;
+
+```r
+```r
+library(customSeqDB)
+taxa &lt;- c(\Trombidiformes\, \Holothyrida\)
+gene &lt;- c(\COI\, \CO1\, \COXI\, \COX1\) # ncbi includes 6 orders and the COI gene can be written 4 ways
+ncbi &lt;- get_ncbiDetails(taxa = taxa, gene = gene, customTerm = \AND complete [TITL] NOT unverfified[KYWD]\)
 head(ncbi$details)</code></pre>
-<!-- rnb-source-end -->
-<!-- rnb-chunk-end -->
-<!-- rnb-text-begin -->
-<p>If you want to separate your queries by taxon to see how many you get from each, you can also use get_ncbiAcc the same way and then use the history server information that it returns to store the next queries in the same WebEnv and then use those to get the details.</p>
-<!-- rnb-text-end -->
-<!-- rnb-chunk-begin -->
-<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxubmNiaSA8LSBsaXN0KE9waWxpb2FjYXJpZGEgPSBnZXRfbmNiaURldGFpbHMoXCJPcGlsaW9hY2FyaWRhXCIsIGMoXCJDT0lcIiwgXCJDTzFcIiwgXCJDT1hJXCIsIFwiQ09YMVwiKSwgY3VzdG9tVGVybSA9IFwiQU5EIGNvbXBsZXRlW0FMTGxdIE5PVCBVTlZFUklGSUVEW0tZV0RdXCIpKVxuZm9yKG8gaW4gYyhcIkhvbG90aHlyaWRhXCIsIFwiSXhvZGlkYVwiLCBcIk1lc29zdGlnbWF0YVwiLCBcIlRyb21iaWRpZm9ybWVzXCIsIFwiU2FyY29wdGlmb3JtZXNcIikpe1xuICBuY2JpW1tvXV0gPC0gZ2V0X25jYmlEZXRhaWxzKG8sIGMoXCJDT0lcIiwgXCJDTzFcIiwgXCJDT1hJXCIsIFwiQ09YMVwiKSwgY3VzdG9tVGVybSA9IFwiQU5EIGNvbXBsZXRlW0FMTGxdIE5PVCBVTlZFUklGSUVEW0tZV0RdXCIsIHF1ZXJ5ID0gbmNiaSRPcGlsaW9hY2FyaWRhJHF1ZXJ5KVxufVxuYGBgIn0= -->
-<pre class="r"><code>ncbi &lt;- list(Opilioacarida = get_ncbiDetails(&quot;Opilioacarida&quot;, c(&quot;COI&quot;, &quot;CO1&quot;, &quot;COXI&quot;, &quot;COX1&quot;), customTerm = &quot;AND complete[ALLl] NOT UNVERIFIED[KYWD]&quot;))
-for(o in c(&quot;Holothyrida&quot;, &quot;Ixodida&quot;, &quot;Mesostigmata&quot;, &quot;Trombidiformes&quot;, &quot;Sarcoptiformes&quot;)){
-  ncbi[[o]] &lt;- get_ncbiDetails(o, c(&quot;COI&quot;, &quot;CO1&quot;, &quot;COXI&quot;, &quot;COX1&quot;), customTerm = &quot;AND complete[ALLl] NOT UNVERIFIED[KYWD]&quot;, query = ncbi$Opilioacarida$query)
+<pre><code>
+&lt;!-- rnb-source-end --&gt;
+
+&lt;!-- rnb-chunk-end --&gt;
+
+
+&lt;!-- rnb-text-begin --&gt;
+
+If you want to separate your queries by taxon to see how many you get from each, you can also use get_ncbiAcc the same way and then use the history server information that it returns to store the next queries in the same WebEnv and then use those to get the details.
+
+&lt;!-- rnb-text-end --&gt;
+
+
+&lt;!-- rnb-chunk-begin --&gt;
+
+
+&lt;!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuYGBgclxubmNiaSA8LSBsaXN0KE9waWxpb2FjYXJpZGEgPSBnZXRfbmNiaURldGFpbHMoXFxPcGlsaW9hY2FyaWRhXFwsIGMoXFxDT0lcXCwgXFxDTzFcXCwgXFxDT1hJXFwsIFxcQ09YMVxcKSwgY3VzdG9tVGVybSA9IFxcQU5EIGNvbXBsZXRlW0FMTGxdIE5PVCBVTlZFUklGSUVEW0tZV0RdXFwpKVxuZm9yKG8gaW4gYyhcXEhvbG90aHlyaWRhXFwsIFxcSXhvZGlkYVxcLCBcXE1lc29zdGlnbWF0YVxcLCBcXFRyb21iaWRpZm9ybWVzXFwsIFxcU2FyY29wdGlmb3JtZXNcXCkpe1xuICBuY2JpW1tvXV0gPC0gZ2V0X25jYmlEZXRhaWxzKG8sIGMoXFxDT0lcXCwgXFxDTzFcXCwgXFxDT1hJXFwsIFxcQ09YMVxcKSwgY3VzdG9tVGVybSA9IFxcQU5EIGNvbXBsZXRlW0FMTGxdIE5PVCBVTlZFUklGSUVEW0tZV0RdXFwsIHF1ZXJ5ID0gbmNiaSRPcGlsaW9hY2FyaWRhJHF1ZXJ5KVxufVxuYGBgXG5gYGAifQ== --&gt;
+
+```r
+```r
+ncbi &lt;- list(Opilioacarida = get_ncbiDetails(\Opilioacarida\, c(\COI\, \CO1\, \COXI\, \COX1\), customTerm = \AND complete[ALLl] NOT UNVERIFIED[KYWD]\))
+for(o in c(\Holothyrida\, \Ixodida\, \Mesostigmata\, \Trombidiformes\, \Sarcoptiformes\)){
+  ncbi[[o]] &lt;- get_ncbiDetails(o, c(\COI\, \CO1\, \COXI\, \COX1\), customTerm = \AND complete[ALLl] NOT UNVERIFIED[KYWD]\, query = ncbi$Opilioacarida$query)
 }</code></pre>
-<!-- rnb-source-end -->
-<!-- rnb-chunk-end -->
-<!-- rnb-text-begin -->
-<p>Sometimes it return ‘Error in parse_con(txt, bigint_as_char) : parse error: premature EOF’, but rerunning fixes it… I’m not sure why.</p>
-<div id="filtering-the-details-to-get-only-complete-coi" class="section level2">
-<h2>Filtering the details to get only “complete” COI</h2>
-<p><i>This step will need to be adapted depending on your query.</i> The fltr string looks for the word ‘complete’ a maximum of two commas after the gene (because farther than that it’s not the COI gene that is complete based on these descriptions). Some sequences won’t have the word for the gene but will be complete genome/sequence and can have a complete gene, so they are included. The gene is looked for with COx?[I1] because sometimes there’s an X but not always and the one can be arabic or roman. ignore.case = T because the gene can be in all caps or not. <i>some sequences will still be partial sequences and so, they will be filtered again once we have the fasta files</i></p>
-<!-- rnb-text-end -->
-<!-- rnb-chunk-begin -->
-<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxubmNiaSRkZXRhaWxzIDwtIGRvLmNhbGwocmJpbmQsIGxhcHBseShuY2JpWzE6Nl0sIGZ1bmN0aW9uKHgpIHgkZGV0YWlscykpXG5zYXBwbHkobmNiaSRkZXRhaWxzLCBuY29sKVxubmNiaSRPcGlsaW9hY2FyaWRhJGRldGFpbHMgPC0gdChuY2JpJE9waWxpb2FjYXJpZGEkZGV0YWlscylcbm5jYmkkSG9sb3RoeXJpZGEkZGV0YWlscyA8LSB0KG5jYmkkSG9sb3RoeXJpZGEkZGV0YWlscylcbm5jYmkkZGV0YWlscyA8LSBOVUxMXG5uY2JpJGRldGFpbHMgPC0gZG8uY2FsbChyYmluZCwgbGFwcGx5KG5jYmlbMTo2XSwgZnVuY3Rpb24oeCkgeCRkZXRhaWxzKSlcbm5yb3cobmNiaSRkZXRhaWxzKVxuZmx0ciA8LSBcIkNPWD9bSTFdXFxcXCk/W1s6YWxudW06XSBcXFxcKFxcXFwpO10qLD9bWzphbG51bTpdIFxcXFwoXFxcXCk7XSosIGNvbXBsZXRlfGNvbXBsZXRlIGdlbm9tZXxjb21wbGV0ZSBzZXF1ZW5jZVwiXG5uY2JpJGNvbXBsZXRlJGRldGFpbHMgPC0gbmNiaSRkZXRhaWxzW2dyZXAoZmx0ciwgbmNiaSRkZXRhaWxzJGRlc2NyaXB0aW9uLCBpZ25vcmUuY2FzZSA9IFQpLF1cbm5yb3cobmNiaSRjb21wbGV0ZSRkZXRhaWxzKVxuYGBgIn0= -->
-<pre class="r"><code>ncbi$details &lt;- do.call(rbind, lapply(ncbi[1:6], function(x) x$details))
+<pre><code>
+&lt;!-- rnb-source-end --&gt;
+
+&lt;!-- rnb-chunk-end --&gt;
+
+
+&lt;!-- rnb-text-begin --&gt;
+
+Sometimes it return &#39;Error in parse_con(txt, bigint_as_char) : parse error: premature EOF&#39;, but rerunning fixes it... I&#39;m not sure why.
+
+## Filtering the details to get only &quot;complete&quot; COI
+&lt;i&gt;This step will need to be adapted depending on your query.&lt;/i&gt;
+The fltr string looks for the word &#39;complete&#39; a maximum of two commas after the gene (because farther than that it&#39;s not the COI gene that is complete based on these descriptions). Some sequences won&#39;t have the word for the gene but will be complete genome/sequence and can have a complete gene, so they are included. The gene is looked for with COx?[I1] because sometimes there&#39;s an X but not always and the one can be arabic or roman. ignore.case = T because the gene can be in all caps or not.
+&lt;i&gt;some sequences will still be partial sequences and so, they will be filtered again once we have the fasta files&lt;/i&gt;
+
+&lt;!-- rnb-text-end --&gt;
+
+
+&lt;!-- rnb-chunk-begin --&gt;
+
+
+&lt;!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuYGBgclxubmNiaSRkZXRhaWxzIDwtIGRvLmNhbGwocmJpbmQsIGxhcHBseShuY2JpWzE6Nl0sIGZ1bmN0aW9uKHgpIHgkZGV0YWlscykpXG5zYXBwbHkobmNiaSRkZXRhaWxzLCBuY29sKVxubmNiaSRPcGlsaW9hY2FyaWRhJGRldGFpbHMgPC0gdChuY2JpJE9waWxpb2FjYXJpZGEkZGV0YWlscylcbm5jYmkkSG9sb3RoeXJpZGEkZGV0YWlscyA8LSB0KG5jYmkkSG9sb3RoeXJpZGEkZGV0YWlscylcbm5jYmkkZGV0YWlscyA8LSBOVUxMXG5uY2JpJGRldGFpbHMgPC0gZG8uY2FsbChyYmluZCwgbGFwcGx5KG5jYmlbMTo2XSwgZnVuY3Rpb24oeCkgeCRkZXRhaWxzKSlcbm5yb3cobmNiaSRkZXRhaWxzKVxuZmx0ciA8LSBcXENPWD9bSTFdXFxcXCk/W1s6YWxudW06XSBcXFxcKFxcXFwpO10qXG5gYGAifQ== --&gt;
+
+```r
+```r
+ncbi$details &lt;- do.call(rbind, lapply(ncbi[1:6], function(x) x$details))
 sapply(ncbi$details, ncol)
 ncbi$Opilioacarida$details &lt;- t(ncbi$Opilioacarida$details)
 ncbi$Holothyrida$details &lt;- t(ncbi$Holothyrida$details)
 ncbi$details &lt;- NULL
 ncbi$details &lt;- do.call(rbind, lapply(ncbi[1:6], function(x) x$details))
 nrow(ncbi$details)
-fltr &lt;- &quot;COX?[I1]\\)?[[:alnum:] \\(\\);]*,?[[:alnum:] \\(\\);]*, complete|complete genome|complete sequence&quot;
-ncbi$complete$details &lt;- ncbi$details[grep(fltr, ncbi$details$description, ignore.case = T),]
-nrow(ncbi$complete$details)</code></pre>
+fltr &lt;- \COX?[I1]\\)?[[:alnum:] \\(\\);]*</code></pre>
 <!-- rnb-source-end -->
 <!-- rnb-chunk-end -->
 <!-- rnb-text-begin -->
@@ -1828,126 +1871,212 @@ nrow(ncbi$complete$details)</code></pre>
 <p>This will download the CDS fasta files from NCBI. If a record has more than one CDS, it returns all of them so we will have to filter for the gene again. The outDir can be changed to the desired folder.</p>
 <!-- rnb-text-end -->
 <!-- rnb-chunk-begin -->
-<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxubmNiaSRjb21wbGV0ZSRmaWxlcyA8LSBnZXRfbmNiaUZhc3RhKG5jYmkkY29tcGxldGUkZGV0YWlscyRhY2Nlc3Npb24sIG91dERpciA9IFwiLi9lRmV0Y2hfY29tcGxldGVDRFMvXCIpXG5gYGAifQ== -->
-<pre class="r"><code>ncbi$complete$files &lt;- get_ncbiFasta(ncbi$complete$details$accession, outDir = &quot;./eFetch_completeCDS/&quot;)</code></pre>
-<!-- rnb-source-end -->
-<!-- rnb-chunk-end -->
-<!-- rnb-text-begin -->
-</div>
-<div id="filtering-the-complete-sequences-fasta-files" class="section level2">
-<h2>Filtering the “complete” sequences fasta files</h2>
-<div id="read-the-fasta-file-and-make-a-data.frame-out-of-it." class="section level3">
-<h3>Read the fasta file and make a data.frame out of it.</h3>
-<!-- rnb-text-end -->
-<!-- rnb-chunk-begin -->
-<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxubmNiaSRjb21wbGV0ZSRmYXN0YSA8LSBTaG9ydFJlYWQ6OnJlYWRGYXN0YShuY2JpJGNvbXBsZXRlJGZpbGVzKVxubmNiaSRjb21wbGV0ZSRpZCA8LSBhcy52ZWN0b3IoU2hvcnRSZWFkOjppZChuY2JpJGNvbXBsZXRlJGZhc3RhKSlcbiMgcmVmb3JtYXQgdGhlIHN0cmluZyB0byBiZSBhYmxlIHRvIHBhcnNlIHdpdGgganNvbmxpdGVcbm5jYmkkY29tcGxldGUkZGYgPC0ganNvbmxpdGU6OmZyb21KU09OKHBhc3RlMCgnW3tcIicsIHBhc3RlKHBhc3RlMCgnYWNjZXNzaW9uXCI6XCInLCBnc3ViKFwiX2Nkc19bWzphbG51bTpdX1xcXFwuXSpcIiwgXCJcIiwgZ3N1YihcIiAoW1s6YWxudW06XV9dKik9XCIsICdcIixcIlxcXFwxXCI6XCInLCBnc3ViKFwiXi4qXFxcXHx8XFxcXFt8XFxcXF1cIiwgXCJcIiwgIG5jYmkkY29tcGxldGUkaWQpKSkpLCBjb2xsYXBzZT0nXCJ9LHtcIicpLCdcIn1dJykpXG4jIGFkZCBzZXF1ZW5jZXMgdG8gdGhlIGRmXG5uY2JpJGNvbXBsZXRlJGRmJHNlcSA8LSBhcy52ZWN0b3IoU2hvcnRSZWFkOjpzcmVhZChuY2JpJGNvbXBsZXRlJGZhc3RhKSlcbiMgdG8gc2F2ZSBtZW1vcnksIG5jYmkkY29tcGxldGUkZmFzdGEgY2FuIGJlIHJlbW92ZWQgc2luY2UgaXQgbWlnaHQgYmUgYW4gaGVhdnkgb2JqZWN0XG4jIG5jYmkkY29tcGxldGUkZmFzdGEgPC0gTlVMTFxubnJvdyhuY2JpJGNvbXBsZXRlJGRmKVxuYGBgIn0= -->
-<pre class="r"><code>ncbi$complete$fasta &lt;- ShortRead::readFasta(ncbi$complete$files)
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuYGBgclxubmNiaSRjb21wbGV0ZSRmaWxlcyA8LSBnZXRfbmNiaUZhc3RhKG5jYmkkY29tcGxldGUkZGV0YWlscyRhY2Nlc3Npb24sIG91dERpciA9IFxcLi9lRmV0Y2hfY29tcGxldGVDRFMvXFwpXG5gYGBcbmBgYCJ9 -->
+<pre class="r"><code>```r
+ncbi$complete$files &lt;- get_ncbiFasta(ncbi$complete$details$accession, outDir = \./eFetch_completeCDS/\)</code></pre>
+<pre><code>
+&lt;!-- rnb-source-end --&gt;
+
+&lt;!-- rnb-chunk-end --&gt;
+
+
+&lt;!-- rnb-text-begin --&gt;
+
+
+## Filtering the &quot;complete&quot; sequences fasta files
+### Read the fasta file and make a data.frame out of it.
+
+&lt;!-- rnb-text-end --&gt;
+
+
+&lt;!-- rnb-chunk-begin --&gt;
+
+
+&lt;!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuYGBgclxubmNiaSRjb21wbGV0ZSRmYXN0YSA8LSBTaG9ydFJlYWQ6OnJlYWRGYXN0YShuY2JpJGNvbXBsZXRlJGZpbGVzKVxubmNiaSRjb21wbGV0ZSRpZCA8LSBhcy52ZWN0b3IoU2hvcnRSZWFkOjppZChuY2JpJGNvbXBsZXRlJGZhc3RhKSlcbiMgcmVmb3JtYXQgdGhlIHN0cmluZyB0byBiZSBhYmxlIHRvIHBhcnNlIHdpdGgganNvbmxpdGVcbm5jYmkkY29tcGxldGUkZGYgPC0ganNvbmxpdGU6OmZyb21KU09OKHBhc3RlMCgnW3tcXCdcbmBgYCJ9 --&gt;
+
+```r
+```r
+ncbi$complete$fasta &lt;- ShortRead::readFasta(ncbi$complete$files)
 ncbi$complete$id &lt;- as.vector(ShortRead::id(ncbi$complete$fasta))
 # reformat the string to be able to parse with jsonlite
-ncbi$complete$df &lt;- jsonlite::fromJSON(paste0(&#39;[{&quot;&#39;, paste(paste0(&#39;accession&quot;:&quot;&#39;, gsub(&quot;_cds_[[:alnum:]_\\.]*&quot;, &quot;&quot;, gsub(&quot; ([[:alnum:]_]*)=&quot;, &#39;&quot;,&quot;\\1&quot;:&quot;&#39;, gsub(&quot;^.*\\||\\[|\\]&quot;, &quot;&quot;,  ncbi$complete$id)))), collapse=&#39;&quot;},{&quot;&#39;),&#39;&quot;}]&#39;))
-# add sequences to the df
-ncbi$complete$df$seq &lt;- as.vector(ShortRead::sread(ncbi$complete$fasta))
-# to save memory, ncbi$complete$fasta can be removed since it might be an heavy object
-# ncbi$complete$fasta &lt;- NULL
-nrow(ncbi$complete$df)</code></pre>
+ncbi$complete$df &lt;- jsonlite::fromJSON(paste0(&#39;[{\&#39;</code></pre>
 <!-- rnb-source-end -->
 <!-- rnb-chunk-end -->
 <!-- rnb-text-begin -->
 <p>There more rows than accession because it fetch all cds and not just the COI cds.</p>
-</div>
 <div id="take-only-the-sequences-for-the-coi-genes" class="section level3">
 <h3>Take only the sequences for the COI genes</h3>
 <p>Since records are all filled differently, some may have the gene field or the protein field empty but not the other. So we look in both fo the desired gene/protein.</p>
 <!-- rnb-text-end -->
 <!-- rnb-chunk-begin -->
-<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxubmNiaSRjb21wbGV0ZSRDT0kgPC0gbmNiaSRjb21wbGV0ZSRkZlt1bmlxdWUoZ3JlcChcIkNPWD9bSTFdJFwiLCBuY2JpJGNvbXBsZXRlJGRmJGdlbmUsIGlnbm9yZS5jYXNlID0gVCksIGdyZXAoXCJjeXRvY2hyb21lIGM/ID9veGlkYXNlIChzdWJ1bml0ICk/W0kxXSRcIiwgbmNiaSRjb21wbGV0ZSRkZiRwcm90ZWluLCBpZ25vcmUuY2FzZSA9IFQpKSxdXG5ucm93KG5jYmkkY29tcGxldGUkQ09JKVxuYGBgIn0= -->
-<pre class="r"><code>ncbi$complete$COI &lt;- ncbi$complete$df[unique(grep(&quot;COX?[I1]$&quot;, ncbi$complete$df$gene, ignore.case = T), grep(&quot;cytochrome c? ?oxidase (subunit )?[I1]$&quot;, ncbi$complete$df$protein, ignore.case = T)),]
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuYGBgclxubmNiaSRjb21wbGV0ZSRDT0kgPC0gbmNiaSRjb21wbGV0ZSRkZlt1bmlxdWUoZ3JlcChcXENPWD9bSTFdJFxcLCBuY2JpJGNvbXBsZXRlJGRmJGdlbmUsIGlnbm9yZS5jYXNlID0gVCksIGdyZXAoXFxjeXRvY2hyb21lIGM/ID9veGlkYXNlIChzdWJ1bml0ICk/W0kxXSRcXCwgbmNiaSRjb21wbGV0ZSRkZiRwcm90ZWluLCBpZ25vcmUuY2FzZSA9IFQpKSxdXG5ucm93KG5jYmkkY29tcGxldGUkQ09JKVxuYGBgXG5gYGAifQ== -->
+<pre class="r"><code>```r
+ncbi$complete$COI &lt;- ncbi$complete$df[unique(grep(\COX?[I1]$\, ncbi$complete$df$gene, ignore.case = T), grep(\cytochrome c? ?oxidase (subunit )?[I1]$\, ncbi$complete$df$protein, ignore.case = T)),]
 nrow(ncbi$complete$COI)</code></pre>
-<!-- rnb-source-end -->
-<!-- rnb-chunk-end -->
-<!-- rnb-text-begin -->
-</div>
-<div id="making-sure-sequences-are-actually-complete" class="section level3">
-<h3>Making sure sequences are actually complete</h3>
-<p>Some sequences will have the information in the column ‘partial’ but not all of them. The start and end codons might vary depending on the taxa. See : <a href="https://www.ncbi.nlm.nih.gov/Taxonomy/Utils/wprintgc.cgi" class="uri">https://www.ncbi.nlm.nih.gov/Taxonomy/Utils/wprintgc.cgi</a> This example uses transl_table5.</p>
-<!-- rnb-text-end -->
-<!-- rnb-chunk-begin -->
-<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuc3RhcnRfY29kb25zIDwtIGMoXCJUVEdcIixcIkFUVFwiLFwiQVRDXCIsXCJBVEFcIixcIkFUR1wiLFwiR1RHXCIpXG5lbmRfY29kb25zIDwtIGMoXCJUQUFcIiwgXCJUQUdcIilcbmhhcy5zdGFydCA8LSBncmVwKHBhc3RlMChcIl5cIiwgcGFzdGUoc3RhcnRfY29kb25zLCBjb2xsYXBzZSA9IFwifF5cIikpLCBuY2JpJGNvbXBsZXRlJENPSSRzZXEsIGlnbm9yZS5jYXNlID0gVClcbmhhcy5lbmQgPC0gZ3JlcChwYXN0ZTAocGFzdGUoZW5kX2NvZG9ucywgY29sbGFwc2UgPSBcIiR8XCIpLCBcIiRcIiksIG5jYmkkY29tcGxldGUkQ09JJHNlcSwgaWdub3JlLmNhc2UgPSBUKVxubmNiaSRjb21wbGV0ZSRDT0kgPC0gbmNiaSRjb21wbGV0ZSRDT0lbaW50ZXJzZWN0KGhhcy5zdGFydCwgaGFzLmVuZCksXVxubnJvdyhuY2JpJGNvbXBsZXRlJENPSSlcbmBgYCJ9 -->
-<pre class="r"><code>start_codons &lt;- c(&quot;TTG&quot;,&quot;ATT&quot;,&quot;ATC&quot;,&quot;ATA&quot;,&quot;ATG&quot;,&quot;GTG&quot;)
-end_codons &lt;- c(&quot;TAA&quot;, &quot;TAG&quot;)
-has.start &lt;- grep(paste0(&quot;^&quot;, paste(start_codons, collapse = &quot;|^&quot;)), ncbi$complete$COI$seq, ignore.case = T)
-has.end &lt;- grep(paste0(paste(end_codons, collapse = &quot;$|&quot;), &quot;$&quot;), ncbi$complete$COI$seq, ignore.case = T)
+<pre><code>
+&lt;!-- rnb-source-end --&gt;
+
+&lt;!-- rnb-chunk-end --&gt;
+
+
+&lt;!-- rnb-text-begin --&gt;
+
+
+### Making sure sequences are actually complete
+Some sequences will have the information in the column &#39;partial&#39; but not all of them.
+The start and end codons might vary depending on the taxa. See : https://www.ncbi.nlm.nih.gov/Taxonomy/Utils/wprintgc.cgi
+This example uses transl_table5.
+
+&lt;!-- rnb-text-end --&gt;
+
+
+&lt;!-- rnb-chunk-begin --&gt;
+
+
+&lt;!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuYGBgclxuc3RhcnRfY29kb25zIDwtIGMoXFxUVEdcXCxcXEFUVFxcLFxcQVRDXFwsXFxBVEFcXCxcXEFUR1xcLFxcR1RHXFwpXG5lbmRfY29kb25zIDwtIGMoXFxUQUFcXCwgXFxUQUdcXClcbmhhcy5zdGFydCA8LSBncmVwKHBhc3RlMChcXF5cXCwgcGFzdGUoc3RhcnRfY29kb25zLCBjb2xsYXBzZSA9IFxcfF5cXCkpLCBuY2JpJGNvbXBsZXRlJENPSSRzZXEsIGlnbm9yZS5jYXNlID0gVClcbmhhcy5lbmQgPC0gZ3JlcChwYXN0ZTAocGFzdGUoZW5kX2NvZG9ucywgY29sbGFwc2UgPSBcXCR8XFwpLCBcXCRcXCksIG5jYmkkY29tcGxldGUkQ09JJHNlcSwgaWdub3JlLmNhc2UgPSBUKVxubmNiaSRjb21wbGV0ZSRDT0kgPC0gbmNiaSRjb21wbGV0ZSRDT0lbaW50ZXJzZWN0KGhhcy5zdGFydCwgaGFzLmVuZCksXVxubnJvdyhuY2JpJGNvbXBsZXRlJENPSSlcbmBgYFxuYGBgIn0= --&gt;
+
+```r
+```r
+start_codons &lt;- c(\TTG\,\ATT\,\ATC\,\ATA\,\ATG\,\GTG\)
+end_codons &lt;- c(\TAA\, \TAG\)
+has.start &lt;- grep(paste0(\^\, paste(start_codons, collapse = \|^\)), ncbi$complete$COI$seq, ignore.case = T)
+has.end &lt;- grep(paste0(paste(end_codons, collapse = \$|\), \$\), ncbi$complete$COI$seq, ignore.case = T)
 ncbi$complete$COI &lt;- ncbi$complete$COI[intersect(has.start, has.end),]
 nrow(ncbi$complete$COI)</code></pre>
-<!-- rnb-source-end -->
-<!-- rnb-chunk-end -->
-<!-- rnb-text-begin -->
-<p>Some accession numbers might be duplicated. Usually because the gene is present twice in the genome. Records should be checked manually. In this case, since sequences were the same for each pair, deleted the duplicates.</p>
-<!-- rnb-text-end -->
-<!-- rnb-chunk-begin -->
-<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuc3VtKGR1cGxpY2F0ZWQobmNiaSRjb21wbGV0ZSRDT0kkYWNjZXNzaW9uKSlcbm5jYmkkY29tcGxldGUkQ09JW25jYmkkY29tcGxldGUkQ09JJGFjY2Vzc2lvbiAlaW4lIG5jYmkkY29tcGxldGUkQ09JJGFjY2Vzc2lvbltkdXBsaWNhdGVkKG5jYmkkY29tcGxldGUkQ09JJGFjY2Vzc2lvbildLF1cbm5jYmkkY29tcGxldGUkQ09JIDwtIG5jYmkkY29tcGxldGUkQ09JWyFkdXBsaWNhdGVkKG5jYmkkY29tcGxldGUkQ09JJGFjY2Vzc2lvbiksIF1cbm5yb3cobmNiaSRjb21wbGV0ZSRDT0kpXG5gYGAifQ== -->
-<pre class="r"><code>sum(duplicated(ncbi$complete$COI$accession))
+<pre><code>
+&lt;!-- rnb-source-end --&gt;
+
+&lt;!-- rnb-chunk-end --&gt;
+
+
+&lt;!-- rnb-text-begin --&gt;
+
+
+Some accession numbers might be duplicated. Usually because the gene is present twice in the genome. Records should be checked manually.
+In this case, since sequences were the same for each pair, deleted the duplicates.
+
+&lt;!-- rnb-text-end --&gt;
+
+
+&lt;!-- rnb-chunk-begin --&gt;
+
+
+&lt;!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuYGBgclxuc3VtKGR1cGxpY2F0ZWQobmNiaSRjb21wbGV0ZSRDT0kkYWNjZXNzaW9uKSlcbm5jYmkkY29tcGxldGUkQ09JW25jYmkkY29tcGxldGUkQ09JJGFjY2Vzc2lvbiAlaW4lIG5jYmkkY29tcGxldGUkQ09JJGFjY2Vzc2lvbltkdXBsaWNhdGVkKG5jYmkkY29tcGxldGUkQ09JJGFjY2Vzc2lvbildLF1cbm5jYmkkY29tcGxldGUkQ09JIDwtIG5jYmkkY29tcGxldGUkQ09JWyFkdXBsaWNhdGVkKG5jYmkkY29tcGxldGUkQ09JJGFjY2Vzc2lvbiksIF1cbm5yb3cobmNiaSRjb21wbGV0ZSRDT0kpXG5gYGBcbmBgYCJ9 --&gt;
+
+```r
+```r
+sum(duplicated(ncbi$complete$COI$accession))
 ncbi$complete$COI[ncbi$complete$COI$accession %in% ncbi$complete$COI$accession[duplicated(ncbi$complete$COI$accession)],]
 ncbi$complete$COI &lt;- ncbi$complete$COI[!duplicated(ncbi$complete$COI$accession), ]
 nrow(ncbi$complete$COI)</code></pre>
-<!-- rnb-source-end -->
-<!-- rnb-chunk-end -->
-<!-- rnb-text-begin -->
-<p>Then there will be duplicated sequences with the same taxId which should be removed.</p>
-<!-- rnb-text-end -->
-<!-- rnb-chunk-begin -->
-<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxubmNiaSRjb21wbGV0ZSRDT0kkdGF4SWQgPC0gbmNiaSRjb21wbGV0ZSRkZXRhaWxzW25jYmkkY29tcGxldGUkZGV0YWlscyRhY2Nlc3Npb24gJWluJSBuY2JpJGNvbXBsZXRlJENPSSRhY2Nlc3Npb24sXSR0YXhpZFxuI2ZpbmQgdGhlIHJvdyBuYW1lcyBvZiB0aGUgZHVwbGljYXRlZCBzZXF1ZW5jZXMgZm9yIGVhY2ggdGF4SWQuXG5kdXBzIDwtIGxhcHBseSh1bmlxdWUobmNiaSRjb21wbGV0ZSRDT0kkdGF4SWQpLCBmdW5jdGlvbihpZCkgcm93bmFtZXMobmNiaSRjb21wbGV0ZSRDT0lbbmNiaSRjb21wbGV0ZSRDT0kkdGF4SWQgPT0gaWQsXSlbZHVwbGljYXRlZChuY2JpJGNvbXBsZXRlJENPSVtuY2JpJGNvbXBsZXRlJENPSSR0YXhJZCA9PSBpZCxdJHNlcSldKVxubGVuZ3RoKGR1cHMpXG4ja2VlcCBvbmx5IHRoZSByb3dzIG5vdCBpbiB0aGF0IGxpc3Qgb2YgZHVwbGljYXRlZCBzZXF1ZW5jZXMuXG5uY2JpJGNvbXBsZXRlJENPSSA8LSBuY2JpJGNvbXBsZXRlJENPSVshcm93bmFtZXMobmNiaSRjb21wbGV0ZSRDT0kpICVpbiUgdW5saXN0KGR1cHMpLF1cbm5yb3cobmNiaSRjb21wbGV0ZSRDT0kpXG5gYGAifQ== -->
-<pre class="r"><code>ncbi$complete$COI$taxId &lt;- ncbi$complete$details[ncbi$complete$details$accession %in% ncbi$complete$COI$accession,]$taxid
+<pre><code>
+&lt;!-- rnb-source-end --&gt;
+
+&lt;!-- rnb-chunk-end --&gt;
+
+
+&lt;!-- rnb-text-begin --&gt;
+
+Then there will be duplicated sequences with the same taxId which should be removed.
+
+
+&lt;!-- rnb-text-end --&gt;
+
+
+&lt;!-- rnb-chunk-begin --&gt;
+
+
+&lt;!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuYGBgclxubmNiaSRjb21wbGV0ZSRDT0kkdGF4SWQgPC0gbmNiaSRjb21wbGV0ZSRkZXRhaWxzW25jYmkkY29tcGxldGUkZGV0YWlscyRhY2Nlc3Npb24gJWluJSBuY2JpJGNvbXBsZXRlJENPSSRhY2Nlc3Npb24sXSR0YXhpZFxuI2ZpbmQgdGhlIHJvdyBuYW1lcyBvZiB0aGUgZHVwbGljYXRlZCBzZXF1ZW5jZXMgZm9yIGVhY2ggdGF4SWQuXG5kdXBzIDwtIGxhcHBseSh1bmlxdWUobmNiaSRjb21wbGV0ZSRDT0kkdGF4SWQpLCBmdW5jdGlvbihpZCkgcm93bmFtZXMobmNiaSRjb21wbGV0ZSRDT0lbbmNiaSRjb21wbGV0ZSRDT0kkdGF4SWQgPT0gaWQsXSlbZHVwbGljYXRlZChuY2JpJGNvbXBsZXRlJENPSVtuY2JpJGNvbXBsZXRlJENPSSR0YXhJZCA9PSBpZCxdJHNlcSldKVxubGVuZ3RoKGR1cHMpXG4ja2VlcCBvbmx5IHRoZSByb3dzIG5vdCBpbiB0aGF0IGxpc3Qgb2YgZHVwbGljYXRlZCBzZXF1ZW5jZXMuXG5uY2JpJGNvbXBsZXRlJENPSSA8LSBuY2JpJGNvbXBsZXRlJENPSVshcm93bmFtZXMobmNiaSRjb21wbGV0ZSRDT0kpICVpbiUgdW5saXN0KGR1cHMpLF1cbm5yb3cobmNiaSRjb21wbGV0ZSRDT0kpXG5gYGBcbmBgYCJ9 --&gt;
+
+```r
+```r
+ncbi$complete$COI$taxId &lt;- ncbi$complete$details[ncbi$complete$details$accession %in% ncbi$complete$COI$accession,]$taxid
 #find the row names of the duplicated sequences for each taxId.
 dups &lt;- lapply(unique(ncbi$complete$COI$taxId), function(id) rownames(ncbi$complete$COI[ncbi$complete$COI$taxId == id,])[duplicated(ncbi$complete$COI[ncbi$complete$COI$taxId == id,]$seq)])
 length(dups)
 #keep only the rows not in that list of duplicated sequences.
 ncbi$complete$COI &lt;- ncbi$complete$COI[!rownames(ncbi$complete$COI) %in% unlist(dups),]
 nrow(ncbi$complete$COI)</code></pre>
-<!-- rnb-source-end -->
-<!-- rnb-chunk-end -->
-<!-- rnb-text-begin -->
-</div>
-</div>
-<div id="getting-the-taxonomy-for-the-remaining-sequences" class="section level2">
-<h2>Getting the taxonomy for the remaining sequences</h2>
-<div id="making-the-taxonomy-sql-table" class="section level3">
-<h3>Making the taxonomy sql table</h3>
-<p>The function will download a taxdump.tar.gz file from NCBI servers and extract the names.dmp and nodes.dmp files from it. Then thes files will be merged into one tax.dmp file keeping only the columns required (id, name, rank and parentId) For names.dmp, also only keeps the rows containing the scientific names so there’s only one name per id. It will then use that file to create a SQLite database containing a taxonomy table from which we can get taxonomic information from taxIds with the get_taxonomy() function. get_taxonomy gets the the parentId of all parents of each taxIds and returns the names corresponding to the ranks desired a data frame with the taxids as row names and ranks as columns.</p>
-<!-- rnb-text-end -->
-<!-- rnb-chunk-begin -->
-<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuZGJfcGF0aCA8LSBta190YXhvbm9teS50YWJsZShkYkZpbGUgPSBwYXN0ZTAoJy4vbmNiaS1kYl8nLCBTeXMuRGF0ZSgpKSlcbm5jYmkkY29tcGxldGUkdGF4IDwtIGdldF90YXhvbm9teShuY2JpJGNvbXBsZXRlJENPSSR0YXhJZCwgc3FsRmlsZSA9IGRiX3BhdGgsIHJhbmtzID0gYyhcImtpbmdkb21cIixcInBoeWx1bVwiLFwiY2xhc3NcIixcIm9yZGVyXCIsXCJmYW1pbHlcIixcImdlbnVzXCIsXCJzcGVjaWVzXCIpKVxuI3RvIHNlZSB3aGF0IHRheGEgdGhlIGRiIGNvdmVycyA6XG5hcHBseShuY2JpJGNvbXBsZXRlJHRheFs0OjddLCAyLCB0YWJsZSlcbmBgYCJ9 -->
-<pre class="r"><code>db_path &lt;- mk_taxonomy.table(dbFile = paste0(&#39;./ncbi-db_&#39;, Sys.Date()))
-ncbi$complete$tax &lt;- get_taxonomy(ncbi$complete$COI$taxId, sqlFile = db_path, ranks = c(&quot;kingdom&quot;,&quot;phylum&quot;,&quot;class&quot;,&quot;order&quot;,&quot;family&quot;,&quot;genus&quot;,&quot;species&quot;))
+<pre><code>
+&lt;!-- rnb-source-end --&gt;
+
+&lt;!-- rnb-chunk-end --&gt;
+
+
+&lt;!-- rnb-text-begin --&gt;
+
+
+## Getting the taxonomy for the remaining sequences
+### Making the taxonomy sql table
+The function will download a taxdump.tar.gz file from NCBI servers and extract the names.dmp and nodes.dmp files from it.
+Then thes files will be merged into one tax.dmp file keeping only the columns required (id, name, rank and parentId)
+For names.dmp, also only keeps the rows containing the scientific names so there&#39;s only one name per id.
+It will then use that file to create a SQLite database containing a taxonomy table from which we can get taxonomic information from taxIds with the get_taxonomy() function.
+get_taxonomy gets the the parentId of all parents of each taxIds and returns the names corresponding to the ranks desired a data frame with the taxids as row names and ranks as columns.
+
+&lt;!-- rnb-text-end --&gt;
+
+
+&lt;!-- rnb-chunk-begin --&gt;
+
+
+&lt;!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuYGBgclxuZGJfcGF0aCA8LSBta190YXhvbm9teS50YWJsZShkYkZpbGUgPSBwYXN0ZTAoJy4vbmNiaS1kYl8nLCBTeXMuRGF0ZSgpKSlcbm5jYmkkY29tcGxldGUkdGF4IDwtIGdldF90YXhvbm9teShuY2JpJGNvbXBsZXRlJENPSSR0YXhJZCwgc3FsRmlsZSA9IGRiX3BhdGgsIHJhbmtzID0gYyhcXGtpbmdkb21cXCxcXHBoeWx1bVxcLFxcY2xhc3NcXCxcXG9yZGVyXFwsXFxmYW1pbHlcXCxcXGdlbnVzXFwsXFxzcGVjaWVzXFwpKVxuI3RvIHNlZSB3aGF0IHRheGEgdGhlIGRiIGNvdmVycyA6XG5hcHBseShuY2JpJGNvbXBsZXRlJHRheFs0OjddLCAyLCB0YWJsZSlcbmBgYFxuYGBgIn0= --&gt;
+
+```r
+```r
+db_path &lt;- mk_taxonomy.table(dbFile = paste0(&#39;./ncbi-db_&#39;, Sys.Date()))
+ncbi$complete$tax &lt;- get_taxonomy(ncbi$complete$COI$taxId, sqlFile = db_path, ranks = c(\kingdom\,\phylum\,\class\,\order\,\family\,\genus\,\species\))
 #to see what taxa the db covers :
 apply(ncbi$complete$tax[4:7], 2, table)</code></pre>
+<pre><code>
+&lt;!-- rnb-source-end --&gt;
+
+&lt;!-- rnb-chunk-end --&gt;
+
+
+&lt;!-- rnb-text-begin --&gt;
+
+
+## Writing the dada2 formated fasta file
+
+&lt;!-- rnb-text-end --&gt;
+
+
+&lt;!-- rnb-chunk-begin --&gt;
+
+
+&lt;!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuYGBgclxubmNiaSRjb21wbGV0ZSR0YXgkaWQgPC0gcGFzdGUwKGFwcGx5KG5jYmkkY29tcGxldGUkdGF4WzE6N10sIDEsIHBhc3RlMCwgY29sbGFwc2UgPSBcXDtcXCksIFxcO1xcKVxud3JpdGVfZmFzdGEoc2VxdWVuY2VzID0gbmNiaSRjb21wbGV0ZSRDT0kkc2VxLCBpZHMgPSBuY2JpJGNvbXBsZXRlJHRheCRpZCwgb3V0RmlsZSA9IFxcbmNiaUNvbXBsZXRlQ09JX25jYmkuZmFzdGFcXClcbmBgYFxuYGBgIn0= --&gt;
+
+```r
+```r
+ncbi$complete$tax$id &lt;- paste0(apply(ncbi$complete$tax[1:7], 1, paste0, collapse = \;\), \;\)
+write_fasta(sequences = ncbi$complete$COI$seq, ids = ncbi$complete$tax$id, outFile = \ncbiCompleteCOI_ncbi.fasta\)</code></pre>
+<pre><code>
+&lt;!-- rnb-source-end --&gt;
+
+&lt;!-- rnb-chunk-end --&gt;
+
+
+&lt;!-- rnb-text-begin --&gt;
+
+
+## Testing the database
+
+&lt;!-- rnb-text-end --&gt;
+
+
+&lt;!-- rnb-chunk-begin --&gt;
+
+
+&lt;!-- rnb-source-begin eyJkYXRhIjoiYGBgclxubmNiaSRzZXF0YWJcblxuYGBgIn0= --&gt;
+
+```r
+ncbi$seqtab
+</code></pre>
 <!-- rnb-source-end -->
-<!-- rnb-chunk-end -->
-<!-- rnb-text-begin -->
-</div>
-</div>
-<div id="writing-the-dada2-formated-fasta-file" class="section level2">
-<h2>Writing the dada2 formated fasta file</h2>
-<!-- rnb-text-end -->
-<!-- rnb-chunk-begin -->
-<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxubmNiaSRjb21wbGV0ZSR0YXgkaWQgPC0gcGFzdGUwKGFwcGx5KG5jYmkkY29tcGxldGUkdGF4WzE6N10sIDEsIHBhc3RlMCwgY29sbGFwc2UgPSBcIjtcIiksIFwiO1wiKVxud3JpdGVfZmFzdGEoc2VxdWVuY2VzID0gbmNiaSRjb21wbGV0ZSRDT0kkc2VxLCBpZHMgPSBuY2JpJGNvbXBsZXRlJHRheCRpZCwgb3V0RmlsZSA9IFwibmNiaUNvbXBsZXRlQ09JX25jYmkuZmFzdGFcIilcbmBgYCJ9 -->
-<pre class="r"><code>ncbi$complete$tax$id &lt;- paste0(apply(ncbi$complete$tax[1:7], 1, paste0, collapse = &quot;;&quot;), &quot;;&quot;)
-write_fasta(sequences = ncbi$complete$COI$seq, ids = ncbi$complete$tax$id, outFile = &quot;ncbiCompleteCOI_ncbi.fasta&quot;)</code></pre>
-<!-- rnb-source-end -->
-<!-- rnb-chunk-end -->
-<!-- rnb-text-begin -->
-</div>
-<div id="testing-the-database" class="section level2">
-<h2>Testing the database</h2>
-<!-- rnb-text-end -->
-<!-- rnb-chunk-begin -->
-<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxubmNiaSRzZXF0YWIgPC0gYXMubWF0cml4KHJlYWQuY3N2KFwiLi9kYXRhL3NlcXRhYi5ub2NoaW1fbmNiaS5jc3ZcIiwgcm93Lm5hbWVzID0gMSkpXG5uY2JpJHRheGEgPC0gZGFkYTI6OmFzc2lnblRheG9ub215KGVuYSRzZXF0YWIsIFwiLi9uY2JpQ29tcGxldGVDT0lfbmNiaS5mYXN0YVwiLCB0cnlSQyA9IFQpXG5uY2JpJHRheGEucCA9IG1rX3ByaW50REYobmNiaSR0YXhhLCBuYTJjaGFyID0gRilcbiMgVG8gc2VlIGhvdyBtYW55IHNlcXVlbmNlcyBhcmUgYXNzaWduZWQgcGVyIHJhbmtzXG5jb2xTdW1zKCFpcy5uYShuY2JpJHRheGEucCkpXG5gYGAifQ== -->
-<pre class="r"><code>ncbi$seqtab &lt;- as.matrix(read.csv(&quot;./data/seqtab.nochim_ncbi.csv&quot;, row.names = 1))
-ncbi$taxa &lt;- dada2::assignTaxonomy(ena$seqtab, &quot;./ncbiCompleteCOI_ncbi.fasta&quot;, tryRC = T)
-ncbi$taxa.p = mk_printDF(ncbi$taxa, na2char = F)
-# To see how many sequences are assigned per ranks
-colSums(!is.na(ncbi$taxa.p))</code></pre>
-<!-- rnb-source-end -->
+<!-- rnb-output-begin eyJkYXRhIjoiTlVMTFxuIn0= -->
+<pre><code>NULL</code></pre>
+<!-- rnb-output-end -->
 <!-- rnb-chunk-end -->
 <!-- rnb-text-begin -->
 </div>
@@ -1957,37 +2086,83 @@ colSums(!is.na(ncbi$taxa.p))</code></pre>
 <p>Functions specific to this db are here : <a href="https://github.com/salix-d/customSeqDB/blob/master/R/ena-db.R" class="uri">https://github.com/salix-d/customSeqDB/blob/master/R/ena-db.R</a> ## Getting the taxIds The ENA API lets you find all records which have sequences for a taxonomic tree. So with a parent taxon you can find all children taxon which have sequences. But to do so, you can’t use their name, you have to use their taxonomic id. See : <a href="https://ena-docs.readthedocs.io/en/latest/retrieval/programmatic-access/taxon-based-search.html" class="uri">https://ena-docs.readthedocs.io/en/latest/retrieval/programmatic-access/taxon-based-search.html</a></p>
 <!-- rnb-text-end -->
 <!-- rnb-chunk-begin -->
-<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuZW5hIDwtIGxpc3QoaWRzID0gZ2V0X2VuYVRheElkcyhuYW1lcyA9IGMoXCJPcGlsaW9hY2FyaWRhXCIsIFwiSG9sb3RoeXJpZGFcIiwgXCJJeG9kaWRhXCIsIFwiTWVzb3N0aWdtYXRhXCIsIFwiVHJvbWJpZGlmb3JtZXNcIiwgXCJTYXJjb3B0aWZvcm1lc1wiKSkpXG5lbmEkaWRzXG5gYGAifQ== -->
-<pre class="r"><code>ena &lt;- list(ids = get_enaTaxIds(names = c(&quot;Opilioacarida&quot;, &quot;Holothyrida&quot;, &quot;Ixodida&quot;, &quot;Mesostigmata&quot;, &quot;Trombidiformes&quot;, &quot;Sarcoptiformes&quot;)))
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuYGBgclxuZW5hIDwtIGxpc3QoaWRzID0gZ2V0X2VuYVRheElkcyhuYW1lcyA9IGMoXFxPcGlsaW9hY2FyaWRhXFwsIFxcSG9sb3RoeXJpZGFcXCwgXFxJeG9kaWRhXFwsIFxcTWVzb3N0aWdtYXRhXFwsIFxcVHJvbWJpZGlmb3JtZXNcXCwgXFxTYXJjb3B0aWZvcm1lc1xcKSkpXG5lbmEkaWRzXG5gYGBcbmBgYCJ9 -->
+<pre class="r"><code>```r
+ena &lt;- list(ids = get_enaTaxIds(names = c(\Opilioacarida\, \Holothyrida\, \Ixodida\, \Mesostigmata\, \Trombidiformes\, \Sarcoptiformes\)))
 ena$ids</code></pre>
-<!-- rnb-source-end -->
-<!-- rnb-chunk-end -->
-<!-- rnb-text-begin -->
-<p>Ignore the ‘incomplete final line found’, it doesn’t affect anything.</p>
-<p>Then we can get the details (Accession numbers and description) of the records matching the taxIds and a specified gene to pre-filter for which records have complete sequences. This may take a while.</p>
-<p><i>The connection often times out the more criteria you add. So I modified the function to directly download the file instead of just reading it with jsonlite. And since it doesn’t look for the genes in the records but only in the description, there will be record missing if only looking for the gene name because sometimes it’s not abbreviated AND because it will miss the “whole genome” and “mitochondrial DNA, complete sequence” type of records. But, because this returns only accession and description pretty fast, all records associated with the taxa which have “complete” in the description can be downloaded and then sorted for the gene.</i></p>
-<!-- rnb-text-end -->
-<!-- rnb-chunk-begin -->
-<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuZW5hJGRldGFpbHMgPC0gZ2V0X2VuYURldGFpbHMoZW5hJGlkcyR0YXhJZCwgZGVzY3JpcHRpb24gPSBcImNvbXBsZXRlXCIpXG5ucm93KGVuYSRkZXRhaWxzKVxuYGBgIn0= -->
-<pre class="r"><code>ena$details &lt;- get_enaDetails(ena$ids$taxId, description = &quot;complete&quot;)
+<pre><code>
+&lt;!-- rnb-source-end --&gt;
+
+&lt;!-- rnb-chunk-end --&gt;
+
+
+&lt;!-- rnb-text-begin --&gt;
+
+Ignore the &#39;incomplete final line found&#39;, it doesn&#39;t affect anything.
+
+Then we can get the details (Accession numbers and description) of the records matching the taxIds and a specified gene to pre-filter for which records have complete sequences. This may take a while.
+
+&lt;i&gt;The connection often times out the more criteria you add. So I modified the function to directly download the file instead of just reading it with jsonlite.
+And since it doesn&#39;t look for the genes in the records but only in the description, there will be record missing if only looking for the gene name because sometimes it&#39;s not abbreviated AND because it will miss the &quot;whole genome&quot; and &quot;mitochondrial DNA, complete sequence&quot; type of records.
+But, because this returns only accession and description pretty fast, all records associated with the taxa which have &quot;complete&quot; in the description can be downloaded and then sorted for the gene.&lt;/i&gt;
+
+&lt;!-- rnb-text-end --&gt;
+
+
+&lt;!-- rnb-chunk-begin --&gt;
+
+
+&lt;!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuYGBgclxuZW5hJGRldGFpbHMgPC0gZ2V0X2VuYURldGFpbHMoZW5hJGlkcyR0YXhJZCwgZGVzY3JpcHRpb24gPSBcXGNvbXBsZXRlXFwpXG5ucm93KGVuYSRkZXRhaWxzKVxuYGBgXG5gYGAifQ== --&gt;
+
+```r
+```r
+ena$details &lt;- get_enaDetails(ena$ids$taxId, description = \complete\)
 nrow(ena$details)</code></pre>
-<!-- rnb-source-end -->
-<!-- rnb-chunk-end -->
-<!-- rnb-text-begin -->
-<!-- rnb-text-end -->
-<!-- rnb-chunk-begin -->
-<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuaGVhZChlbmEkZGV0YWlscylcbmBgYCJ9 -->
-<pre class="r"><code>head(ena$details)</code></pre>
-<!-- rnb-source-end -->
-<!-- rnb-chunk-end -->
-<!-- rnb-text-begin -->
-<p>Now we have to filter for the records with our gene. ENA has COI written as COI, COX1 and CO1. We also want to keep the complete genome and mitochondrial DNA. “[ [:punct:]]” means it must be preceded/followed by a space or a punctuation sign. This is to avoid to have records where COI is found in a string of uppercase letter (as in some voucher/code like BXMSCOIDJF) and the sequences for the COII and COIII genes. See <a href="https://rstudio.com/wp-content/uploads/2016/09/RegExCheatsheet.pdf" class="uri">https://rstudio.com/wp-content/uploads/2016/09/RegExCheatsheet.pdf</a> for more details on r regexp.</p>
-<!-- rnb-text-end -->
-<!-- rnb-chunk-begin -->
-<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuZmx0ciA8LSBcIlsgWzpwdW5jdDpdXUNPWD9bSTFdWyBbOnB1bmN0Ol1dW1s6YWxudW06XSBcXFxcKFxcXFwpO10rLD9bWzphbG51bTpdIFxcXFwoXFxcXCldKiw/IGNvbXBsZXRlfGNvbXBsZXRlIGdlbm9tZXxETkEsIGNvbXBsZXRlXCJcbmVuYSRjb21wbGV0ZSRkZXRhaWxzIDwtIGVuYSRkZXRhaWxzW2dyZXAoZmx0ciwgZW5hJGRldGFpbHMkZGVzY3JpcHRpb24sIGlnbm9yZS5jYXNlID0gVCksXVxubnJvdyhlbmEkY29tcGxldGUkZGV0YWlscylcbmBgYCJ9 -->
-<pre class="r"><code>fltr &lt;- &quot;[ [:punct:]]COX?[I1][ [:punct:]][[:alnum:] \\(\\);]+,?[[:alnum:] \\(\\)]*,? complete|complete genome|DNA, complete&quot;
-ena$complete$details &lt;- ena$details[grep(fltr, ena$details$description, ignore.case = T),]
-nrow(ena$complete$details)</code></pre>
+<pre><code>
+&lt;!-- rnb-source-end --&gt;
+
+&lt;!-- rnb-chunk-end --&gt;
+
+
+&lt;!-- rnb-text-begin --&gt;
+
+
+
+&lt;!-- rnb-text-end --&gt;
+
+
+&lt;!-- rnb-chunk-begin --&gt;
+
+
+&lt;!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuYGBgclxuaGVhZChlbmEkZGV0YWlscylcbmBgYFxuYGBgIn0= --&gt;
+
+```r
+```r
+head(ena$details)</code></pre>
+<pre><code>
+&lt;!-- rnb-source-end --&gt;
+
+&lt;!-- rnb-chunk-end --&gt;
+
+
+&lt;!-- rnb-text-begin --&gt;
+
+
+Now we have to filter for the records with our gene. ENA has COI written as COI, COX1 and CO1. We also want to keep the complete genome and  mitochondrial DNA.
+&quot;[ [:punct:]]&quot; means it must be preceded/followed by a space or a punctuation sign. This is to avoid to have records where COI is found in a string of uppercase letter (as in some voucher/code like BXMSCOIDJF) and the sequences for the COII and COIII genes.
+See https://rstudio.com/wp-content/uploads/2016/09/RegExCheatsheet.pdf for more details on r regexp.
+
+&lt;!-- rnb-text-end --&gt;
+
+
+&lt;!-- rnb-chunk-begin --&gt;
+
+
+&lt;!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuYGBgclxuZmx0ciA8LSBcXFsgWzpwdW5jdDpdXUNPWD9bSTFdWyBbOnB1bmN0Ol1dW1s6YWxudW06XSBcXFxcKFxcXFwpO10rXG5gYGAifQ== --&gt;
+
+```r
+```r
+fltr &lt;- \[ [:punct:]]COX?[I1][ [:punct:]][[:alnum:] \\(\\);]+</code></pre>
 <!-- rnb-source-end -->
 <!-- rnb-chunk-end -->
 <!-- rnb-text-begin -->
@@ -1995,73 +2170,154 @@ nrow(ena$complete$details)</code></pre>
 <p>Since the ENA api doesn’t returns just CDS, the records will be downloaded in insdxml format (a format also available from ncbi) and then parsed them to get the accession number, the taxid and the COI gene sequence. To get the sequence it finds the gene field which has the name COI and then gets the location information to get the range of the gene which is used to substring the string in the sequence field. Since CDS have reading frames, the argument start_codon must be set to TRUE so it can adjust the start of gene range according to the reading frame. The INSDxml files can optionnaly be downloaded instead of read : add agruments saveXml = T. It will download as ‘./ena_downloads/xml/[Sys.Date]<em>records</em>[###].xml. To specify path use arguement outXml. The resulting sequence can optionnaly be saved as fasta file (the ids will be the info merge in a json string to convert back to data.frame easily) : add agruments saveFasta = T. It will download as’./ena_downloads/fasta/[Sys.Date]<em>sequences</em>[###].xml. To specify path use arguement outFasta.</p>
 <!-- rnb-text-end -->
 <!-- rnb-chunk-begin -->
-<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuZW5hJGNvbXBsZXRlJHNlcSA8LSBnZXRfZW5hRmFzdGEoYWNjTGlzdCA9IGVuYSRjb21wbGV0ZSRkZXRhaWxzJGFjY2Vzc2lvbiwgZ2VuZSA9IFwiQ09YP1tJMV1bWzpzcGFjZTpdXVwiLCBjb2Rvbl9zdGFydCA9IFQsIHNhdmVYTUwgPSBUKVxuI2dldHRpbmcgYW4gZXJyb3IgYmVjYXVzZSBzb21lIGFjY2Vzc2lvbiBhcmUgYXZhaWxhYmxlIGluIHRoYXQgZm9ybWF0LlxuIyBmaXggOiBcbmBgYCJ9 -->
-<pre class="r"><code>ena$complete$seq &lt;- get_enaFasta(accList = ena$complete$details$accession, gene = &quot;COX?[I1][[:space:]]&quot;, codon_start = T, saveXML = T)
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuYGBgclxuZW5hJGNvbXBsZXRlJHNlcSA8LSBnZXRfZW5hRmFzdGEoYWNjTGlzdCA9IGVuYSRjb21wbGV0ZSRkZXRhaWxzJGFjY2Vzc2lvbiwgZ2VuZSA9IFxcQ09YP1tJMV1bWzpzcGFjZTpdXVxcLCBjb2Rvbl9zdGFydCA9IFQsIHNhdmVYTUwgPSBUKVxuI2dldHRpbmcgYW4gZXJyb3IgYmVjYXVzZSBzb21lIGFjY2Vzc2lvbiBhcmUgYXZhaWxhYmxlIGluIHRoYXQgZm9ybWF0LlxuIyBmaXggOiBcbmBgYFxuYGBgIn0= -->
+<pre class="r"><code>```r
+ena$complete$seq &lt;- get_enaFasta(accList = ena$complete$details$accession, gene = \COX?[I1][[:space:]]\, codon_start = T, saveXML = T)
 #getting an error because some accession are available in that format.
 # fix : </code></pre>
-<!-- rnb-source-end -->
-<!-- rnb-chunk-end -->
-<!-- rnb-text-begin -->
-<!-- rnb-text-end -->
-<!-- rnb-chunk-begin -->
-<!-- rnb-source-begin eyJkYXRhIjoiYGBgYmFzaFxuc2VkICcvPElOU0RTZXFfc2VxdWVuY2U+ICAgIDxcXC9JTlNEU2VxPi9kJyAuLi9lbmFfZG93bmxvYWRzL3htbC8yMDIwLTEwLTAyX3JlY29yZHNfMDAxLnhtbCA+IC4uL2VuYV9kb3dubG9hZHMveG1sLzIwMjAtMTAtMDJfcmVjb3Jkc18wMDIueG1sXG5gYGAifQ== -->
-<pre class="bash"><code>sed &#39;/&lt;INSDSeq_sequence&gt;    &lt;\/INSDSeq&gt;/d&#39; ../ena_downloads/xml/2020-10-02_records_001.xml &gt; ../ena_downloads/xml/2020-10-02_records_002.xml</code></pre>
-<!-- rnb-source-end -->
-<!-- rnb-chunk-end -->
-<!-- rnb-text-begin -->
-<!-- rnb-text-end -->
-<!-- rnb-chunk-begin -->
-<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuZW5hJGNvbXBsZXRlJHNlcSA8LSBwYXJzZV9JTlNEeG1sKFVSTCA9IFwiLi9lbmFfZG93bmxvYWRzL3htbC8yMDIwLTEwLTAyX3JlY29yZHNfMDAyLnhtbFwiLCBnZW5lID0gXCJDT1g/W0kxXTx8Y3l0b2Nocm9tZSBjPyA/b3hpZGFzZSAoc3VidW5pdCk/ID9bSTFdPFwiLCBjb2Rvbl9zdGFydCA9IFQpXG5gYGAifQ== -->
-<pre class="r"><code>ena$complete$seq &lt;- parse_INSDxml(URL = &quot;./ena_downloads/xml/2020-10-02_records_002.xml&quot;, gene = &quot;COX?[I1]&lt;|cytochrome c? ?oxidase (subunit)? ?[I1]&lt;&quot;, codon_start = T)</code></pre>
-<!-- rnb-source-end -->
-<!-- rnb-chunk-end -->
-<!-- rnb-text-begin -->
-<p>LN874269 and LN874270 are mitochondrial complete genome. TaxId : 52283</p>
-<!-- rnb-text-end -->
-<!-- rnb-chunk-begin -->
-<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuc3VtKGVuYSRjb21wbGV0ZSRzZXEkdGF4SWQgJWluJSBcIjUyMjgzXCIpXG5gYGAifQ== -->
-<pre class="r"><code>sum(ena$complete$seq$taxId %in% &quot;52283&quot;)</code></pre>
-<!-- rnb-source-end -->
-<!-- rnb-chunk-end -->
-<!-- rnb-text-begin -->
-<p>We have 13 other sequence for this taxId.</p>
-<p>Let’s check which accession weren’t available in that format :</p>
-<!-- rnb-text-end -->
-<!-- rnb-chunk-begin -->
-<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuZW1ibF9hY2MgPC0gZW5hJGNvbXBsZXRlJGRldGFpbHMkYWNjZXNzaW9uWyEgZW5hJGNvbXBsZXRlJGRldGFpbHMkYWNjZXNzaW9uICVpbiUgYyhnc3ViKFwiXFxcXC5bMC05XSokXCIsIFwiXCIsIGVuYSRjb21wbGV0ZSRzZXEkYWNjZXNzaW9uKSwgXCJMTjg3NDI2OVwiLCBcIkxOODc0MjcwXCIpXVxuZW1ibF9hY2NcbmBgYCJ9 -->
-<pre class="r"><code>embl_acc &lt;- ena$complete$details$accession[! ena$complete$details$accession %in% c(gsub(&quot;\\.[0-9]*$&quot;, &quot;&quot;, ena$complete$seq$accession), &quot;LN874269&quot;, &quot;LN874270&quot;)]
+<pre><code>
+&lt;!-- rnb-source-end --&gt;
+
+&lt;!-- rnb-chunk-end --&gt;
+
+
+&lt;!-- rnb-text-begin --&gt;
+
+
+
+&lt;!-- rnb-text-end --&gt;
+
+
+&lt;!-- rnb-chunk-begin --&gt;
+
+
+&lt;!-- rnb-source-begin eyJkYXRhIjoiYGBgYmFzaFxuYGBgYmFzaFxuc2VkICcvPElOU0RTZXFfc2VxdWVuY2U+ICAgIDxcXC9JTlNEU2VxPi9kJyAuLi9lbmFfZG93bmxvYWRzL3htbC8yMDIwLTEwLTAyX3JlY29yZHNfMDAxLnhtbCA+IC4uL2VuYV9kb3dubG9hZHMveG1sLzIwMjAtMTAtMDJfcmVjb3Jkc18wMDIueG1sXG5gYGBcbmBgYCJ9 --&gt;
+
+```bash
+```bash
+sed &#39;/&lt;INSDSeq_sequence&gt;    &lt;\/INSDSeq&gt;/d&#39; ../ena_downloads/xml/2020-10-02_records_001.xml &gt; ../ena_downloads/xml/2020-10-02_records_002.xml</code></pre>
+<pre><code>
+&lt;!-- rnb-source-end --&gt;
+
+&lt;!-- rnb-chunk-end --&gt;
+
+
+&lt;!-- rnb-text-begin --&gt;
+
+
+
+&lt;!-- rnb-text-end --&gt;
+
+
+&lt;!-- rnb-chunk-begin --&gt;
+
+
+&lt;!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuYGBgclxuZW5hJGNvbXBsZXRlJHNlcSA8LSBwYXJzZV9JTlNEeG1sKFVSTCA9IFxcLi9lbmFfZG93bmxvYWRzL3htbC8yMDIwLTEwLTAyX3JlY29yZHNfMDAyLnhtbFxcLCBnZW5lID0gXFxDT1g/W0kxXTx8Y3l0b2Nocm9tZSBjPyA/b3hpZGFzZSAoc3VidW5pdCk/ID9bSTFdPFxcLCBjb2Rvbl9zdGFydCA9IFQpXG5gYGBcbmBgYCJ9 --&gt;
+
+```r
+```r
+ena$complete$seq &lt;- parse_INSDxml(URL = \./ena_downloads/xml/2020-10-02_records_002.xml\, gene = \COX?[I1]&lt;|cytochrome c? ?oxidase (subunit)? ?[I1]&lt;\, codon_start = T)</code></pre>
+<pre><code>
+&lt;!-- rnb-source-end --&gt;
+
+&lt;!-- rnb-chunk-end --&gt;
+
+
+&lt;!-- rnb-text-begin --&gt;
+
+LN874269 and LN874270 are mitochondrial complete genome. TaxId : 52283
+
+
+&lt;!-- rnb-text-end --&gt;
+
+
+&lt;!-- rnb-chunk-begin --&gt;
+
+
+&lt;!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuYGBgclxuc3VtKGVuYSRjb21wbGV0ZSRzZXEkdGF4SWQgJWluJSBcXDUyMjgzXFwpXG5gYGBcbmBgYCJ9 --&gt;
+
+```r
+```r
+sum(ena$complete$seq$taxId %in% \52283\)</code></pre>
+<pre><code>
+&lt;!-- rnb-source-end --&gt;
+
+&lt;!-- rnb-chunk-end --&gt;
+
+
+&lt;!-- rnb-text-begin --&gt;
+
+We have 13 other sequence for this taxId.
+
+Let&#39;s check which accession weren&#39;t available in that format :
+
+
+&lt;!-- rnb-text-end --&gt;
+
+
+&lt;!-- rnb-chunk-begin --&gt;
+
+
+&lt;!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuYGBgclxuZW1ibF9hY2MgPC0gZW5hJGNvbXBsZXRlJGRldGFpbHMkYWNjZXNzaW9uWyEgZW5hJGNvbXBsZXRlJGRldGFpbHMkYWNjZXNzaW9uICVpbiUgYyhnc3ViKFxcXFxcXC5bMC05XSokXFwsIFxcXFwsIGVuYSRjb21wbGV0ZSRzZXEkYWNjZXNzaW9uKSwgXFxMTjg3NDI2OVxcLCBcXExOODc0MjcwXFwpXVxuZW1ibF9hY2NcbmBgYFxuYGBgIn0= --&gt;
+
+```r
+```r
+embl_acc &lt;- ena$complete$details$accession[! ena$complete$details$accession %in% c(gsub(\\\.[0-9]*$\, \\, ena$complete$seq$accession), \LN874269\, \LN874270\)]
 embl_acc</code></pre>
-<!-- rnb-source-end -->
-<!-- rnb-chunk-end -->
-<!-- rnb-text-begin -->
-<p>We can parse the rest with the EMBL format. This format is less consistent between records which is why I rather use INSDxml when possible.</p>
-<!-- rnb-text-end -->
-<!-- rnb-chunk-begin -->
-<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuIyBNYWtpbmcgVVJMIG1hbnVhbGx5XG5VUkwgPC0gcGFzdGUwKFwiaHR0cDovL3d3dy5lYmkuYWMudWsvVG9vbHMvZGJmZXRjaC9kYmZldGNoP2RiPWVuYV9zZXF1ZW5jZTtpZD1cIiwgcGFzdGUoZW1ibF9hY2MsIGNvbGxhcHNlID0gXCIsXCIpLFwiO2Zvcm1hdD1lbWJseG1sLTEuMlwiKVxuI3BhcnNpbmcgaXRcbiMgZW1ibCBpcyBhIGJpdCBkaWZmZXJlbnQgc28gdGhlcmUgYXJlIHNwYWNlIGJldHdlZW4gdGV4dCBhbmQgbmV4dCAnPCdcbmVuYSRjb21wbGV0ZSRzZXEgPC0gcmJpbmQoZW5hJGNvbXBsZXRlJHNlcSwgcGFyc2VfRU1CTHhtbChVUkwsIGdlbmUgPSBcIkNPWD9bSTFdW1s6c3BhY2U6XV18Y3l0b2Nocm9tZSBjPyA/b3hpZGFzZSAoc3VidW5pdCk/ID9bSTFdW1s6c3BhY2U6XV1cIiwgY29kb25fc3RhcnQgPSBUKSlcbm5yb3coZW5hJGNvbXBsZXRlJHNlcSlcbmBgYCJ9 -->
-<pre class="r"><code># Making URL manually
-URL &lt;- paste0(&quot;http://www.ebi.ac.uk/Tools/dbfetch/dbfetch?db=ena_sequence;id=&quot;, paste(embl_acc, collapse = &quot;,&quot;),&quot;;format=emblxml-1.2&quot;)
-#parsing it
-# embl is a bit different so there are space between text and next &#39;&lt;&#39;
-ena$complete$seq &lt;- rbind(ena$complete$seq, parse_EMBLxml(URL, gene = &quot;COX?[I1][[:space:]]|cytochrome c? ?oxidase (subunit)? ?[I1][[:space:]]&quot;, codon_start = T))
-nrow(ena$complete$seq)</code></pre>
+<pre><code>
+&lt;!-- rnb-source-end --&gt;
+
+&lt;!-- rnb-chunk-end --&gt;
+
+
+&lt;!-- rnb-text-begin --&gt;
+
+We can parse the rest with the EMBL format. This format is less consistent between records which is why I rather use INSDxml when possible.
+
+&lt;!-- rnb-text-end --&gt;
+
+
+&lt;!-- rnb-chunk-begin --&gt;
+
+
+&lt;!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuYGBgclxuIyBNYWtpbmcgVVJMIG1hbnVhbGx5XG5VUkwgPC0gcGFzdGUwKFxcaHR0cDovL3d3dy5lYmkuYWMudWsvVG9vbHMvZGJmZXRjaC9kYmZldGNoP2RiPWVuYV9zZXF1ZW5jZTtpZD1cXCwgcGFzdGUoZW1ibF9hY2MsIGNvbGxhcHNlID0gXFxcbmBgYCJ9 --&gt;
+
+```r
+```r
+# Making URL manually
+URL &lt;- paste0(\http://www.ebi.ac.uk/Tools/dbfetch/dbfetch?db=ena_sequence;id=\, paste(embl_acc, collapse = \</code></pre>
 <!-- rnb-source-end -->
 <!-- rnb-chunk-end -->
 <!-- rnb-text-begin -->
 <p>hmmm… Apparently we can’t even…</p>
 <!-- rnb-text-end -->
 <!-- rnb-chunk-begin -->
-<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxubm9YbWxfYWNjIDwtIGVuYSRjb21wbGV0ZSRkZXRhaWxzJGFjY2Vzc2lvblshIGVuYSRjb21wbGV0ZSRkZXRhaWxzJGFjY2Vzc2lvbiAlaW4lIGMoZ3N1YihcIlxcXFwuWzAtOV0qJFwiLCBcIlwiLCBlbmEkY29tcGxldGUkc2VxJGFjY2Vzc2lvbiksIFwiTE44NzQyNjlcIiwgXCJMTjg3NDI3MFwiKV1cbmBgYCJ9 -->
-<pre class="r"><code>noXml_acc &lt;- ena$complete$details$accession[! ena$complete$details$accession %in% c(gsub(&quot;\\.[0-9]*$&quot;, &quot;&quot;, ena$complete$seq$accession), &quot;LN874269&quot;, &quot;LN874270&quot;)]</code></pre>
-<!-- rnb-source-end -->
-<!-- rnb-chunk-end -->
-<!-- rnb-text-begin -->
-<p>These just don’t have any xml forma available. Guess we’ll have to parse the flat files… If it’s not slower, we could have parse them all this way. To test out. Flat file are also different, so the limiter to not get COII/COIII is &quot;</p>
-<!-- rnb-text-end -->
-<!-- rnb-chunk-begin -->
-<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuVVJMIDwtIHBhc3RlMChcImh0dHA6Ly93d3cuZWJpLmFjLnVrL1Rvb2xzL2RiZmV0Y2gvZGJmZXRjaD9kYj1lbmFfc2VxdWVuY2UmaWQ9XCIsIHBhc3RlKG5vWG1sX2FjYywgY29sbGFwc2UgPSBcIixcIiksXCImZm9ybWF0PWVtYmwmc3R5bGU9cmF3XCIpXG5lbmEkY29tcGxldGUkc2VxIDwtIHJiaW5kKGVuYSRjb21wbGV0ZSRzZXEsIHBhcnNlX2ZsYXRGaWxlKFVSTCwgZ2VuZSA9IFwiQ09YP1tJMV1cXFwifGN5dG9jaHJvbWUgYz8gP294aWRhc2UgKHN1YnVuaXQpPyA/W0kxXVxcXCJcIiwgY29kb25fc3RhcnQgPSBUKSkgXG5ucm93KGVuYSRjb21wbGV0ZSRzZXEpXG5gYGAifQ== -->
-<pre class="r"><code>URL &lt;- paste0(&quot;http://www.ebi.ac.uk/Tools/dbfetch/dbfetch?db=ena_sequence&amp;id=&quot;, paste(noXml_acc, collapse = &quot;,&quot;),&quot;&amp;format=embl&amp;style=raw&quot;)
-ena$complete$seq &lt;- rbind(ena$complete$seq, parse_flatFile(URL, gene = &quot;COX?[I1]\&quot;|cytochrome c? ?oxidase (subunit)? ?[I1]\&quot;&quot;, codon_start = T)) 
-nrow(ena$complete$seq)</code></pre>
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuYGBgclxubm9YbWxfYWNjIDwtIGVuYSRjb21wbGV0ZSRkZXRhaWxzJGFjY2Vzc2lvblshIGVuYSRjb21wbGV0ZSRkZXRhaWxzJGFjY2Vzc2lvbiAlaW4lIGMoZ3N1YihcXFxcXFwuWzAtOV0qJFxcLCBcXFxcLCBlbmEkY29tcGxldGUkc2VxJGFjY2Vzc2lvbiksIFxcTE44NzQyNjlcXCwgXFxMTjg3NDI3MFxcKV1cbmBgYFxuYGBgIn0= -->
+<pre class="r"><code>```r
+noXml_acc &lt;- ena$complete$details$accession[! ena$complete$details$accession %in% c(gsub(\\\.[0-9]*$\, \\, ena$complete$seq$accession), \LN874269\, \LN874270\)]</code></pre>
+<pre><code>
+&lt;!-- rnb-source-end --&gt;
+
+&lt;!-- rnb-chunk-end --&gt;
+
+
+&lt;!-- rnb-text-begin --&gt;
+
+These just don&#39;t have any xml forma available. Guess we&#39;ll have to parse the flat files...
+If it&#39;s not slower, we could have parse them all this way. To test out.
+Flat file are also different, so the limiter to not get COII/COIII is &quot;
+
+&lt;!-- rnb-text-end --&gt;
+
+
+&lt;!-- rnb-chunk-begin --&gt;
+
+
+&lt;!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuYGBgclxuVVJMIDwtIHBhc3RlMChcXGh0dHA6Ly93d3cuZWJpLmFjLnVrL1Rvb2xzL2RiZmV0Y2gvZGJmZXRjaD9kYj1lbmFfc2VxdWVuY2UmaWQ9XFwsIHBhc3RlKG5vWG1sX2FjYywgY29sbGFwc2UgPSBcXFxuYGBgIn0= --&gt;
+
+```r
+```r
+URL &lt;- paste0(\http://www.ebi.ac.uk/Tools/dbfetch/dbfetch?db=ena_sequence&amp;id=\, paste(noXml_acc, collapse = \</code></pre>
 <!-- rnb-source-end -->
 <!-- rnb-chunk-end -->
 <!-- rnb-text-begin -->
@@ -2070,86 +2326,149 @@ nrow(ena$complete$seq)</code></pre>
 <!-- rnb-chunk-begin -->
 <!-- rnb-chunk-end -->
 <!-- rnb-text-begin -->
-<div id="making-sure-sequences-are-actually-complete-1" class="section level3">
+<div id="making-sure-sequences-are-actually-complete" class="section level3">
 <h3>Making sure sequences are actually complete</h3>
 <p>The start and end codons might vary depending on the taxa. See : <a href="https://www.ncbi.nlm.nih.gov/Taxonomy/Utils/wprintgc.cgi" class="uri">https://www.ncbi.nlm.nih.gov/Taxonomy/Utils/wprintgc.cgi</a> This example uses transl_table5.</p>
 <!-- rnb-text-end -->
 <!-- rnb-chunk-begin -->
-<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuc3RhcnRfY29kb25zIDwtIGMoXCJUVEdcIixcIkFUVFwiLFwiQVRDXCIsXCJBVEFcIixcIkFUR1wiLFwiR1RHXCIpXG5lbmRfY29kb25zIDwtIGMoXCJUQUFcIiwgXCJUQUdcIilcbmhhcy5zdGFydCA8LSBncmVwKHBhc3RlMChcIl5cIiwgcGFzdGUoc3RhcnRfY29kb25zLCBjb2xsYXBzZSA9IFwifF5cIikpLCBlbmEkY29tcGxldGUkc2VxJHNlcXVlbmNlLCBpZ25vcmUuY2FzZSA9IFQpXG5oYXMuZW5kIDwtIGdyZXAocGFzdGUwKHBhc3RlKGVuZF9jb2RvbnMsIGNvbGxhcHNlID0gXCIkfFwiKSwgXCIkXCIpLCBlbmEkY29tcGxldGUkc2VxJHNlcXVlbmNlLCBpZ25vcmUuY2FzZSA9IFQpXG5lbmEkY29tcGxldGUkQ09JIDwtIGVuYSRjb21wbGV0ZSRzZXFbaW50ZXJzZWN0KGhhcy5zdGFydCwgaGFzLmVuZCksXVxubnJvdyhlbmEkY29tcGxldGUkQ09JKVxuYGBgIn0= -->
-<pre class="r"><code>start_codons &lt;- c(&quot;TTG&quot;,&quot;ATT&quot;,&quot;ATC&quot;,&quot;ATA&quot;,&quot;ATG&quot;,&quot;GTG&quot;)
-end_codons &lt;- c(&quot;TAA&quot;, &quot;TAG&quot;)
-has.start &lt;- grep(paste0(&quot;^&quot;, paste(start_codons, collapse = &quot;|^&quot;)), ena$complete$seq$sequence, ignore.case = T)
-has.end &lt;- grep(paste0(paste(end_codons, collapse = &quot;$|&quot;), &quot;$&quot;), ena$complete$seq$sequence, ignore.case = T)
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuYGBgclxuc3RhcnRfY29kb25zIDwtIGMoXFxUVEdcXCxcXEFUVFxcLFxcQVRDXFwsXFxBVEFcXCxcXEFUR1xcLFxcR1RHXFwpXG5lbmRfY29kb25zIDwtIGMoXFxUQUFcXCwgXFxUQUdcXClcbmhhcy5zdGFydCA8LSBncmVwKHBhc3RlMChcXF5cXCwgcGFzdGUoc3RhcnRfY29kb25zLCBjb2xsYXBzZSA9IFxcfF5cXCkpLCBlbmEkY29tcGxldGUkc2VxJHNlcXVlbmNlLCBpZ25vcmUuY2FzZSA9IFQpXG5oYXMuZW5kIDwtIGdyZXAocGFzdGUwKHBhc3RlKGVuZF9jb2RvbnMsIGNvbGxhcHNlID0gXFwkfFxcKSwgXFwkXFwpLCBlbmEkY29tcGxldGUkc2VxJHNlcXVlbmNlLCBpZ25vcmUuY2FzZSA9IFQpXG5lbmEkY29tcGxldGUkQ09JIDwtIGVuYSRjb21wbGV0ZSRzZXFbaW50ZXJzZWN0KGhhcy5zdGFydCwgaGFzLmVuZCksXVxubnJvdyhlbmEkY29tcGxldGUkQ09JKVxuYGBgXG5gYGAifQ== -->
+<pre class="r"><code>```r
+start_codons &lt;- c(\TTG\,\ATT\,\ATC\,\ATA\,\ATG\,\GTG\)
+end_codons &lt;- c(\TAA\, \TAG\)
+has.start &lt;- grep(paste0(\^\, paste(start_codons, collapse = \|^\)), ena$complete$seq$sequence, ignore.case = T)
+has.end &lt;- grep(paste0(paste(end_codons, collapse = \$|\), \$\), ena$complete$seq$sequence, ignore.case = T)
 ena$complete$COI &lt;- ena$complete$seq[intersect(has.start, has.end),]
 nrow(ena$complete$COI)</code></pre>
-<!-- rnb-source-end -->
-<!-- rnb-chunk-end -->
-<!-- rnb-text-begin -->
-<p>There will be duplicated sequences with the same taxId which should be removed.</p>
-<!-- rnb-text-end -->
-<!-- rnb-chunk-begin -->
-<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuI2ZpbmQgdGhlIHJvdyBuYW1lcyBvZiB0aGUgZHVwbGljYXRlZCBzZXF1ZW5jZXMgZm9yIGVhY2ggdGF4SWQuXG5kdXBzIDwtIGxhcHBseSh1bmlxdWUoZW5hJGNvbXBsZXRlJENPSSR0YXhJZCksIGZ1bmN0aW9uKGlkKSByb3duYW1lcyhlbmEkY29tcGxldGUkQ09JW2VuYSRjb21wbGV0ZSRDT0kkdGF4SWQgPT0gaWQsXSlbZHVwbGljYXRlZChlbmEkY29tcGxldGUkQ09JW2VuYSRjb21wbGV0ZSRDT0kkdGF4SWQgPT0gaWQsXSRzZXF1ZW5jZSldKVxuI2tlZXAgb25seSB0aGUgcm93cyBub3QgaW4gdGhhdCBsaXN0IG9mIGR1cGxpY2F0ZWQgc2VxdWVuY2VzLlxuZW5hJGNvbXBsZXRlJENPSSA8LSBlbmEkY29tcGxldGUkQ09JWyFyb3duYW1lcyhlbmEkY29tcGxldGUkQ09JKSAlaW4lIHVubGlzdChkdXBzKSxdXG5ucm93KGVuYSRjb21wbGV0ZSRDT0kpXG5gYGAifQ== -->
-<pre class="r"><code>#find the row names of the duplicated sequences for each taxId.
+<pre><code>
+&lt;!-- rnb-source-end --&gt;
+
+&lt;!-- rnb-chunk-end --&gt;
+
+
+&lt;!-- rnb-text-begin --&gt;
+
+There will be duplicated sequences with the same taxId which should be removed.
+
+
+&lt;!-- rnb-text-end --&gt;
+
+
+&lt;!-- rnb-chunk-begin --&gt;
+
+
+&lt;!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuYGBgclxuI2ZpbmQgdGhlIHJvdyBuYW1lcyBvZiB0aGUgZHVwbGljYXRlZCBzZXF1ZW5jZXMgZm9yIGVhY2ggdGF4SWQuXG5kdXBzIDwtIGxhcHBseSh1bmlxdWUoZW5hJGNvbXBsZXRlJENPSSR0YXhJZCksIGZ1bmN0aW9uKGlkKSByb3duYW1lcyhlbmEkY29tcGxldGUkQ09JW2VuYSRjb21wbGV0ZSRDT0kkdGF4SWQgPT0gaWQsXSlbZHVwbGljYXRlZChlbmEkY29tcGxldGUkQ09JW2VuYSRjb21wbGV0ZSRDT0kkdGF4SWQgPT0gaWQsXSRzZXF1ZW5jZSldKVxuI2tlZXAgb25seSB0aGUgcm93cyBub3QgaW4gdGhhdCBsaXN0IG9mIGR1cGxpY2F0ZWQgc2VxdWVuY2VzLlxuZW5hJGNvbXBsZXRlJENPSSA8LSBlbmEkY29tcGxldGUkQ09JWyFyb3duYW1lcyhlbmEkY29tcGxldGUkQ09JKSAlaW4lIHVubGlzdChkdXBzKSxdXG5ucm93KGVuYSRjb21wbGV0ZSRDT0kpXG5gYGBcbmBgYCJ9 --&gt;
+
+```r
+```r
+#find the row names of the duplicated sequences for each taxId.
 dups &lt;- lapply(unique(ena$complete$COI$taxId), function(id) rownames(ena$complete$COI[ena$complete$COI$taxId == id,])[duplicated(ena$complete$COI[ena$complete$COI$taxId == id,]$sequence)])
 #keep only the rows not in that list of duplicated sequences.
 ena$complete$COI &lt;- ena$complete$COI[!rownames(ena$complete$COI) %in% unlist(dups),]
 nrow(ena$complete$COI)</code></pre>
-<!-- rnb-source-end -->
-<!-- rnb-chunk-end -->
-<!-- rnb-text-begin -->
-</div>
-<div id="getting-the-taxonomy-for-the-remaining-sequences-1" class="section level2">
-<h2>Getting the taxonomy for the remaining sequences</h2>
-<!-- rnb-text-end -->
-<!-- rnb-chunk-begin -->
-<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuZGJfcGF0aCA8LSBcIi4uLy4uL01pdGVzREIvbmNiaS1kYl8yMDIwLTA5LTI5LnNxbGl0ZVwiXG5kaXIoZGlybmFtZShkYl9wYXRoKSlcbmVuYSRjb21wbGV0ZSR0YXggPC0gZ2V0X3RheG9ub215KGFzLm51bWVyaWMoZW5hJGNvbXBsZXRlJENPSSR0YXhJZCksIHNxbEZpbGUgPSBkYl9wYXRoLCByYW5rcyA9IGMoXCJraW5nZG9tXCIsXCJwaHlsdW1cIixcImNsYXNzXCIsXCJvcmRlclwiLFwiZmFtaWx5XCIsXCJnZW51c1wiLFwic3BlY2llc1wiKSlcbiN0byBzZWUgd2hhdCB0YXhhIHRoZSBkYiBjb3ZlcnMgOlxuYXBwbHkoZW5hJGNvbXBsZXRlJHRheFs0OjddLCAyLCB0YWJsZSlcbmBgYCJ9 -->
-<pre class="r"><code>db_path &lt;- &quot;../../MitesDB/ncbi-db_2020-09-29.sqlite&quot;
+<pre><code>
+&lt;!-- rnb-source-end --&gt;
+
+&lt;!-- rnb-chunk-end --&gt;
+
+
+&lt;!-- rnb-text-begin --&gt;
+
+
+## Getting the taxonomy for the remaining sequences
+
+
+&lt;!-- rnb-text-end --&gt;
+
+
+&lt;!-- rnb-chunk-begin --&gt;
+
+
+&lt;!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuYGBgclxuZGJfcGF0aCA8LSBcXC4uLy4uL01pdGVzREIvbmNiaS1kYl8yMDIwLTA5LTI5LnNxbGl0ZVxcXG5kaXIoZGlybmFtZShkYl9wYXRoKSlcbmVuYSRjb21wbGV0ZSR0YXggPC0gZ2V0X3RheG9ub215KGFzLm51bWVyaWMoZW5hJGNvbXBsZXRlJENPSSR0YXhJZCksIHNxbEZpbGUgPSBkYl9wYXRoLCByYW5rcyA9IGMoXFxraW5nZG9tXFwsXFxwaHlsdW1cXCxcXGNsYXNzXFwsXFxvcmRlclxcLFxcZmFtaWx5XFwsXFxnZW51c1xcLFxcc3BlY2llc1xcKSlcbiN0byBzZWUgd2hhdCB0YXhhIHRoZSBkYiBjb3ZlcnMgOlxuYXBwbHkoZW5hJGNvbXBsZXRlJHRheFs0OjddLCAyLCB0YWJsZSlcbmBgYFxuYGBgIn0= --&gt;
+
+```r
+```r
+db_path &lt;- \../../MitesDB/ncbi-db_2020-09-29.sqlite\
 dir(dirname(db_path))
-ena$complete$tax &lt;- get_taxonomy(as.numeric(ena$complete$COI$taxId), sqlFile = db_path, ranks = c(&quot;kingdom&quot;,&quot;phylum&quot;,&quot;class&quot;,&quot;order&quot;,&quot;family&quot;,&quot;genus&quot;,&quot;species&quot;))
+ena$complete$tax &lt;- get_taxonomy(as.numeric(ena$complete$COI$taxId), sqlFile = db_path, ranks = c(\kingdom\,\phylum\,\class\,\order\,\family\,\genus\,\species\))
 #to see what taxa the db covers :
 apply(ena$complete$tax[4:7], 2, table)</code></pre>
-<!-- rnb-source-end -->
-<!-- rnb-chunk-end -->
-<!-- rnb-text-begin -->
-</div>
-<div id="writing-the-dada2-formated-fasta-file-1" class="section level2">
-<h2>Writing the dada2 formated fasta file</h2>
-<!-- rnb-text-end -->
-<!-- rnb-chunk-begin -->
-<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuZW5hJGNvbXBsZXRlJHRheCRpZCA8LSBwYXN0ZTAoYXBwbHkoZW5hJGNvbXBsZXRlJHRheFsxOjddLCAxLCBwYXN0ZTAsIGNvbGxhcHNlID0gXCI7XCIpLCBcIjtcIilcbndyaXRlX2Zhc3RhKHNlcXVlbmNlcyA9IGVuYSRjb21wbGV0ZSRDT0kkc2VxLCBpZHMgPSBlbmEkY29tcGxldGUkdGF4JGlkLCBvdXRGaWxlID0gXCJlbmFDb21wbGV0ZUNPSV9lbmEuZmFzdGFcIilcbmBgYCJ9 -->
-<pre class="r"><code>ena$complete$tax$id &lt;- paste0(apply(ena$complete$tax[1:7], 1, paste0, collapse = &quot;;&quot;), &quot;;&quot;)
-write_fasta(sequences = ena$complete$COI$seq, ids = ena$complete$tax$id, outFile = &quot;enaCompleteCOI_ena.fasta&quot;)</code></pre>
-<!-- rnb-source-end -->
-<!-- rnb-chunk-end -->
-<!-- rnb-text-begin -->
-</div>
-<div id="testing-the-database-1" class="section level2">
-<h2>Testing the database</h2>
-<!-- rnb-text-end -->
-<!-- rnb-chunk-begin -->
-<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuZW5hJHNlcXRhYiA8LSBhcy5tYXRyaXgocmVhZC5jc3YoXCIuLi8uLi9NaXRlc0RCL2RhdGEvc2VxdGFiLm5vY2hpbV9NSVRFUy5jc3ZcIiwgcm93Lm5hbWVzID0gMSkpXG5lbmEkdGF4YSA8LSBkYWRhMjo6YXNzaWduVGF4b25vbXkoZW5hJHNlcXRhYiwgXCIuL2VuYUNvbXBsZXRlQ09JX2VuYS5mYXN0YVwiLCB0cnlSQyA9IFQpXG5lbmEkdGF4YS5wID0gbWtfcHJpbnRERihlbmEkdGF4YSwgbmEyY2hhciA9IEYpXG4jIFRvIHNlZSBob3cgbWFueSBzZXF1ZW5jZXMgYXJlIGFzc2lnbmVkIHBlciByYW5rc1xuY29sU3VtcyghaXMubmEoZW5hJHRheGEucCkpXG5gYGAifQ== -->
-<pre class="r"><code>ena$seqtab &lt;- as.matrix(read.csv(&quot;../../MitesDB/data/seqtab.nochim_MITES.csv&quot;, row.names = 1))
-ena$taxa &lt;- dada2::assignTaxonomy(ena$seqtab, &quot;./enaCompleteCOI_ena.fasta&quot;, tryRC = T)
+<pre><code>
+&lt;!-- rnb-source-end --&gt;
+
+&lt;!-- rnb-chunk-end --&gt;
+
+
+&lt;!-- rnb-text-begin --&gt;
+
+
+## Writing the dada2 formated fasta file
+
+&lt;!-- rnb-text-end --&gt;
+
+
+&lt;!-- rnb-chunk-begin --&gt;
+
+
+&lt;!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuYGBgclxuZW5hJGNvbXBsZXRlJHRheCRpZCA8LSBwYXN0ZTAoYXBwbHkoZW5hJGNvbXBsZXRlJHRheFsxOjddLCAxLCBwYXN0ZTAsIGNvbGxhcHNlID0gXFw7XFwpLCBcXDtcXClcbndyaXRlX2Zhc3RhKHNlcXVlbmNlcyA9IGVuYSRjb21wbGV0ZSRDT0kkc2VxLCBpZHMgPSBlbmEkY29tcGxldGUkdGF4JGlkLCBvdXRGaWxlID0gXFxlbmFDb21wbGV0ZUNPSV9lbmEuZmFzdGFcXClcbmBgYFxuYGBgIn0= --&gt;
+
+```r
+```r
+ena$complete$tax$id &lt;- paste0(apply(ena$complete$tax[1:7], 1, paste0, collapse = \;\), \;\)
+write_fasta(sequences = ena$complete$COI$seq, ids = ena$complete$tax$id, outFile = \enaCompleteCOI_ena.fasta\)</code></pre>
+<pre><code>
+&lt;!-- rnb-source-end --&gt;
+
+&lt;!-- rnb-chunk-end --&gt;
+
+
+&lt;!-- rnb-text-begin --&gt;
+
+
+## Testing the database
+
+&lt;!-- rnb-text-end --&gt;
+
+
+&lt;!-- rnb-chunk-begin --&gt;
+
+
+&lt;!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuYGBgclxuZW5hJHNlcXRhYiA8LSBhcy5tYXRyaXgocmVhZC5jc3YoXFwuLi8uLi9NaXRlc0RCL2RhdGEvc2VxdGFiLm5vY2hpbV9NSVRFUy5jc3ZcXCwgcm93Lm5hbWVzID0gMSkpXG5lbmEkdGF4YSA8LSBkYWRhMjo6YXNzaWduVGF4b25vbXkoZW5hJHNlcXRhYiwgXFwuL2VuYUNvbXBsZXRlQ09JX2VuYS5mYXN0YVxcLCB0cnlSQyA9IFQpXG5lbmEkdGF4YS5wID0gbWtfcHJpbnRERihlbmEkdGF4YSwgbmEyY2hhciA9IEYpXG4jIFRvIHNlZSBob3cgbWFueSBzZXF1ZW5jZXMgYXJlIGFzc2lnbmVkIHBlciByYW5rc1xuY29sU3VtcyghaXMubmEoZW5hJHRheGEucCkpXG5gYGBcbmBgYCJ9 --&gt;
+
+```r
+```r
+ena$seqtab &lt;- as.matrix(read.csv(\../../MitesDB/data/seqtab.nochim_MITES.csv\, row.names = 1))
+ena$taxa &lt;- dada2::assignTaxonomy(ena$seqtab, \./enaCompleteCOI_ena.fasta\, tryRC = T)
 ena$taxa.p = mk_printDF(ena$taxa, na2char = F)
 # To see how many sequences are assigned per ranks
 colSums(!is.na(ena$taxa.p))</code></pre>
-<!-- rnb-source-end -->
-<!-- rnb-chunk-end -->
-<!-- rnb-text-begin -->
-</div>
-<div id="merging-the-dbs" class="section level2">
-<h2>MERGING the dbs</h2>
-<!-- rnb-text-end -->
-<!-- rnb-chunk-begin -->
-<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuc2FtZV9hY2MgPC0gaW50ZXJzZWN0KG5jYmkkY29tcGxldGUkQ09JJGFjY2Vzc2lvbiwgZW5hJGNvbXBsZXRlJENPSSRhY2Nlc3Npb24pXG5sZW5ndGgoc2FtZV9hY2MpXG5cbm5jYmlfZW5hIDwtIG5jYmkkY29tcGxldGUkQ09JW2MoXCJhY2Nlc3Npb25cIiwgXCJ0YXhJZFwiLCBcInNlcVwiKV1cbmNvbG5hbWVzKG5jYmlfZW5hKVszXSA8LSBcInNlcXVlbmNlXCJcbm5jYmlfZW5hIDwtIHJiaW5kKG5jYmlfZW5hLCBlbmEkY29tcGxldGUkQ09JWyFlbmEkY29tcGxldGUkQ09JJGFjY2Vzc2lvbiAlaW4lIHNhbWVfYWNjLGMoXCJhY2Nlc3Npb25cIiwgXCJ0YXhJZFwiLCBcInNlcXVlbmNlXCIpXSlcbm5yb3cobmNiaV9lbmEpXG5uY2JpX2VuYV9kdXBzIDwtIGxhcHBseSh1bmlxdWUobmNiaV9lbmEkdGF4SWQpLCBmdW5jdGlvbihpZCkgcm93bmFtZXMobmNiaV9lbmFbbmNiaV9lbmEkdGF4SWQgPT0gaWQsXSlbZHVwbGljYXRlZChuY2JpX2VuYVtuY2JpX2VuYSR0YXhJZCA9PSBpZCwgXCJzZXF1ZW5jZVwiXSldKVxubnJvdyhuY2JpX2VuYSkgLSBsZW5ndGgodW5saXN0KG5jYmlfZW5hX2R1cHMpKVxubGVuZ3RoKHVubGlzdChuY2JpX2VuYV9kdXBzKSlcbm5jYmlfZW5hIDwtIG5jYmlfZW5hWyEgcm93bmFtZXMobmNiaV9lbmEpICVpbiUgdW5saXN0KG5jYmlfZW5hX2R1cHMpLF1cbm5yb3cobmNiaV9lbmEpXG5cbnN1bShlbmEkY29tcGxldGUkQ09JJGFjY2Vzc2lvbiAlaW4lIG5jYmlfZW5hJGFjY2Vzc2lvbikgLSBzdW0oZW5hJGNvbXBsZXRlJENPSSRhY2Nlc3Npb24gJWluJSBzYW1lX2FjYylcbnN1bShuY2JpJGNvbXBsZXRlJENPSSRhY2Nlc3Npb24gJWluJSBuY2JpX2VuYSRhY2Nlc3Npb24pIC0gc3VtKG5jYmkkY29tcGxldGUkQ09JJGFjY2Vzc2lvbiAlaW4lIHNhbWVfYWNjKVxuYGBgIn0= -->
-<pre class="r"><code>same_acc &lt;- intersect(ncbi$complete$COI$accession, ena$complete$COI$accession)
+<pre><code>
+&lt;!-- rnb-source-end --&gt;
+
+&lt;!-- rnb-chunk-end --&gt;
+
+
+&lt;!-- rnb-text-begin --&gt;
+
+## MERGING the dbs
+
+&lt;!-- rnb-text-end --&gt;
+
+
+&lt;!-- rnb-chunk-begin --&gt;
+
+
+&lt;!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuYGBgclxuc2FtZV9hY2MgPC0gaW50ZXJzZWN0KG5jYmkkY29tcGxldGUkQ09JJGFjY2Vzc2lvbiwgZW5hJGNvbXBsZXRlJENPSSRhY2Nlc3Npb24pXG5sZW5ndGgoc2FtZV9hY2MpXG5cbm5jYmlfZW5hIDwtIG5jYmkkY29tcGxldGUkQ09JW2MoXFxhY2Nlc3Npb25cXCwgXFx0YXhJZFxcLCBcXHNlcVxcKV1cbmNvbG5hbWVzKG5jYmlfZW5hKVszXSA8LSBcXHNlcXVlbmNlXFxcbm5jYmlfZW5hIDwtIHJiaW5kKG5jYmlfZW5hLCBlbmEkY29tcGxldGUkQ09JWyFlbmEkY29tcGxldGUkQ09JJGFjY2Vzc2lvbiAlaW4lIHNhbWVfYWNjLGMoXFxhY2Nlc3Npb25cXCwgXFx0YXhJZFxcLCBcXHNlcXVlbmNlXFwpXSlcbm5yb3cobmNiaV9lbmEpXG5uY2JpX2VuYV9kdXBzIDwtIGxhcHBseSh1bmlxdWUobmNiaV9lbmEkdGF4SWQpLCBmdW5jdGlvbihpZCkgcm93bmFtZXMobmNiaV9lbmFbbmNiaV9lbmEkdGF4SWQgPT0gaWQsXSlbZHVwbGljYXRlZChuY2JpX2VuYVtuY2JpX2VuYSR0YXhJZCA9PSBpZCwgXFxzZXF1ZW5jZVxcXSldKVxubnJvdyhuY2JpX2VuYSkgLSBsZW5ndGgodW5saXN0KG5jYmlfZW5hX2R1cHMpKVxubGVuZ3RoKHVubGlzdChuY2JpX2VuYV9kdXBzKSlcbm5jYmlfZW5hIDwtIG5jYmlfZW5hWyEgcm93bmFtZXMobmNiaV9lbmEpICVpbiUgdW5saXN0KG5jYmlfZW5hX2R1cHMpLF1cbm5yb3cobmNiaV9lbmEpXG5cbnN1bShlbmEkY29tcGxldGUkQ09JJGFjY2Vzc2lvbiAlaW4lIG5jYmlfZW5hJGFjY2Vzc2lvbikgLSBzdW0oZW5hJGNvbXBsZXRlJENPSSRhY2Nlc3Npb24gJWluJSBzYW1lX2FjYylcbnN1bShuY2JpJGNvbXBsZXRlJENPSSRhY2Nlc3Npb24gJWluJSBuY2JpX2VuYSRhY2Nlc3Npb24pIC0gc3VtKG5jYmkkY29tcGxldGUkQ09JJGFjY2Vzc2lvbiAlaW4lIHNhbWVfYWNjKVxuYGBgXG5gYGAifQ== --&gt;
+
+```r
+```r
+same_acc &lt;- intersect(ncbi$complete$COI$accession, ena$complete$COI$accession)
 length(same_acc)
 
-ncbi_ena &lt;- ncbi$complete$COI[c(&quot;accession&quot;, &quot;taxId&quot;, &quot;seq&quot;)]
-colnames(ncbi_ena)[3] &lt;- &quot;sequence&quot;
-ncbi_ena &lt;- rbind(ncbi_ena, ena$complete$COI[!ena$complete$COI$accession %in% same_acc,c(&quot;accession&quot;, &quot;taxId&quot;, &quot;sequence&quot;)])
+ncbi_ena &lt;- ncbi$complete$COI[c(\accession\, \taxId\, \seq\)]
+colnames(ncbi_ena)[3] &lt;- \sequence\
+ncbi_ena &lt;- rbind(ncbi_ena, ena$complete$COI[!ena$complete$COI$accession %in% same_acc,c(\accession\, \taxId\, \sequence\)])
 nrow(ncbi_ena)
-ncbi_ena_dups &lt;- lapply(unique(ncbi_ena$taxId), function(id) rownames(ncbi_ena[ncbi_ena$taxId == id,])[duplicated(ncbi_ena[ncbi_ena$taxId == id, &quot;sequence&quot;])])
+ncbi_ena_dups &lt;- lapply(unique(ncbi_ena$taxId), function(id) rownames(ncbi_ena[ncbi_ena$taxId == id,])[duplicated(ncbi_ena[ncbi_ena$taxId == id, \sequence\])])
 nrow(ncbi_ena) - length(unlist(ncbi_ena_dups))
 length(unlist(ncbi_ena_dups))
 ncbi_ena &lt;- ncbi_ena[! rownames(ncbi_ena) %in% unlist(ncbi_ena_dups),]
@@ -2157,40 +2476,76 @@ nrow(ncbi_ena)
 
 sum(ena$complete$COI$accession %in% ncbi_ena$accession) - sum(ena$complete$COI$accession %in% same_acc)
 sum(ncbi$complete$COI$accession %in% ncbi_ena$accession) - sum(ncbi$complete$COI$accession %in% same_acc)</code></pre>
-<!-- rnb-source-end -->
-<!-- rnb-chunk-end -->
-<!-- rnb-text-begin -->
-</div>
-<div id="getting-the-taxonomy-for-the-remaining-sequences-2" class="section level2">
-<h2>Getting the taxonomy for the remaining sequences</h2>
-<!-- rnb-text-end -->
-<!-- rnb-chunk-begin -->
-<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuZGJfcGF0aCA8LSBcIi4uLy4uL01pdGVzREIvbmNiaS1kYl8yMDIwLTA5LTI5LnNxbGl0ZVwiXG5uY2JpX2VuYS50YXggPC0gZ2V0X3RheG9ub215KGFzLm51bWVyaWMobmNiaV9lbmEkdGF4SWQpLCBzcWxGaWxlID0gZGJfcGF0aCwgcmFua3MgPSBjKFwia2luZ2RvbVwiLFwicGh5bHVtXCIsXCJjbGFzc1wiLFwib3JkZXJcIixcImZhbWlseVwiLFwiZ2VudXNcIixcInNwZWNpZXNcIikpXG4jdG8gc2VlIHdoYXQgdGF4YSB0aGUgZGIgY292ZXJzIDpcbmFwcGx5KG5jYmlfZW5hLnRheFs0OjVdLCAyLCB0YWJsZSlcbmBgYCJ9 -->
-<pre class="r"><code>db_path &lt;- &quot;../../MitesDB/ncbi-db_2020-09-29.sqlite&quot;
-ncbi_ena.tax &lt;- get_taxonomy(as.numeric(ncbi_ena$taxId), sqlFile = db_path, ranks = c(&quot;kingdom&quot;,&quot;phylum&quot;,&quot;class&quot;,&quot;order&quot;,&quot;family&quot;,&quot;genus&quot;,&quot;species&quot;))
+<pre><code>
+&lt;!-- rnb-source-end --&gt;
+
+&lt;!-- rnb-chunk-end --&gt;
+
+
+&lt;!-- rnb-text-begin --&gt;
+
+
+## Getting the taxonomy for the remaining sequences
+
+
+&lt;!-- rnb-text-end --&gt;
+
+
+&lt;!-- rnb-chunk-begin --&gt;
+
+
+&lt;!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuYGBgclxuZGJfcGF0aCA8LSBcXC4uLy4uL01pdGVzREIvbmNiaS1kYl8yMDIwLTA5LTI5LnNxbGl0ZVxcXG5uY2JpX2VuYS50YXggPC0gZ2V0X3RheG9ub215KGFzLm51bWVyaWMobmNiaV9lbmEkdGF4SWQpLCBzcWxGaWxlID0gZGJfcGF0aCwgcmFua3MgPSBjKFxca2luZ2RvbVxcLFxccGh5bHVtXFwsXFxjbGFzc1xcLFxcb3JkZXJcXCxcXGZhbWlseVxcLFxcZ2VudXNcXCxcXHNwZWNpZXNcXCkpXG4jdG8gc2VlIHdoYXQgdGF4YSB0aGUgZGIgY292ZXJzIDpcbmFwcGx5KG5jYmlfZW5hLnRheFs0OjVdLCAyLCB0YWJsZSlcbmBgYFxuYGBgIn0= --&gt;
+
+```r
+```r
+db_path &lt;- \../../MitesDB/ncbi-db_2020-09-29.sqlite\
+ncbi_ena.tax &lt;- get_taxonomy(as.numeric(ncbi_ena$taxId), sqlFile = db_path, ranks = c(\kingdom\,\phylum\,\class\,\order\,\family\,\genus\,\species\))
 #to see what taxa the db covers :
 apply(ncbi_ena.tax[4:5], 2, table)</code></pre>
-<!-- rnb-source-end -->
-<!-- rnb-chunk-end -->
-<!-- rnb-text-begin -->
-</div>
-<div id="writing-the-dada2-formated-fasta-file-2" class="section level2">
-<h2>Writing the dada2 formated fasta file</h2>
-<!-- rnb-text-end -->
-<!-- rnb-chunk-begin -->
-<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxubmNiaV9lbmEudGF4JGlkIDwtIHBhc3RlMChhcHBseShuY2JpX2VuYS50YXhbMTo3XSwgMSwgcGFzdGUwLCBjb2xsYXBzZSA9IFwiO1wiKSwgXCI7XCIpXG53cml0ZV9mYXN0YShzZXF1ZW5jZXMgPSBuY2JpX2VuYSRzZXF1ZW5jZSwgaWRzID0gbmNiaV9lbmEudGF4JGlkLCBvdXRGaWxlID0gXCJjb21wbGV0ZUNPSV9uY2JpX2VuYS5mYXN0YVwiKVxuYGBgIn0= -->
-<pre class="r"><code>ncbi_ena.tax$id &lt;- paste0(apply(ncbi_ena.tax[1:7], 1, paste0, collapse = &quot;;&quot;), &quot;;&quot;)
-write_fasta(sequences = ncbi_ena$sequence, ids = ncbi_ena.tax$id, outFile = &quot;completeCOI_ncbi_ena.fasta&quot;)</code></pre>
-<!-- rnb-source-end -->
-<!-- rnb-chunk-end -->
-<!-- rnb-text-begin -->
-</div>
-<div id="testing-the-database-2" class="section level2">
-<h2>Testing the database</h2>
-<!-- rnb-text-end -->
-<!-- rnb-chunk-begin -->
-<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuZW5hJHNlcXRhYiA8LSBhcy5tYXRyaXgocmVhZC5jc3YoXCIuLi8uLi9NaXRlc0RCL2RhdGEvc2VxdGFiLm5vY2hpbV9NSVRFUy5jc3ZcIiwgcm93Lm5hbWVzID0gMSkpXG5uY2JpX2VuYS50YXhhIDwtIGRhZGEyOjphc3NpZ25UYXhvbm9teShlbmEkc2VxdGFiLCBcIi4vY29tcGxldGVDT0lfbmNiaV9lbmEuZmFzdGFcIiwgdHJ5UkMgPSBUKVxubmNiaV9lbmEudGF4YS5wID0gbWtfcHJpbnRERihuY2JpX2VuYS50YXhhLCBuYTJjaGFyID0gRilcbiMgVG8gc2VlIGhvdyBtYW55IHNlcXVlbmNlcyBhcmUgYXNzaWduZWQgcGVyIHJhbmtzXG5jb2xTdW1zKCFpcy5uYShuY2JpX2VuYS50YXhhLnApKVxuYGBgIn0= -->
-<pre class="r"><code>ena$seqtab &lt;- as.matrix(read.csv(&quot;../../MitesDB/data/seqtab.nochim_MITES.csv&quot;, row.names = 1))
+<pre><code>
+&lt;!-- rnb-source-end --&gt;
+
+&lt;!-- rnb-chunk-end --&gt;
+
+
+&lt;!-- rnb-text-begin --&gt;
+
+
+## Writing the dada2 formated fasta file
+
+&lt;!-- rnb-text-end --&gt;
+
+
+&lt;!-- rnb-chunk-begin --&gt;
+
+
+&lt;!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuYGBgclxubmNiaV9lbmEudGF4JGlkIDwtIHBhc3RlMChhcHBseShuY2JpX2VuYS50YXhbMTo3XSwgMSwgcGFzdGUwLCBjb2xsYXBzZSA9IFxcO1xcKSwgXFw7XFwpXG53cml0ZV9mYXN0YShzZXF1ZW5jZXMgPSBuY2JpX2VuYSRzZXF1ZW5jZSwgaWRzID0gbmNiaV9lbmEudGF4JGlkLCBvdXRGaWxlID0gXFxjb21wbGV0ZUNPSV9uY2JpX2VuYS5mYXN0YVxcKVxuYGBgXG5gYGAifQ== --&gt;
+
+```r
+```r
+ncbi_ena.tax$id &lt;- paste0(apply(ncbi_ena.tax[1:7], 1, paste0, collapse = \;\), \;\)
+write_fasta(sequences = ncbi_ena$sequence, ids = ncbi_ena.tax$id, outFile = \completeCOI_ncbi_ena.fasta\)</code></pre>
+<pre><code>
+&lt;!-- rnb-source-end --&gt;
+
+&lt;!-- rnb-chunk-end --&gt;
+
+
+&lt;!-- rnb-text-begin --&gt;
+
+
+## Testing the database
+
+&lt;!-- rnb-text-end --&gt;
+
+
+&lt;!-- rnb-chunk-begin --&gt;
+
+
+&lt;!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuZW5hJHNlcXRhYiA8LSBhcy5tYXRyaXgocmVhZC5jc3YoXCIuLi8uLi9NaXRlc0RCL2RhdGEvc2VxdGFiLm5vY2hpbV9NSVRFUy5jc3ZcIiwgcm93Lm5hbWVzID0gMSkpXG5uY2JpX2VuYS50YXhhIDwtIGRhZGEyOjphc3NpZ25UYXhvbm9teShlbmEkc2VxdGFiLCBcIi4vY29tcGxldGVDT0lfbmNiaV9lbmEuZmFzdGFcIiwgdHJ5UkMgPSBUKVxubmNiaV9lbmEudGF4YS5wID0gbWtfcHJpbnRERihuY2JpX2VuYS50YXhhLCBuYTJjaGFyID0gRilcbiMgVG8gc2VlIGhvdyBtYW55IHNlcXVlbmNlcyBhcmUgYXNzaWduZWQgcGVyIHJhbmtzXG5jb2xTdW1zKCFpcy5uYShuY2JpX2VuYS50YXhhLnApKVxuYGBgIn0= --&gt;
+
+```r
+ena$seqtab &lt;- as.matrix(read.csv(&quot;../../MitesDB/data/seqtab.nochim_MITES.csv&quot;, row.names = 1))
 ncbi_ena.taxa &lt;- dada2::assignTaxonomy(ena$seqtab, &quot;./completeCOI_ncbi_ena.fasta&quot;, tryRC = T)
 ncbi_ena.taxa.p = mk_printDF(ncbi_ena.taxa, na2char = F)
 # To see how many sequences are assigned per ranks
@@ -2200,7 +2555,7 @@ colSums(!is.na(ncbi_ena.taxa.p))</code></pre>
 </div>
 </div>
 
-<div id="rmd-source-code">LS0tDQp0aXRsZTogIk1ha2luZyBhIGN1c3RvbSBkYXRhYmFzZSAtIG5jYmkgRXhhbXBsZSINCmF1dGhvcjogIlNhbGl4IER1Ym9pcyINCmRhdGU6ICIzMC8wOS8yMDIwIg0Kb3V0cHV0OiBodG1sX25vdGVib29rDQotLS0NCg0KYGBge3Igc2V0dXAsIGluY2x1ZGU9RkFMU0V9DQprbml0cjo6b3B0c19jaHVuayRzZXQoZWNobyA9IFRSVUUpDQpgYGANCiMjIFByZXANClRoZXNlIHBhY2thZ2VzIHdpbGwgYmUgbmVlZGVkLg0KVGhlIGNvZGUgb2YgdGhlIGN1c3RvbSBmdW5jdGlvbnMgSSB1c2VkIGZvciB0aGlzIGlzIGhlcmUgOiBodHRwczovL2dpdGh1Yi5jb20vc2FsaXgtZC9jdXN0b21TZXFEQg0KYGBge3J9DQppZiAoIXJlcXVpcmVOYW1lc3BhY2UoIkJpb2NNYW5hZ2VyIiwgcXVpZXRseSA9IFRSVUUpKQ0KICAgIGluc3RhbGwucGFja2FnZXMoIkJpb2NNYW5hZ2VyIikNCkJpb2NNYW5hZ2VyOjppbnN0YWxsKCJTaG9ydFJlYWQiKQ0KDQppbnN0YWxsLnBhY2thZ2VzKCJqc29ubGl0ZSIpDQppbnN0YWxsLnBhY2thZ2VzKCJ4bWwyIikNCg0KI3RoZXNlIGFyZSB0aGUgZnVuY3Rpb24gSSBtYWRlIGZvciB0aGlzIHNwZWNpZmljYWxseQ0KaWYgKCFyZXF1aXJlTmFtZXNwYWNlKCJkZXZ0b29scyIsIHF1aWV0bHkgPSBUUlVFKSkNCiAgICBpbnN0YWxsLnBhY2thZ2VzKCJkZXZ0b29scyIpDQpkZXZ0b29sczo6aW5zdGFsbF9naXRodWIoInNhbGl4LWQvY3VzdG9tU2VxREIiKQ0KDQpgYGANCg0KIyBOQ0JJIGRhdGFiYXNlDQpGdW5jdGlvbnMgc3BlY2lmaWMgdG8gdGhpcyBkYiBhcmUgaGVyZSA6IGh0dHBzOi8vZ2l0aHViLmNvbS9zYWxpeC1kL2N1c3RvbVNlcURCL2Jsb2IvbWFzdGVyL1IvbmNiaS1kYi5SDQojIyMgR2V0dGluZyB0aGUgc2VxdWVuY2VzIGRldGFpbHMgZnJvbSBOQ0JJDQpUaGlzIGdldHMgdGhlIEVTdW1tYXJ5IG9mIGFsbCByZWNvcmRzIGluIHRoZSBOQ0JJIG51Y2xlb3RpZGUgZGF0YWJhc2UgbWF0Y2hpbmcgdGhlc2UgdGF4YSBhbmQgZ2VuZSB3aGljaCBoYXZlIHRoZSB3b3JkICdjb21wbGV0ZScgaW4gdGhlICd0aXRsZScgZmllbGRzIGJ1dCBkb24ndCBoYXZlICdVTlZFUklGSUVEJyBpbiB0aGUgJ2tleXdvcmQnIGZpZWxkcy4gVGhlIHF1ZXJ5IGlzbid0IGNhc2Ugc2Vuc2l0aXZlLiBGb3IgdGhlIHVzYWJsZSBmaWVsZHMgYW5kIHRoZWlyIG5hbWUgc2VlIDogaHR0cHM6Ly93d3cubmNiaS5ubG0ubmloLmdvdi9ib29rcy9OQks0OTU0MC8NCg0KSXQgdGhlbiBwYXJzZSB0aGUgZGF0YSBhbmQgcmV0dXJucyBhIGxpc3Qgd2l0aCBoaXN0b3J5IHNlcnZlciBpbmZvcm1hdGlvbiBpbiBjYXNlIHdlIHdhbnQgdG8gbG9vayBhdCB0aGUgcmVjb3JkcyBhZ2FpbiBhbmQgYSBsaXN0IG9mIGRldGFpbHMgaW5jbHVkaW5nIHRoZSBhY2Nlc3Npb24gbnVtYmVycywgdGhlIHRheG9ub21pYyBpZHMgYW5kIHRoZSBkZXNjcmlwdGlvbi4gVGhlIEVTZWFyY2ggY2FuIHJldHVybiB1cCB0byAxMDBrIHJlc3VsdHMuIFRoaXMgcGFydCBtYXkgdGFrZSBhIHdoaWxlLg0KDQpgYGB7cn0NCmxpYnJhcnkoY3VzdG9tU2VxREIpDQp0YXhhIDwtIGMoIlRyb21iaWRpZm9ybWVzIiwgIkhvbG90aHlyaWRhIikNCmdlbmUgPC0gYygiQ09JIiwgIkNPMSIsICJDT1hJIiwgIkNPWDEiKSAjIG5jYmkgaW5jbHVkZXMgNiBvcmRlcnMgYW5kIHRoZSBDT0kgZ2VuZSBjYW4gYmUgd3JpdHRlbiA0IHdheXMNCm5jYmkgPC0gZ2V0X25jYmlEZXRhaWxzKHRheGEgPSB0YXhhLCBnZW5lID0gZ2VuZSwgY3VzdG9tVGVybSA9ICJBTkQgY29tcGxldGUgW1RJVExdIE5PVCB1bnZlcmZpZmllZFtLWVdEXSIpDQpoZWFkKG5jYmkkZGV0YWlscykNCmBgYA0KSWYgeW91IHdhbnQgdG8gc2VwYXJhdGUgeW91ciBxdWVyaWVzIGJ5IHRheG9uIHRvIHNlZSBob3cgbWFueSB5b3UgZ2V0IGZyb20gZWFjaCwgeW91IGNhbiBhbHNvIHVzZSBnZXRfbmNiaUFjYyB0aGUgc2FtZSB3YXkgYW5kIHRoZW4gdXNlIHRoZSBoaXN0b3J5IHNlcnZlciBpbmZvcm1hdGlvbiB0aGF0IGl0IHJldHVybnMgdG8gc3RvcmUgdGhlIG5leHQgcXVlcmllcyBpbiB0aGUgc2FtZSBXZWJFbnYgYW5kIHRoZW4gdXNlIHRob3NlIHRvIGdldCB0aGUgZGV0YWlscy4NCmBgYHtyfQ0KbmNiaSA8LSBsaXN0KE9waWxpb2FjYXJpZGEgPSBnZXRfbmNiaURldGFpbHMoIk9waWxpb2FjYXJpZGEiLCBjKCJDT0kiLCAiQ08xIiwgIkNPWEkiLCAiQ09YMSIpLCBjdXN0b21UZXJtID0gIkFORCBjb21wbGV0ZVtBTExsXSBOT1QgVU5WRVJJRklFRFtLWVdEXSIpKQ0KZm9yKG8gaW4gYygiSG9sb3RoeXJpZGEiLCAiSXhvZGlkYSIsICJNZXNvc3RpZ21hdGEiLCAiVHJvbWJpZGlmb3JtZXMiLCAiU2FyY29wdGlmb3JtZXMiKSl7DQogIG5jYmlbW29dXSA8LSBnZXRfbmNiaURldGFpbHMobywgYygiQ09JIiwgIkNPMSIsICJDT1hJIiwgIkNPWDEiKSwgY3VzdG9tVGVybSA9ICJBTkQgY29tcGxldGVbQUxMbF0gTk9UIFVOVkVSSUZJRURbS1lXRF0iLCBxdWVyeSA9IG5jYmkkT3BpbGlvYWNhcmlkYSRxdWVyeSkNCn0NCmBgYA0KU29tZXRpbWVzIGl0IHJldHVybiAnRXJyb3IgaW4gcGFyc2VfY29uKHR4dCwgYmlnaW50X2FzX2NoYXIpIDogcGFyc2UgZXJyb3I6IHByZW1hdHVyZSBFT0YnLCBidXQgcmVydW5uaW5nIGZpeGVzIGl0Li4uIEknbSBub3Qgc3VyZSB3aHkuDQoNCiMjIEZpbHRlcmluZyB0aGUgZGV0YWlscyB0byBnZXQgb25seSAiY29tcGxldGUiIENPSQ0KPGk+VGhpcyBzdGVwIHdpbGwgbmVlZCB0byBiZSBhZGFwdGVkIGRlcGVuZGluZyBvbiB5b3VyIHF1ZXJ5LjwvaT4NClRoZSBmbHRyIHN0cmluZyBsb29rcyBmb3IgdGhlIHdvcmQgJ2NvbXBsZXRlJyBhIG1heGltdW0gb2YgdHdvIGNvbW1hcyBhZnRlciB0aGUgZ2VuZSAoYmVjYXVzZSBmYXJ0aGVyIHRoYW4gdGhhdCBpdCdzIG5vdCB0aGUgQ09JIGdlbmUgdGhhdCBpcyBjb21wbGV0ZSBiYXNlZCBvbiB0aGVzZSBkZXNjcmlwdGlvbnMpLiBTb21lIHNlcXVlbmNlcyB3b24ndCBoYXZlIHRoZSB3b3JkIGZvciB0aGUgZ2VuZSBidXQgd2lsbCBiZSBjb21wbGV0ZSBnZW5vbWUvc2VxdWVuY2UgYW5kIGNhbiBoYXZlIGEgY29tcGxldGUgZ2VuZSwgc28gdGhleSBhcmUgaW5jbHVkZWQuIFRoZSBnZW5lIGlzIGxvb2tlZCBmb3Igd2l0aCBDT3g/W0kxXSBiZWNhdXNlIHNvbWV0aW1lcyB0aGVyZSdzIGFuIFggYnV0IG5vdCBhbHdheXMgYW5kIHRoZSBvbmUgY2FuIGJlIGFyYWJpYyBvciByb21hbi4gaWdub3JlLmNhc2UgPSBUIGJlY2F1c2UgdGhlIGdlbmUgY2FuIGJlIGluIGFsbCBjYXBzIG9yIG5vdC4NCjxpPnNvbWUgc2VxdWVuY2VzIHdpbGwgc3RpbGwgYmUgcGFydGlhbCBzZXF1ZW5jZXMgYW5kIHNvLCB0aGV5IHdpbGwgYmUgZmlsdGVyZWQgYWdhaW4gb25jZSB3ZSBoYXZlIHRoZSBmYXN0YSBmaWxlczwvaT4NCmBgYHtyfQ0KbmNiaSRkZXRhaWxzIDwtIGRvLmNhbGwocmJpbmQsIGxhcHBseShuY2JpWzE6Nl0sIGZ1bmN0aW9uKHgpIHgkZGV0YWlscykpDQpzYXBwbHkobmNiaSRkZXRhaWxzLCBuY29sKQ0KbmNiaSRPcGlsaW9hY2FyaWRhJGRldGFpbHMgPC0gdChuY2JpJE9waWxpb2FjYXJpZGEkZGV0YWlscykNCm5jYmkkSG9sb3RoeXJpZGEkZGV0YWlscyA8LSB0KG5jYmkkSG9sb3RoeXJpZGEkZGV0YWlscykNCm5jYmkkZGV0YWlscyA8LSBOVUxMDQpuY2JpJGRldGFpbHMgPC0gZG8uY2FsbChyYmluZCwgbGFwcGx5KG5jYmlbMTo2XSwgZnVuY3Rpb24oeCkgeCRkZXRhaWxzKSkNCm5yb3cobmNiaSRkZXRhaWxzKQ0KZmx0ciA8LSAiQ09YP1tJMV1cXCk/W1s6YWxudW06XSBcXChcXCk7XSosP1tbOmFsbnVtOl0gXFwoXFwpO10qLCBjb21wbGV0ZXxjb21wbGV0ZSBnZW5vbWV8Y29tcGxldGUgc2VxdWVuY2UiDQpuY2JpJGNvbXBsZXRlJGRldGFpbHMgPC0gbmNiaSRkZXRhaWxzW2dyZXAoZmx0ciwgbmNiaSRkZXRhaWxzJGRlc2NyaXB0aW9uLCBpZ25vcmUuY2FzZSA9IFQpLF0NCm5yb3cobmNiaSRjb21wbGV0ZSRkZXRhaWxzKQ0KYGBgDQojIyBHZXR0aW5nIHRoZSAiY29tcGxldGUiIHNlcXVlbmNlcyBmYXN0YSBmaWxlcw0KVGhpcyB3aWxsIGRvd25sb2FkIHRoZSBDRFMgZmFzdGEgZmlsZXMgZnJvbSBOQ0JJLiBJZiBhIHJlY29yZCBoYXMgbW9yZSB0aGFuIG9uZSBDRFMsIGl0IHJldHVybnMgYWxsIG9mIHRoZW0gc28gd2Ugd2lsbCBoYXZlIHRvIGZpbHRlciBmb3IgdGhlIGdlbmUgYWdhaW4uDQpUaGUgb3V0RGlyIGNhbiBiZSBjaGFuZ2VkIHRvIHRoZSBkZXNpcmVkIGZvbGRlci4NCmBgYHtyfQ0KbmNiaSRjb21wbGV0ZSRmaWxlcyA8LSBnZXRfbmNiaUZhc3RhKG5jYmkkY29tcGxldGUkZGV0YWlscyRhY2Nlc3Npb24sIG91dERpciA9ICIuL2VGZXRjaF9jb21wbGV0ZUNEUy8iKQ0KYGBgDQoNCiMjIEZpbHRlcmluZyB0aGUgImNvbXBsZXRlIiBzZXF1ZW5jZXMgZmFzdGEgZmlsZXMNCiMjIyBSZWFkIHRoZSBmYXN0YSBmaWxlIGFuZCBtYWtlIGEgZGF0YS5mcmFtZSBvdXQgb2YgaXQuDQpgYGB7cn0NCm5jYmkkY29tcGxldGUkZmFzdGEgPC0gU2hvcnRSZWFkOjpyZWFkRmFzdGEobmNiaSRjb21wbGV0ZSRmaWxlcykNCm5jYmkkY29tcGxldGUkaWQgPC0gYXMudmVjdG9yKFNob3J0UmVhZDo6aWQobmNiaSRjb21wbGV0ZSRmYXN0YSkpDQojIHJlZm9ybWF0IHRoZSBzdHJpbmcgdG8gYmUgYWJsZSB0byBwYXJzZSB3aXRoIGpzb25saXRlDQpuY2JpJGNvbXBsZXRlJGRmIDwtIGpzb25saXRlOjpmcm9tSlNPTihwYXN0ZTAoJ1t7IicsIHBhc3RlKHBhc3RlMCgnYWNjZXNzaW9uIjoiJywgZ3N1YigiX2Nkc19bWzphbG51bTpdX1xcLl0qIiwgIiIsIGdzdWIoIiAoW1s6YWxudW06XV9dKik9IiwgJyIsIlxcMSI6IicsIGdzdWIoIl4uKlxcfHxcXFt8XFxdIiwgIiIsICBuY2JpJGNvbXBsZXRlJGlkKSkpKSwgY29sbGFwc2U9JyJ9LHsiJyksJyJ9XScpKQ0KIyBhZGQgc2VxdWVuY2VzIHRvIHRoZSBkZg0KbmNiaSRjb21wbGV0ZSRkZiRzZXEgPC0gYXMudmVjdG9yKFNob3J0UmVhZDo6c3JlYWQobmNiaSRjb21wbGV0ZSRmYXN0YSkpDQojIHRvIHNhdmUgbWVtb3J5LCBuY2JpJGNvbXBsZXRlJGZhc3RhIGNhbiBiZSByZW1vdmVkIHNpbmNlIGl0IG1pZ2h0IGJlIGFuIGhlYXZ5IG9iamVjdA0KIyBuY2JpJGNvbXBsZXRlJGZhc3RhIDwtIE5VTEwNCm5yb3cobmNiaSRjb21wbGV0ZSRkZikNCmBgYA0KVGhlcmUgbW9yZSByb3dzIHRoYW4gYWNjZXNzaW9uIGJlY2F1c2UgaXQgZmV0Y2ggYWxsIGNkcyBhbmQgbm90IGp1c3QgdGhlIENPSSBjZHMuDQoNCiMjIyBUYWtlIG9ubHkgdGhlIHNlcXVlbmNlcyBmb3IgdGhlIENPSSBnZW5lcw0KU2luY2UgcmVjb3JkcyBhcmUgYWxsIGZpbGxlZCBkaWZmZXJlbnRseSwgc29tZSBtYXkgaGF2ZSB0aGUgZ2VuZSBmaWVsZCBvciB0aGUgcHJvdGVpbiBmaWVsZCBlbXB0eSBidXQgbm90IHRoZSBvdGhlci4NClNvIHdlIGxvb2sgaW4gYm90aCBmbyB0aGUgZGVzaXJlZCBnZW5lL3Byb3RlaW4uDQpgYGB7cn0NCm5jYmkkY29tcGxldGUkQ09JIDwtIG5jYmkkY29tcGxldGUkZGZbdW5pcXVlKGdyZXAoIkNPWD9bSTFdJCIsIG5jYmkkY29tcGxldGUkZGYkZ2VuZSwgaWdub3JlLmNhc2UgPSBUKSwgZ3JlcCgiY3l0b2Nocm9tZSBjPyA/b3hpZGFzZSAoc3VidW5pdCApP1tJMV0kIiwgbmNiaSRjb21wbGV0ZSRkZiRwcm90ZWluLCBpZ25vcmUuY2FzZSA9IFQpKSxdDQpucm93KG5jYmkkY29tcGxldGUkQ09JKQ0KYGBgDQoNCiMjIyBNYWtpbmcgc3VyZSBzZXF1ZW5jZXMgYXJlIGFjdHVhbGx5IGNvbXBsZXRlDQpTb21lIHNlcXVlbmNlcyB3aWxsIGhhdmUgdGhlIGluZm9ybWF0aW9uIGluIHRoZSBjb2x1bW4gJ3BhcnRpYWwnIGJ1dCBub3QgYWxsIG9mIHRoZW0uDQpUaGUgc3RhcnQgYW5kIGVuZCBjb2RvbnMgbWlnaHQgdmFyeSBkZXBlbmRpbmcgb24gdGhlIHRheGEuIFNlZSA6IGh0dHBzOi8vd3d3Lm5jYmkubmxtLm5paC5nb3YvVGF4b25vbXkvVXRpbHMvd3ByaW50Z2MuY2dpDQpUaGlzIGV4YW1wbGUgdXNlcyB0cmFuc2xfdGFibGU1Lg0KYGBge3J9DQpzdGFydF9jb2RvbnMgPC0gYygiVFRHIiwiQVRUIiwiQVRDIiwiQVRBIiwiQVRHIiwiR1RHIikNCmVuZF9jb2RvbnMgPC0gYygiVEFBIiwgIlRBRyIpDQpoYXMuc3RhcnQgPC0gZ3JlcChwYXN0ZTAoIl4iLCBwYXN0ZShzdGFydF9jb2RvbnMsIGNvbGxhcHNlID0gInxeIikpLCBuY2JpJGNvbXBsZXRlJENPSSRzZXEsIGlnbm9yZS5jYXNlID0gVCkNCmhhcy5lbmQgPC0gZ3JlcChwYXN0ZTAocGFzdGUoZW5kX2NvZG9ucywgY29sbGFwc2UgPSAiJHwiKSwgIiQiKSwgbmNiaSRjb21wbGV0ZSRDT0kkc2VxLCBpZ25vcmUuY2FzZSA9IFQpDQpuY2JpJGNvbXBsZXRlJENPSSA8LSBuY2JpJGNvbXBsZXRlJENPSVtpbnRlcnNlY3QoaGFzLnN0YXJ0LCBoYXMuZW5kKSxdDQpucm93KG5jYmkkY29tcGxldGUkQ09JKQ0KYGBgDQoNClNvbWUgYWNjZXNzaW9uIG51bWJlcnMgbWlnaHQgYmUgZHVwbGljYXRlZC4gVXN1YWxseSBiZWNhdXNlIHRoZSBnZW5lIGlzIHByZXNlbnQgdHdpY2UgaW4gdGhlIGdlbm9tZS4gUmVjb3JkcyBzaG91bGQgYmUgY2hlY2tlZCBtYW51YWxseS4NCkluIHRoaXMgY2FzZSwgc2luY2Ugc2VxdWVuY2VzIHdlcmUgdGhlIHNhbWUgZm9yIGVhY2ggcGFpciwgZGVsZXRlZCB0aGUgZHVwbGljYXRlcy4NCmBgYHtyfQ0Kc3VtKGR1cGxpY2F0ZWQobmNiaSRjb21wbGV0ZSRDT0kkYWNjZXNzaW9uKSkNCm5jYmkkY29tcGxldGUkQ09JW25jYmkkY29tcGxldGUkQ09JJGFjY2Vzc2lvbiAlaW4lIG5jYmkkY29tcGxldGUkQ09JJGFjY2Vzc2lvbltkdXBsaWNhdGVkKG5jYmkkY29tcGxldGUkQ09JJGFjY2Vzc2lvbildLF0NCm5jYmkkY29tcGxldGUkQ09JIDwtIG5jYmkkY29tcGxldGUkQ09JWyFkdXBsaWNhdGVkKG5jYmkkY29tcGxldGUkQ09JJGFjY2Vzc2lvbiksIF0NCm5yb3cobmNiaSRjb21wbGV0ZSRDT0kpDQpgYGANClRoZW4gdGhlcmUgd2lsbCBiZSBkdXBsaWNhdGVkIHNlcXVlbmNlcyB3aXRoIHRoZSBzYW1lIHRheElkIHdoaWNoIHNob3VsZCBiZSByZW1vdmVkLg0KDQpgYGB7cn0NCm5jYmkkY29tcGxldGUkQ09JJHRheElkIDwtIG5jYmkkY29tcGxldGUkZGV0YWlsc1tuY2JpJGNvbXBsZXRlJGRldGFpbHMkYWNjZXNzaW9uICVpbiUgbmNiaSRjb21wbGV0ZSRDT0kkYWNjZXNzaW9uLF0kdGF4aWQNCiNmaW5kIHRoZSByb3cgbmFtZXMgb2YgdGhlIGR1cGxpY2F0ZWQgc2VxdWVuY2VzIGZvciBlYWNoIHRheElkLg0KZHVwcyA8LSBsYXBwbHkodW5pcXVlKG5jYmkkY29tcGxldGUkQ09JJHRheElkKSwgZnVuY3Rpb24oaWQpIHJvd25hbWVzKG5jYmkkY29tcGxldGUkQ09JW25jYmkkY29tcGxldGUkQ09JJHRheElkID09IGlkLF0pW2R1cGxpY2F0ZWQobmNiaSRjb21wbGV0ZSRDT0lbbmNiaSRjb21wbGV0ZSRDT0kkdGF4SWQgPT0gaWQsXSRzZXEpXSkNCmxlbmd0aChkdXBzKQ0KI2tlZXAgb25seSB0aGUgcm93cyBub3QgaW4gdGhhdCBsaXN0IG9mIGR1cGxpY2F0ZWQgc2VxdWVuY2VzLg0KbmNiaSRjb21wbGV0ZSRDT0kgPC0gbmNiaSRjb21wbGV0ZSRDT0lbIXJvd25hbWVzKG5jYmkkY29tcGxldGUkQ09JKSAlaW4lIHVubGlzdChkdXBzKSxdDQpucm93KG5jYmkkY29tcGxldGUkQ09JKQ0KYGBgDQoNCiMjIEdldHRpbmcgdGhlIHRheG9ub215IGZvciB0aGUgcmVtYWluaW5nIHNlcXVlbmNlcw0KIyMjIE1ha2luZyB0aGUgdGF4b25vbXkgc3FsIHRhYmxlDQpUaGUgZnVuY3Rpb24gd2lsbCBkb3dubG9hZCBhIHRheGR1bXAudGFyLmd6IGZpbGUgZnJvbSBOQ0JJIHNlcnZlcnMgYW5kIGV4dHJhY3QgdGhlIG5hbWVzLmRtcCBhbmQgbm9kZXMuZG1wIGZpbGVzIGZyb20gaXQuDQpUaGVuIHRoZXMgZmlsZXMgd2lsbCBiZSBtZXJnZWQgaW50byBvbmUgdGF4LmRtcCBmaWxlIGtlZXBpbmcgb25seSB0aGUgY29sdW1ucyByZXF1aXJlZCAoaWQsIG5hbWUsIHJhbmsgYW5kIHBhcmVudElkKQ0KRm9yIG5hbWVzLmRtcCwgYWxzbyBvbmx5IGtlZXBzIHRoZSByb3dzIGNvbnRhaW5pbmcgdGhlIHNjaWVudGlmaWMgbmFtZXMgc28gdGhlcmUncyBvbmx5IG9uZSBuYW1lIHBlciBpZC4NCkl0IHdpbGwgdGhlbiB1c2UgdGhhdCBmaWxlIHRvIGNyZWF0ZSBhIFNRTGl0ZSBkYXRhYmFzZSBjb250YWluaW5nIGEgdGF4b25vbXkgdGFibGUgZnJvbSB3aGljaCB3ZSBjYW4gZ2V0IHRheG9ub21pYyBpbmZvcm1hdGlvbiBmcm9tIHRheElkcyB3aXRoIHRoZSBnZXRfdGF4b25vbXkoKSBmdW5jdGlvbi4NCmdldF90YXhvbm9teSBnZXRzIHRoZSB0aGUgcGFyZW50SWQgb2YgYWxsIHBhcmVudHMgb2YgZWFjaCB0YXhJZHMgYW5kIHJldHVybnMgdGhlIG5hbWVzIGNvcnJlc3BvbmRpbmcgdG8gdGhlIHJhbmtzIGRlc2lyZWQgYSBkYXRhIGZyYW1lIHdpdGggdGhlIHRheGlkcyBhcyByb3cgbmFtZXMgYW5kIHJhbmtzIGFzIGNvbHVtbnMuDQpgYGB7cn0NCmRiX3BhdGggPC0gbWtfdGF4b25vbXkudGFibGUoZGJGaWxlID0gcGFzdGUwKCcuL25jYmktZGJfJywgU3lzLkRhdGUoKSkpDQpuY2JpJGNvbXBsZXRlJHRheCA8LSBnZXRfdGF4b25vbXkobmNiaSRjb21wbGV0ZSRDT0kkdGF4SWQsIHNxbEZpbGUgPSBkYl9wYXRoLCByYW5rcyA9IGMoImtpbmdkb20iLCJwaHlsdW0iLCJjbGFzcyIsIm9yZGVyIiwiZmFtaWx5IiwiZ2VudXMiLCJzcGVjaWVzIikpDQojdG8gc2VlIHdoYXQgdGF4YSB0aGUgZGIgY292ZXJzIDoNCmFwcGx5KG5jYmkkY29tcGxldGUkdGF4WzQ6N10sIDIsIHRhYmxlKQ0KYGBgDQoNCiMjIFdyaXRpbmcgdGhlIGRhZGEyIGZvcm1hdGVkIGZhc3RhIGZpbGUNCmBgYHtyfQ0KbmNiaSRjb21wbGV0ZSR0YXgkaWQgPC0gcGFzdGUwKGFwcGx5KG5jYmkkY29tcGxldGUkdGF4WzE6N10sIDEsIHBhc3RlMCwgY29sbGFwc2UgPSAiOyIpLCAiOyIpDQp3cml0ZV9mYXN0YShzZXF1ZW5jZXMgPSBuY2JpJGNvbXBsZXRlJENPSSRzZXEsIGlkcyA9IG5jYmkkY29tcGxldGUkdGF4JGlkLCBvdXRGaWxlID0gIm5jYmlDb21wbGV0ZUNPSV9uY2JpLmZhc3RhIikNCmBgYA0KDQojIyBUZXN0aW5nIHRoZSBkYXRhYmFzZQ0KYGBge3J9DQpuY2JpJHNlcXRhYiA8LSBhcy5tYXRyaXgocmVhZC5jc3YoIi4vZGF0YS9zZXF0YWIubm9jaGltX25jYmkuY3N2Iiwgcm93Lm5hbWVzID0gMSkpDQpuY2JpJHRheGEgPC0gZGFkYTI6OmFzc2lnblRheG9ub215KGVuYSRzZXF0YWIsICIuL25jYmlDb21wbGV0ZUNPSV9uY2JpLmZhc3RhIiwgdHJ5UkMgPSBUKQ0KbmNiaSR0YXhhLnAgPSBta19wcmludERGKG5jYmkkdGF4YSwgbmEyY2hhciA9IEYpDQojIFRvIHNlZSBob3cgbWFueSBzZXF1ZW5jZXMgYXJlIGFzc2lnbmVkIHBlciByYW5rcw0KY29sU3VtcyghaXMubmEobmNiaSR0YXhhLnApKQ0KYGBgDQoNCiMgRU5BIGRhdGFiYXNlDQpGdW5jdGlvbnMgc3BlY2lmaWMgdG8gdGhpcyBkYiBhcmUgaGVyZSA6IGh0dHBzOi8vZ2l0aHViLmNvbS9zYWxpeC1kL2N1c3RvbVNlcURCL2Jsb2IvbWFzdGVyL1IvZW5hLWRiLlINCiMjIEdldHRpbmcgdGhlIHRheElkcw0KVGhlIEVOQSBBUEkgbGV0cyB5b3UgZmluZCBhbGwgcmVjb3JkcyB3aGljaCBoYXZlIHNlcXVlbmNlcyBmb3IgYSB0YXhvbm9taWMgdHJlZS4gU28gd2l0aCBhIHBhcmVudCB0YXhvbiB5b3UgY2FuIGZpbmQgYWxsIGNoaWxkcmVuIHRheG9uIHdoaWNoIGhhdmUgc2VxdWVuY2VzLiBCdXQgdG8gZG8gc28sIHlvdSBjYW4ndCB1c2UgdGhlaXIgbmFtZSwgeW91IGhhdmUgdG8gdXNlIHRoZWlyIHRheG9ub21pYyBpZC4gDQpTZWUgOiBodHRwczovL2VuYS1kb2NzLnJlYWR0aGVkb2NzLmlvL2VuL2xhdGVzdC9yZXRyaWV2YWwvcHJvZ3JhbW1hdGljLWFjY2Vzcy90YXhvbi1iYXNlZC1zZWFyY2guaHRtbA0KYGBge3J9DQplbmEgPC0gbGlzdChpZHMgPSBnZXRfZW5hVGF4SWRzKG5hbWVzID0gYygiT3BpbGlvYWNhcmlkYSIsICJIb2xvdGh5cmlkYSIsICJJeG9kaWRhIiwgIk1lc29zdGlnbWF0YSIsICJUcm9tYmlkaWZvcm1lcyIsICJTYXJjb3B0aWZvcm1lcyIpKSkNCmVuYSRpZHMNCmBgYA0KSWdub3JlIHRoZSAnaW5jb21wbGV0ZSBmaW5hbCBsaW5lIGZvdW5kJywgaXQgZG9lc24ndCBhZmZlY3QgYW55dGhpbmcuDQoNClRoZW4gd2UgY2FuIGdldCB0aGUgZGV0YWlscyAoQWNjZXNzaW9uIG51bWJlcnMgYW5kIGRlc2NyaXB0aW9uKSBvZiB0aGUgcmVjb3JkcyBtYXRjaGluZyB0aGUgdGF4SWRzIGFuZCBhIHNwZWNpZmllZCBnZW5lIHRvIHByZS1maWx0ZXIgZm9yIHdoaWNoIHJlY29yZHMgaGF2ZSBjb21wbGV0ZSBzZXF1ZW5jZXMuIFRoaXMgbWF5IHRha2UgYSB3aGlsZS4NCg0KPGk+VGhlIGNvbm5lY3Rpb24gb2Z0ZW4gdGltZXMgb3V0IHRoZSBtb3JlIGNyaXRlcmlhIHlvdSBhZGQuIFNvIEkgbW9kaWZpZWQgdGhlIGZ1bmN0aW9uIHRvIGRpcmVjdGx5IGRvd25sb2FkIHRoZSBmaWxlIGluc3RlYWQgb2YganVzdCByZWFkaW5nIGl0IHdpdGgganNvbmxpdGUuDQpBbmQgc2luY2UgaXQgZG9lc24ndCBsb29rIGZvciB0aGUgZ2VuZXMgaW4gdGhlIHJlY29yZHMgYnV0IG9ubHkgaW4gdGhlIGRlc2NyaXB0aW9uLCB0aGVyZSB3aWxsIGJlIHJlY29yZCBtaXNzaW5nIGlmIG9ubHkgbG9va2luZyBmb3IgdGhlIGdlbmUgbmFtZSBiZWNhdXNlIHNvbWV0aW1lcyBpdCdzIG5vdCBhYmJyZXZpYXRlZCBBTkQgYmVjYXVzZSBpdCB3aWxsIG1pc3MgdGhlICJ3aG9sZSBnZW5vbWUiIGFuZCAibWl0b2Nob25kcmlhbCBETkEsIGNvbXBsZXRlIHNlcXVlbmNlIiB0eXBlIG9mIHJlY29yZHMuDQpCdXQsIGJlY2F1c2UgdGhpcyByZXR1cm5zIG9ubHkgYWNjZXNzaW9uIGFuZCBkZXNjcmlwdGlvbiBwcmV0dHkgZmFzdCwgYWxsIHJlY29yZHMgYXNzb2NpYXRlZCB3aXRoIHRoZSB0YXhhIHdoaWNoIGhhdmUgImNvbXBsZXRlIiBpbiB0aGUgZGVzY3JpcHRpb24gY2FuIGJlIGRvd25sb2FkZWQgYW5kIHRoZW4gc29ydGVkIGZvciB0aGUgZ2VuZS48L2k+DQpgYGB7cn0NCmVuYSRkZXRhaWxzIDwtIGdldF9lbmFEZXRhaWxzKGVuYSRpZHMkdGF4SWQsIGRlc2NyaXB0aW9uID0gImNvbXBsZXRlIikNCm5yb3coZW5hJGRldGFpbHMpDQpgYGANCg0KYGBge3J9DQpoZWFkKGVuYSRkZXRhaWxzKQ0KYGBgDQoNCk5vdyB3ZSBoYXZlIHRvIGZpbHRlciBmb3IgdGhlIHJlY29yZHMgd2l0aCBvdXIgZ2VuZS4gRU5BIGhhcyBDT0kgd3JpdHRlbiBhcyBDT0ksIENPWDEgYW5kIENPMS4gV2UgYWxzbyB3YW50IHRvIGtlZXAgdGhlIGNvbXBsZXRlIGdlbm9tZSBhbmQgIG1pdG9jaG9uZHJpYWwgRE5BLg0KIlsgWzpwdW5jdDpdXSIgbWVhbnMgaXQgbXVzdCBiZSBwcmVjZWRlZC9mb2xsb3dlZCBieSBhIHNwYWNlIG9yIGEgcHVuY3R1YXRpb24gc2lnbi4gVGhpcyBpcyB0byBhdm9pZCB0byBoYXZlIHJlY29yZHMgd2hlcmUgQ09JIGlzIGZvdW5kIGluIGEgc3RyaW5nIG9mIHVwcGVyY2FzZSBsZXR0ZXIgKGFzIGluIHNvbWUgdm91Y2hlci9jb2RlIGxpa2UgQlhNU0NPSURKRikgYW5kIHRoZSBzZXF1ZW5jZXMgZm9yIHRoZSBDT0lJIGFuZCBDT0lJSSBnZW5lcy4NClNlZSBodHRwczovL3JzdHVkaW8uY29tL3dwLWNvbnRlbnQvdXBsb2Fkcy8yMDE2LzA5L1JlZ0V4Q2hlYXRzaGVldC5wZGYgZm9yIG1vcmUgZGV0YWlscyBvbiByIHJlZ2V4cC4NCmBgYHtyfQ0KZmx0ciA8LSAiWyBbOnB1bmN0Ol1dQ09YP1tJMV1bIFs6cHVuY3Q6XV1bWzphbG51bTpdIFxcKFxcKTtdKyw/W1s6YWxudW06XSBcXChcXCldKiw/IGNvbXBsZXRlfGNvbXBsZXRlIGdlbm9tZXxETkEsIGNvbXBsZXRlIg0KZW5hJGNvbXBsZXRlJGRldGFpbHMgPC0gZW5hJGRldGFpbHNbZ3JlcChmbHRyLCBlbmEkZGV0YWlscyRkZXNjcmlwdGlvbiwgaWdub3JlLmNhc2UgPSBUKSxdDQpucm93KGVuYSRjb21wbGV0ZSRkZXRhaWxzKQ0KYGBgDQpUaGVyZSBtaWdodCBzdGlsbCBiZSBmYWxzZSBwb3NpdGl2ZXMsIGJ1dCB0aGV5IHdpbGwgYmUgZmlsdGVyZWQgb3V0IHdpdGggdGhlIG5leHQgc3RlcC4NCg0KU2luY2UgdGhlIEVOQSBhcGkgZG9lc24ndCByZXR1cm5zIGp1c3QgQ0RTLCB0aGUgcmVjb3JkcyB3aWxsIGJlIGRvd25sb2FkZWQgaW4gaW5zZHhtbCBmb3JtYXQgKGEgZm9ybWF0IGFsc28gYXZhaWxhYmxlIGZyb20gbmNiaSkgYW5kIHRoZW4gcGFyc2VkIHRoZW0gdG8gZ2V0IHRoZSBhY2Nlc3Npb24gbnVtYmVyLCB0aGUgdGF4aWQgYW5kIHRoZSBDT0kgZ2VuZSBzZXF1ZW5jZS4gVG8gZ2V0IHRoZSBzZXF1ZW5jZSBpdCBmaW5kcyB0aGUgZ2VuZSBmaWVsZCB3aGljaCBoYXMgdGhlIG5hbWUgQ09JIGFuZCB0aGVuIGdldHMgdGhlIGxvY2F0aW9uIGluZm9ybWF0aW9uIHRvIGdldCB0aGUgcmFuZ2Ugb2YgdGhlIGdlbmUgd2hpY2ggaXMgdXNlZCB0byBzdWJzdHJpbmcgdGhlIHN0cmluZyBpbiB0aGUgc2VxdWVuY2UgZmllbGQuDQpTaW5jZSBDRFMgaGF2ZSByZWFkaW5nIGZyYW1lcywgdGhlIGFyZ3VtZW50IHN0YXJ0X2NvZG9uIG11c3QgYmUgc2V0IHRvIFRSVUUgc28gaXQgY2FuIGFkanVzdCB0aGUgc3RhcnQgb2YgZ2VuZSByYW5nZSBhY2NvcmRpbmcgdG8gdGhlIHJlYWRpbmcgZnJhbWUuDQpUaGUgSU5TRHhtbCBmaWxlcyBjYW4gb3B0aW9ubmFseSBiZSBkb3dubG9hZGVkIGluc3RlYWQgb2YgcmVhZCA6IGFkZCBhZ3J1bWVudHMgc2F2ZVhtbCA9IFQuIEl0IHdpbGwgZG93bmxvYWQgYXMgJy4vZW5hX2Rvd25sb2Fkcy94bWwvW1N5cy5EYXRlXV9yZWNvcmRzX1sjIyNdLnhtbC4gVG8gc3BlY2lmeSBwYXRoIHVzZSBhcmd1ZW1lbnQgb3V0WG1sLg0KVGhlIHJlc3VsdGluZyBzZXF1ZW5jZSBjYW4gb3B0aW9ubmFseSBiZSBzYXZlZCBhcyBmYXN0YSBmaWxlICh0aGUgaWRzIHdpbGwgYmUgdGhlIGluZm8gbWVyZ2UgaW4gYSBqc29uIHN0cmluZyB0byBjb252ZXJ0IGJhY2sgdG8gZGF0YS5mcmFtZSBlYXNpbHkpIDogYWRkIGFncnVtZW50cyBzYXZlRmFzdGEgPSBULiBJdCB3aWxsIGRvd25sb2FkIGFzICcuL2VuYV9kb3dubG9hZHMvZmFzdGEvW1N5cy5EYXRlXV9zZXF1ZW5jZXNfWyMjI10ueG1sLiBUbyBzcGVjaWZ5IHBhdGggdXNlIGFyZ3VlbWVudCBvdXRGYXN0YS4NCmBgYHtyfQ0KZW5hJGNvbXBsZXRlJHNlcSA8LSBnZXRfZW5hRmFzdGEoYWNjTGlzdCA9IGVuYSRjb21wbGV0ZSRkZXRhaWxzJGFjY2Vzc2lvbiwgZ2VuZSA9ICJDT1g/W0kxXVtbOnNwYWNlOl1dIiwgY29kb25fc3RhcnQgPSBULCBzYXZlWE1MID0gVCkNCiNnZXR0aW5nIGFuIGVycm9yIGJlY2F1c2Ugc29tZSBhY2Nlc3Npb24gYXJlIGF2YWlsYWJsZSBpbiB0aGF0IGZvcm1hdC4NCiMgZml4IDogDQpgYGANCg0KYGBge2Jhc2h9DQpzZWQgJy88SU5TRFNlcV9zZXF1ZW5jZT4gICAgPFwvSU5TRFNlcT4vZCcgLi4vZW5hX2Rvd25sb2Fkcy94bWwvMjAyMC0xMC0wMl9yZWNvcmRzXzAwMS54bWwgPiAuLi9lbmFfZG93bmxvYWRzL3htbC8yMDIwLTEwLTAyX3JlY29yZHNfMDAyLnhtbA0KYGBgDQoNCmBgYHtyfQ0KZW5hJGNvbXBsZXRlJHNlcSA8LSBwYXJzZV9JTlNEeG1sKFVSTCA9ICIuL2VuYV9kb3dubG9hZHMveG1sLzIwMjAtMTAtMDJfcmVjb3Jkc18wMDIueG1sIiwgZ2VuZSA9ICJDT1g/W0kxXTx8Y3l0b2Nocm9tZSBjPyA/b3hpZGFzZSAoc3VidW5pdCk/ID9bSTFdPCIsIGNvZG9uX3N0YXJ0ID0gVCkNCmBgYA0KTE44NzQyNjkgYW5kIExOODc0MjcwIGFyZSBtaXRvY2hvbmRyaWFsIGNvbXBsZXRlIGdlbm9tZS4gVGF4SWQgOiA1MjI4Mw0KDQpgYGB7cn0NCnN1bShlbmEkY29tcGxldGUkc2VxJHRheElkICVpbiUgIjUyMjgzIikNCmBgYA0KV2UgaGF2ZSAxMyBvdGhlciBzZXF1ZW5jZSBmb3IgdGhpcyB0YXhJZC4NCg0KTGV0J3MgY2hlY2sgd2hpY2ggYWNjZXNzaW9uIHdlcmVuJ3QgYXZhaWxhYmxlIGluIHRoYXQgZm9ybWF0IDoNCg0KYGBge3J9DQplbWJsX2FjYyA8LSBlbmEkY29tcGxldGUkZGV0YWlscyRhY2Nlc3Npb25bISBlbmEkY29tcGxldGUkZGV0YWlscyRhY2Nlc3Npb24gJWluJSBjKGdzdWIoIlxcLlswLTldKiQiLCAiIiwgZW5hJGNvbXBsZXRlJHNlcSRhY2Nlc3Npb24pLCAiTE44NzQyNjkiLCAiTE44NzQyNzAiKV0NCmVtYmxfYWNjDQpgYGANCldlIGNhbiBwYXJzZSB0aGUgcmVzdCB3aXRoIHRoZSBFTUJMIGZvcm1hdC4gVGhpcyBmb3JtYXQgaXMgbGVzcyBjb25zaXN0ZW50IGJldHdlZW4gcmVjb3JkcyB3aGljaCBpcyB3aHkgSSByYXRoZXIgdXNlIElOU0R4bWwgd2hlbiBwb3NzaWJsZS4NCmBgYHtyfQ0KIyBNYWtpbmcgVVJMIG1hbnVhbGx5DQpVUkwgPC0gcGFzdGUwKCJodHRwOi8vd3d3LmViaS5hYy51ay9Ub29scy9kYmZldGNoL2RiZmV0Y2g/ZGI9ZW5hX3NlcXVlbmNlO2lkPSIsIHBhc3RlKGVtYmxfYWNjLCBjb2xsYXBzZSA9ICIsIiksIjtmb3JtYXQ9ZW1ibHhtbC0xLjIiKQ0KI3BhcnNpbmcgaXQNCiMgZW1ibCBpcyBhIGJpdCBkaWZmZXJlbnQgc28gdGhlcmUgYXJlIHNwYWNlIGJldHdlZW4gdGV4dCBhbmQgbmV4dCAnPCcNCmVuYSRjb21wbGV0ZSRzZXEgPC0gcmJpbmQoZW5hJGNvbXBsZXRlJHNlcSwgcGFyc2VfRU1CTHhtbChVUkwsIGdlbmUgPSAiQ09YP1tJMV1bWzpzcGFjZTpdXXxjeXRvY2hyb21lIGM/ID9veGlkYXNlIChzdWJ1bml0KT8gP1tJMV1bWzpzcGFjZTpdXSIsIGNvZG9uX3N0YXJ0ID0gVCkpDQpucm93KGVuYSRjb21wbGV0ZSRzZXEpDQpgYGANCmhtbW0uLi4gQXBwYXJlbnRseSB3ZSBjYW4ndCBldmVuLi4uIA0KYGBge3J9DQpub1htbF9hY2MgPC0gZW5hJGNvbXBsZXRlJGRldGFpbHMkYWNjZXNzaW9uWyEgZW5hJGNvbXBsZXRlJGRldGFpbHMkYWNjZXNzaW9uICVpbiUgYyhnc3ViKCJcXC5bMC05XSokIiwgIiIsIGVuYSRjb21wbGV0ZSRzZXEkYWNjZXNzaW9uKSwgIkxOODc0MjY5IiwgIkxOODc0MjcwIildDQpgYGANClRoZXNlIGp1c3QgZG9uJ3QgaGF2ZSBhbnkgeG1sIGZvcm1hIGF2YWlsYWJsZS4gR3Vlc3Mgd2UnbGwgaGF2ZSB0byBwYXJzZSB0aGUgZmxhdCBmaWxlcy4uLg0KSWYgaXQncyBub3Qgc2xvd2VyLCB3ZSBjb3VsZCBoYXZlIHBhcnNlIHRoZW0gYWxsIHRoaXMgd2F5LiBUbyB0ZXN0IG91dC4NCkZsYXQgZmlsZSBhcmUgYWxzbyBkaWZmZXJlbnQsIHNvIHRoZSBsaW1pdGVyIHRvIG5vdCBnZXQgQ09JSS9DT0lJSSBpcyAiDQpgYGB7cn0NClVSTCA8LSBwYXN0ZTAoImh0dHA6Ly93d3cuZWJpLmFjLnVrL1Rvb2xzL2RiZmV0Y2gvZGJmZXRjaD9kYj1lbmFfc2VxdWVuY2UmaWQ9IiwgcGFzdGUobm9YbWxfYWNjLCBjb2xsYXBzZSA9ICIsIiksIiZmb3JtYXQ9ZW1ibCZzdHlsZT1yYXciKQ0KZW5hJGNvbXBsZXRlJHNlcSA8LSByYmluZChlbmEkY29tcGxldGUkc2VxLCBwYXJzZV9mbGF0RmlsZShVUkwsIGdlbmUgPSAiQ09YP1tJMV1cInxjeXRvY2hyb21lIGM/ID9veGlkYXNlIChzdWJ1bml0KT8gP1tJMV1cIiIsIGNvZG9uX3N0YXJ0ID0gVCkpIA0KbnJvdyhlbmEkY29tcGxldGUkc2VxKQ0KYGBgDQpXT08hIG5vdyBvbmx5IHRoZSAyIHJlY29yZHMgd2l0aCBubyBDT0kgcmVnaW9uIGFyIG1pc3NpbmcNCmBgYHtyfQ0KDQpgYGANCiMjIyBNYWtpbmcgc3VyZSBzZXF1ZW5jZXMgYXJlIGFjdHVhbGx5IGNvbXBsZXRlDQpUaGUgc3RhcnQgYW5kIGVuZCBjb2RvbnMgbWlnaHQgdmFyeSBkZXBlbmRpbmcgb24gdGhlIHRheGEuIFNlZSA6IGh0dHBzOi8vd3d3Lm5jYmkubmxtLm5paC5nb3YvVGF4b25vbXkvVXRpbHMvd3ByaW50Z2MuY2dpDQpUaGlzIGV4YW1wbGUgdXNlcyB0cmFuc2xfdGFibGU1Lg0KYGBge3J9DQpzdGFydF9jb2RvbnMgPC0gYygiVFRHIiwiQVRUIiwiQVRDIiwiQVRBIiwiQVRHIiwiR1RHIikNCmVuZF9jb2RvbnMgPC0gYygiVEFBIiwgIlRBRyIpDQpoYXMuc3RhcnQgPC0gZ3JlcChwYXN0ZTAoIl4iLCBwYXN0ZShzdGFydF9jb2RvbnMsIGNvbGxhcHNlID0gInxeIikpLCBlbmEkY29tcGxldGUkc2VxJHNlcXVlbmNlLCBpZ25vcmUuY2FzZSA9IFQpDQpoYXMuZW5kIDwtIGdyZXAocGFzdGUwKHBhc3RlKGVuZF9jb2RvbnMsIGNvbGxhcHNlID0gIiR8IiksICIkIiksIGVuYSRjb21wbGV0ZSRzZXEkc2VxdWVuY2UsIGlnbm9yZS5jYXNlID0gVCkNCmVuYSRjb21wbGV0ZSRDT0kgPC0gZW5hJGNvbXBsZXRlJHNlcVtpbnRlcnNlY3QoaGFzLnN0YXJ0LCBoYXMuZW5kKSxdDQpucm93KGVuYSRjb21wbGV0ZSRDT0kpDQpgYGANClRoZXJlIHdpbGwgYmUgZHVwbGljYXRlZCBzZXF1ZW5jZXMgd2l0aCB0aGUgc2FtZSB0YXhJZCB3aGljaCBzaG91bGQgYmUgcmVtb3ZlZC4NCg0KYGBge3J9DQojZmluZCB0aGUgcm93IG5hbWVzIG9mIHRoZSBkdXBsaWNhdGVkIHNlcXVlbmNlcyBmb3IgZWFjaCB0YXhJZC4NCmR1cHMgPC0gbGFwcGx5KHVuaXF1ZShlbmEkY29tcGxldGUkQ09JJHRheElkKSwgZnVuY3Rpb24oaWQpIHJvd25hbWVzKGVuYSRjb21wbGV0ZSRDT0lbZW5hJGNvbXBsZXRlJENPSSR0YXhJZCA9PSBpZCxdKVtkdXBsaWNhdGVkKGVuYSRjb21wbGV0ZSRDT0lbZW5hJGNvbXBsZXRlJENPSSR0YXhJZCA9PSBpZCxdJHNlcXVlbmNlKV0pDQoja2VlcCBvbmx5IHRoZSByb3dzIG5vdCBpbiB0aGF0IGxpc3Qgb2YgZHVwbGljYXRlZCBzZXF1ZW5jZXMuDQplbmEkY29tcGxldGUkQ09JIDwtIGVuYSRjb21wbGV0ZSRDT0lbIXJvd25hbWVzKGVuYSRjb21wbGV0ZSRDT0kpICVpbiUgdW5saXN0KGR1cHMpLF0NCm5yb3coZW5hJGNvbXBsZXRlJENPSSkNCmBgYA0KDQojIyBHZXR0aW5nIHRoZSB0YXhvbm9teSBmb3IgdGhlIHJlbWFpbmluZyBzZXF1ZW5jZXMNCg0KYGBge3J9DQpkYl9wYXRoIDwtICIuLi8uLi9NaXRlc0RCL25jYmktZGJfMjAyMC0wOS0yOS5zcWxpdGUiDQpkaXIoZGlybmFtZShkYl9wYXRoKSkNCmVuYSRjb21wbGV0ZSR0YXggPC0gZ2V0X3RheG9ub215KGFzLm51bWVyaWMoZW5hJGNvbXBsZXRlJENPSSR0YXhJZCksIHNxbEZpbGUgPSBkYl9wYXRoLCByYW5rcyA9IGMoImtpbmdkb20iLCJwaHlsdW0iLCJjbGFzcyIsIm9yZGVyIiwiZmFtaWx5IiwiZ2VudXMiLCJzcGVjaWVzIikpDQojdG8gc2VlIHdoYXQgdGF4YSB0aGUgZGIgY292ZXJzIDoNCmFwcGx5KGVuYSRjb21wbGV0ZSR0YXhbNDo3XSwgMiwgdGFibGUpDQpgYGANCg0KIyMgV3JpdGluZyB0aGUgZGFkYTIgZm9ybWF0ZWQgZmFzdGEgZmlsZQ0KYGBge3J9DQplbmEkY29tcGxldGUkdGF4JGlkIDwtIHBhc3RlMChhcHBseShlbmEkY29tcGxldGUkdGF4WzE6N10sIDEsIHBhc3RlMCwgY29sbGFwc2UgPSAiOyIpLCAiOyIpDQp3cml0ZV9mYXN0YShzZXF1ZW5jZXMgPSBlbmEkY29tcGxldGUkQ09JJHNlcSwgaWRzID0gZW5hJGNvbXBsZXRlJHRheCRpZCwgb3V0RmlsZSA9ICJlbmFDb21wbGV0ZUNPSV9lbmEuZmFzdGEiKQ0KYGBgDQoNCiMjIFRlc3RpbmcgdGhlIGRhdGFiYXNlDQpgYGB7cn0NCmVuYSRzZXF0YWIgPC0gYXMubWF0cml4KHJlYWQuY3N2KCIuLi8uLi9NaXRlc0RCL2RhdGEvc2VxdGFiLm5vY2hpbV9NSVRFUy5jc3YiLCByb3cubmFtZXMgPSAxKSkNCmVuYSR0YXhhIDwtIGRhZGEyOjphc3NpZ25UYXhvbm9teShlbmEkc2VxdGFiLCAiLi9lbmFDb21wbGV0ZUNPSV9lbmEuZmFzdGEiLCB0cnlSQyA9IFQpDQplbmEkdGF4YS5wID0gbWtfcHJpbnRERihlbmEkdGF4YSwgbmEyY2hhciA9IEYpDQojIFRvIHNlZSBob3cgbWFueSBzZXF1ZW5jZXMgYXJlIGFzc2lnbmVkIHBlciByYW5rcw0KY29sU3VtcyghaXMubmEoZW5hJHRheGEucCkpDQpgYGANCiMjIE1FUkdJTkcgdGhlIGRicw0KYGBge3J9DQpzYW1lX2FjYyA8LSBpbnRlcnNlY3QobmNiaSRjb21wbGV0ZSRDT0kkYWNjZXNzaW9uLCBlbmEkY29tcGxldGUkQ09JJGFjY2Vzc2lvbikNCmxlbmd0aChzYW1lX2FjYykNCg0KbmNiaV9lbmEgPC0gbmNiaSRjb21wbGV0ZSRDT0lbYygiYWNjZXNzaW9uIiwgInRheElkIiwgInNlcSIpXQ0KY29sbmFtZXMobmNiaV9lbmEpWzNdIDwtICJzZXF1ZW5jZSINCm5jYmlfZW5hIDwtIHJiaW5kKG5jYmlfZW5hLCBlbmEkY29tcGxldGUkQ09JWyFlbmEkY29tcGxldGUkQ09JJGFjY2Vzc2lvbiAlaW4lIHNhbWVfYWNjLGMoImFjY2Vzc2lvbiIsICJ0YXhJZCIsICJzZXF1ZW5jZSIpXSkNCm5yb3cobmNiaV9lbmEpDQpuY2JpX2VuYV9kdXBzIDwtIGxhcHBseSh1bmlxdWUobmNiaV9lbmEkdGF4SWQpLCBmdW5jdGlvbihpZCkgcm93bmFtZXMobmNiaV9lbmFbbmNiaV9lbmEkdGF4SWQgPT0gaWQsXSlbZHVwbGljYXRlZChuY2JpX2VuYVtuY2JpX2VuYSR0YXhJZCA9PSBpZCwgInNlcXVlbmNlIl0pXSkNCm5yb3cobmNiaV9lbmEpIC0gbGVuZ3RoKHVubGlzdChuY2JpX2VuYV9kdXBzKSkNCmxlbmd0aCh1bmxpc3QobmNiaV9lbmFfZHVwcykpDQpuY2JpX2VuYSA8LSBuY2JpX2VuYVshIHJvd25hbWVzKG5jYmlfZW5hKSAlaW4lIHVubGlzdChuY2JpX2VuYV9kdXBzKSxdDQpucm93KG5jYmlfZW5hKQ0KDQpzdW0oZW5hJGNvbXBsZXRlJENPSSRhY2Nlc3Npb24gJWluJSBuY2JpX2VuYSRhY2Nlc3Npb24pIC0gc3VtKGVuYSRjb21wbGV0ZSRDT0kkYWNjZXNzaW9uICVpbiUgc2FtZV9hY2MpDQpzdW0obmNiaSRjb21wbGV0ZSRDT0kkYWNjZXNzaW9uICVpbiUgbmNiaV9lbmEkYWNjZXNzaW9uKSAtIHN1bShuY2JpJGNvbXBsZXRlJENPSSRhY2Nlc3Npb24gJWluJSBzYW1lX2FjYykNCmBgYA0KDQojIyBHZXR0aW5nIHRoZSB0YXhvbm9teSBmb3IgdGhlIHJlbWFpbmluZyBzZXF1ZW5jZXMNCg0KYGBge3J9DQpkYl9wYXRoIDwtICIuLi8uLi9NaXRlc0RCL25jYmktZGJfMjAyMC0wOS0yOS5zcWxpdGUiDQpuY2JpX2VuYS50YXggPC0gZ2V0X3RheG9ub215KGFzLm51bWVyaWMobmNiaV9lbmEkdGF4SWQpLCBzcWxGaWxlID0gZGJfcGF0aCwgcmFua3MgPSBjKCJraW5nZG9tIiwicGh5bHVtIiwiY2xhc3MiLCJvcmRlciIsImZhbWlseSIsImdlbnVzIiwic3BlY2llcyIpKQ0KI3RvIHNlZSB3aGF0IHRheGEgdGhlIGRiIGNvdmVycyA6DQphcHBseShuY2JpX2VuYS50YXhbNDo1XSwgMiwgdGFibGUpDQpgYGANCg0KIyMgV3JpdGluZyB0aGUgZGFkYTIgZm9ybWF0ZWQgZmFzdGEgZmlsZQ0KYGBge3J9DQpuY2JpX2VuYS50YXgkaWQgPC0gcGFzdGUwKGFwcGx5KG5jYmlfZW5hLnRheFsxOjddLCAxLCBwYXN0ZTAsIGNvbGxhcHNlID0gIjsiKSwgIjsiKQ0Kd3JpdGVfZmFzdGEoc2VxdWVuY2VzID0gbmNiaV9lbmEkc2VxdWVuY2UsIGlkcyA9IG5jYmlfZW5hLnRheCRpZCwgb3V0RmlsZSA9ICJjb21wbGV0ZUNPSV9uY2JpX2VuYS5mYXN0YSIpDQpgYGANCg0KIyMgVGVzdGluZyB0aGUgZGF0YWJhc2UNCmBgYHtyfQ0KZW5hJHNlcXRhYiA8LSBhcy5tYXRyaXgocmVhZC5jc3YoIi4uLy4uL01pdGVzREIvZGF0YS9zZXF0YWIubm9jaGltX01JVEVTLmNzdiIsIHJvdy5uYW1lcyA9IDEpKQ0KbmNiaV9lbmEudGF4YSA8LSBkYWRhMjo6YXNzaWduVGF4b25vbXkoZW5hJHNlcXRhYiwgIi4vY29tcGxldGVDT0lfbmNiaV9lbmEuZmFzdGEiLCB0cnlSQyA9IFQpDQpuY2JpX2VuYS50YXhhLnAgPSBta19wcmludERGKG5jYmlfZW5hLnRheGEsIG5hMmNoYXIgPSBGKQ0KIyBUbyBzZWUgaG93IG1hbnkgc2VxdWVuY2VzIGFyZSBhc3NpZ25lZCBwZXIgcmFua3MNCmNvbFN1bXMoIWlzLm5hKG5jYmlfZW5hLnRheGEucCkpDQpgYGA=</div>
+<div id="rmd-source-code">LS0tDQp0aXRsZTogIk1ha2luZyBhIGN1c3RvbSBkYXRhYmFzZSAtIG5jYmkgRXhhbXBsZSINCmF1dGhvcjogIlNhbGl4IER1Ym9pcyINCmRhdGU6ICIzMC8wOS8yMDIwIg0Kb3V0cHV0OiBodG1sX25vdGVib29rDQotLS0NCg0KYGBge3Igc2V0dXAsIGluY2x1ZGU9RkFMU0V9DQprbml0cjo6b3B0c19jaHVuayRzZXQoZWNobyA9IFRSVUUpDQpgYGANCiMjIFByZXANClRoZXNlIHBhY2thZ2VzIHdpbGwgYmUgbmVlZGVkLg0KVGhlIGNvZGUgb2YgdGhlIGN1c3RvbSBmdW5jdGlvbnMgdXNlZCBmb3IgdGhpcyBpcyBoZXJlIDogaHR0cHM6Ly9naXRodWIuY29tL3NhbGl4LWQvY3VzdG9tU2VxREINCmBgYHtyfQ0KaWYgKCFyZXF1aXJlTmFtZXNwYWNlKCJCaW9jTWFuYWdlciIsIHF1aWV0bHkgPSBUUlVFKSkNCiAgICBpbnN0YWxsLnBhY2thZ2VzKCJCaW9jTWFuYWdlciIpDQpCaW9jTWFuYWdlcjo6aW5zdGFsbCgiU2hvcnRSZWFkIikNCg0KaW5zdGFsbC5wYWNrYWdlcygianNvbmxpdGUiKQ0KaW5zdGFsbC5wYWNrYWdlcygieG1sMiIpDQoNCiN0aGVzZSBhcmUgdGhlIGZ1bmN0aW9uIEkgbWFkZSBmb3IgdGhpcyBzcGVjaWZpY2FsbHkNCmlmICghcmVxdWlyZU5hbWVzcGFjZSgiZGV2dG9vbHMiLCBxdWlldGx5ID0gVFJVRSkpDQogICAgaW5zdGFsbC5wYWNrYWdlcygiZGV2dG9vbHMiKQ0KZGV2dG9vbHM6Omluc3RhbGxfZ2l0aHViKCJzYWxpeC1kL2N1c3RvbVNlcURCIikNCg0KYGBgDQoNCiMgTkNCSSBkYXRhYmFzZQ0KRnVuY3Rpb25zIHNwZWNpZmljIHRvIHRoaXMgZGIgYXJlIGhlcmUgOiBodHRwczovL2dpdGh1Yi5jb20vc2FsaXgtZC9jdXN0b21TZXFEQi9ibG9iL21hc3Rlci9SL25jYmktZGIuUg0KIyMjIEdldHRpbmcgdGhlIHNlcXVlbmNlcyBkZXRhaWxzIGZyb20gTkNCSQ0KVGhpcyBnZXRzIHRoZSBFU3VtbWFyeSBvZiBhbGwgcmVjb3JkcyBpbiB0aGUgTkNCSSBudWNsZW90aWRlIGRhdGFiYXNlIG1hdGNoaW5nIHRoZXNlIHRheGEgYW5kIGdlbmUgd2hpY2ggaGF2ZSB0aGUgd29yZCAnY29tcGxldGUnIGluIHRoZSAndGl0bGUnIGZpZWxkcyBidXQgZG9uJ3QgaGF2ZSAnVU5WRVJJRklFRCcgaW4gdGhlICdrZXl3b3JkJyBmaWVsZHMuIFRoZSBxdWVyeSBpc24ndCBjYXNlIHNlbnNpdGl2ZS4gRm9yIHRoZSB1c2FibGUgZmllbGRzIGFuZCB0aGVpciBuYW1lIHNlZSA6IGh0dHBzOi8vd3d3Lm5jYmkubmxtLm5paC5nb3YvYm9va3MvTkJLNDk1NDAvDQoNCkl0IHRoZW4gcGFyc2UgdGhlIGRhdGEgYW5kIHJldHVybnMgYSBsaXN0IHdpdGggaGlzdG9yeSBzZXJ2ZXIgaW5mb3JtYXRpb24gaW4gY2FzZSB3ZSB3YW50IHRvIGxvb2sgYXQgdGhlIHJlY29yZHMgYWdhaW4gYW5kIGEgbGlzdCBvZiBkZXRhaWxzIGluY2x1ZGluZyB0aGUgYWNjZXNzaW9uIG51bWJlcnMsIHRoZSB0YXhvbm9taWMgaWRzIGFuZCB0aGUgZGVzY3JpcHRpb24uIFRoZSBFU2VhcmNoIGNhbiByZXR1cm4gdXAgdG8gMTAwayByZXN1bHRzLiBUaGlzIHBhcnQgbWF5IHRha2UgYSB3aGlsZS4NCg0KYGBge3J9DQpsaWJyYXJ5KGN1c3RvbVNlcURCKQ0KdGF4YSA8LSBjKCJUcm9tYmlkaWZvcm1lcyIsICJIb2xvdGh5cmlkYSIpDQpnZW5lIDwtIGMoIkNPSSIsICJDTzEiLCAiQ09YSSIsICJDT1gxIikgIyBuY2JpIGluY2x1ZGVzIDYgb3JkZXJzIGFuZCB0aGUgQ09JIGdlbmUgY2FuIGJlIHdyaXR0ZW4gNCB3YXlzDQpuY2JpIDwtIGdldF9uY2JpRGV0YWlscyh0YXhhID0gdGF4YSwgZ2VuZSA9IGdlbmUsIGN1c3RvbVRlcm0gPSAiQU5EIGNvbXBsZXRlIFtUSVRMXSBOT1QgdW52ZXJmaWZpZWRbS1lXRF0iKQ0KaGVhZChuY2JpJGRldGFpbHMpDQpgYGANCklmIHlvdSB3YW50IHRvIHNlcGFyYXRlIHlvdXIgcXVlcmllcyBieSB0YXhvbiB0byBzZWUgaG93IG1hbnkgeW91IGdldCBmcm9tIGVhY2gsIHlvdSBjYW4gYWxzbyB1c2UgZ2V0X25jYmlBY2MgdGhlIHNhbWUgd2F5IGFuZCB0aGVuIHVzZSB0aGUgaGlzdG9yeSBzZXJ2ZXIgaW5mb3JtYXRpb24gdGhhdCBpdCByZXR1cm5zIHRvIHN0b3JlIHRoZSBuZXh0IHF1ZXJpZXMgaW4gdGhlIHNhbWUgV2ViRW52IGFuZCB0aGVuIHVzZSB0aG9zZSB0byBnZXQgdGhlIGRldGFpbHMuDQpgYGB7cn0NCm5jYmkgPC0gbGlzdChPcGlsaW9hY2FyaWRhID0gZ2V0X25jYmlEZXRhaWxzKCJPcGlsaW9hY2FyaWRhIiwgYygiQ09JIiwgIkNPMSIsICJDT1hJIiwgIkNPWDEiKSwgY3VzdG9tVGVybSA9ICJBTkQgY29tcGxldGVbQUxMbF0gTk9UIFVOVkVSSUZJRURbS1lXRF0iKSkNCmZvcihvIGluIGMoIkhvbG90aHlyaWRhIiwgIkl4b2RpZGEiLCAiTWVzb3N0aWdtYXRhIiwgIlRyb21iaWRpZm9ybWVzIiwgIlNhcmNvcHRpZm9ybWVzIikpew0KICBuY2JpW1tvXV0gPC0gZ2V0X25jYmlEZXRhaWxzKG8sIGMoIkNPSSIsICJDTzEiLCAiQ09YSSIsICJDT1gxIiksIGN1c3RvbVRlcm0gPSAiQU5EIGNvbXBsZXRlW0FMTGxdIE5PVCBVTlZFUklGSUVEW0tZV0RdIiwgcXVlcnkgPSBuY2JpJE9waWxpb2FjYXJpZGEkcXVlcnkpDQp9DQpgYGANClNvbWV0aW1lcyBpdCByZXR1cm4gJ0Vycm9yIGluIHBhcnNlX2Nvbih0eHQsIGJpZ2ludF9hc19jaGFyKSA6IHBhcnNlIGVycm9yOiBwcmVtYXR1cmUgRU9GJywgYnV0IHJlcnVubmluZyBmaXhlcyBpdC4uLiBJJ20gbm90IHN1cmUgd2h5Lg0KDQojIyBGaWx0ZXJpbmcgdGhlIGRldGFpbHMgdG8gZ2V0IG9ubHkgImNvbXBsZXRlIiBDT0kNCjxpPlRoaXMgc3RlcCB3aWxsIG5lZWQgdG8gYmUgYWRhcHRlZCBkZXBlbmRpbmcgb24geW91ciBxdWVyeS48L2k+DQpUaGUgZmx0ciBzdHJpbmcgbG9va3MgZm9yIHRoZSB3b3JkICdjb21wbGV0ZScgYSBtYXhpbXVtIG9mIHR3byBjb21tYXMgYWZ0ZXIgdGhlIGdlbmUgKGJlY2F1c2UgZmFydGhlciB0aGFuIHRoYXQgaXQncyBub3QgdGhlIENPSSBnZW5lIHRoYXQgaXMgY29tcGxldGUgYmFzZWQgb24gdGhlc2UgZGVzY3JpcHRpb25zKS4gU29tZSBzZXF1ZW5jZXMgd29uJ3QgaGF2ZSB0aGUgd29yZCBmb3IgdGhlIGdlbmUgYnV0IHdpbGwgYmUgY29tcGxldGUgZ2Vub21lL3NlcXVlbmNlIGFuZCBjYW4gaGF2ZSBhIGNvbXBsZXRlIGdlbmUsIHNvIHRoZXkgYXJlIGluY2x1ZGVkLiBUaGUgZ2VuZSBpcyBsb29rZWQgZm9yIHdpdGggQ094P1tJMV0gYmVjYXVzZSBzb21ldGltZXMgdGhlcmUncyBhbiBYIGJ1dCBub3QgYWx3YXlzIGFuZCB0aGUgb25lIGNhbiBiZSBhcmFiaWMgb3Igcm9tYW4uIGlnbm9yZS5jYXNlID0gVCBiZWNhdXNlIHRoZSBnZW5lIGNhbiBiZSBpbiBhbGwgY2FwcyBvciBub3QuDQo8aT5zb21lIHNlcXVlbmNlcyB3aWxsIHN0aWxsIGJlIHBhcnRpYWwgc2VxdWVuY2VzIGFuZCBzbywgdGhleSB3aWxsIGJlIGZpbHRlcmVkIGFnYWluIG9uY2Ugd2UgaGF2ZSB0aGUgZmFzdGEgZmlsZXM8L2k+DQpgYGB7cn0NCm5jYmkkZGV0YWlscyA8LSBkby5jYWxsKHJiaW5kLCBsYXBwbHkobmNiaVsxOjZdLCBmdW5jdGlvbih4KSB4JGRldGFpbHMpKQ0Kc2FwcGx5KG5jYmkkZGV0YWlscywgbmNvbCkNCm5jYmkkT3BpbGlvYWNhcmlkYSRkZXRhaWxzIDwtIHQobmNiaSRPcGlsaW9hY2FyaWRhJGRldGFpbHMpDQpuY2JpJEhvbG90aHlyaWRhJGRldGFpbHMgPC0gdChuY2JpJEhvbG90aHlyaWRhJGRldGFpbHMpDQpuY2JpJGRldGFpbHMgPC0gTlVMTA0KbmNiaSRkZXRhaWxzIDwtIGRvLmNhbGwocmJpbmQsIGxhcHBseShuY2JpWzE6Nl0sIGZ1bmN0aW9uKHgpIHgkZGV0YWlscykpDQpucm93KG5jYmkkZGV0YWlscykNCmZsdHIgPC0gIkNPWD9bSTFdXFwpP1tbOmFsbnVtOl0gXFwoXFwpO10qLD9bWzphbG51bTpdIFxcKFxcKTtdKiwgY29tcGxldGV8Y29tcGxldGUgZ2Vub21lfGNvbXBsZXRlIHNlcXVlbmNlIg0KbmNiaSRjb21wbGV0ZSRkZXRhaWxzIDwtIG5jYmkkZGV0YWlsc1tncmVwKGZsdHIsIG5jYmkkZGV0YWlscyRkZXNjcmlwdGlvbiwgaWdub3JlLmNhc2UgPSBUKSxdDQpucm93KG5jYmkkY29tcGxldGUkZGV0YWlscykNCmBgYA0KIyMgR2V0dGluZyB0aGUgImNvbXBsZXRlIiBzZXF1ZW5jZXMgZmFzdGEgZmlsZXMNClRoaXMgd2lsbCBkb3dubG9hZCB0aGUgQ0RTIGZhc3RhIGZpbGVzIGZyb20gTkNCSS4gSWYgYSByZWNvcmQgaGFzIG1vcmUgdGhhbiBvbmUgQ0RTLCBpdCByZXR1cm5zIGFsbCBvZiB0aGVtIHNvIHdlIHdpbGwgaGF2ZSB0byBmaWx0ZXIgZm9yIHRoZSBnZW5lIGFnYWluLg0KVGhlIG91dERpciBjYW4gYmUgY2hhbmdlZCB0byB0aGUgZGVzaXJlZCBmb2xkZXIuDQpgYGB7cn0NCm5jYmkkY29tcGxldGUkZmlsZXMgPC0gZ2V0X25jYmlGYXN0YShuY2JpJGNvbXBsZXRlJGRldGFpbHMkYWNjZXNzaW9uLCBvdXREaXIgPSAiLi9lRmV0Y2hfY29tcGxldGVDRFMvIikNCmBgYA0KDQojIyBGaWx0ZXJpbmcgdGhlICJjb21wbGV0ZSIgc2VxdWVuY2VzIGZhc3RhIGZpbGVzDQojIyMgUmVhZCB0aGUgZmFzdGEgZmlsZSBhbmQgbWFrZSBhIGRhdGEuZnJhbWUgb3V0IG9mIGl0Lg0KYGBge3J9DQpuY2JpJGNvbXBsZXRlJGZhc3RhIDwtIFNob3J0UmVhZDo6cmVhZEZhc3RhKG5jYmkkY29tcGxldGUkZmlsZXMpDQpuY2JpJGNvbXBsZXRlJGlkIDwtIGFzLnZlY3RvcihTaG9ydFJlYWQ6OmlkKG5jYmkkY29tcGxldGUkZmFzdGEpKQ0KIyByZWZvcm1hdCB0aGUgc3RyaW5nIHRvIGJlIGFibGUgdG8gcGFyc2Ugd2l0aCBqc29ubGl0ZQ0KbmNiaSRjb21wbGV0ZSRkZiA8LSBqc29ubGl0ZTo6ZnJvbUpTT04ocGFzdGUwKCdbeyInLCBwYXN0ZShwYXN0ZTAoJ2FjY2Vzc2lvbiI6IicsIGdzdWIoIl9jZHNfW1s6YWxudW06XV9cXC5dKiIsICIiLCBnc3ViKCIgKFtbOmFsbnVtOl1fXSopPSIsICciLCJcXDEiOiInLCBnc3ViKCJeLipcXHx8XFxbfFxcXSIsICIiLCAgbmNiaSRjb21wbGV0ZSRpZCkpKSksIGNvbGxhcHNlPScifSx7IicpLCcifV0nKSkNCiMgYWRkIHNlcXVlbmNlcyB0byB0aGUgZGYNCm5jYmkkY29tcGxldGUkZGYkc2VxIDwtIGFzLnZlY3RvcihTaG9ydFJlYWQ6OnNyZWFkKG5jYmkkY29tcGxldGUkZmFzdGEpKQ0KIyB0byBzYXZlIG1lbW9yeSwgbmNiaSRjb21wbGV0ZSRmYXN0YSBjYW4gYmUgcmVtb3ZlZCBzaW5jZSBpdCBtaWdodCBiZSBhbiBoZWF2eSBvYmplY3QNCiMgbmNiaSRjb21wbGV0ZSRmYXN0YSA8LSBOVUxMDQpucm93KG5jYmkkY29tcGxldGUkZGYpDQpgYGANClRoZXJlIG1vcmUgcm93cyB0aGFuIGFjY2Vzc2lvbiBiZWNhdXNlIGl0IGZldGNoIGFsbCBjZHMgYW5kIG5vdCBqdXN0IHRoZSBDT0kgY2RzLg0KDQojIyMgVGFrZSBvbmx5IHRoZSBzZXF1ZW5jZXMgZm9yIHRoZSBDT0kgZ2VuZXMNClNpbmNlIHJlY29yZHMgYXJlIGFsbCBmaWxsZWQgZGlmZmVyZW50bHksIHNvbWUgbWF5IGhhdmUgdGhlIGdlbmUgZmllbGQgb3IgdGhlIHByb3RlaW4gZmllbGQgZW1wdHkgYnV0IG5vdCB0aGUgb3RoZXIuDQpTbyB3ZSBsb29rIGluIGJvdGggZm8gdGhlIGRlc2lyZWQgZ2VuZS9wcm90ZWluLg0KYGBge3J9DQpuY2JpJGNvbXBsZXRlJENPSSA8LSBuY2JpJGNvbXBsZXRlJGRmW3VuaXF1ZShncmVwKCJDT1g/W0kxXSQiLCBuY2JpJGNvbXBsZXRlJGRmJGdlbmUsIGlnbm9yZS5jYXNlID0gVCksIGdyZXAoImN5dG9jaHJvbWUgYz8gP294aWRhc2UgKHN1YnVuaXQgKT9bSTFdJCIsIG5jYmkkY29tcGxldGUkZGYkcHJvdGVpbiwgaWdub3JlLmNhc2UgPSBUKSksXQ0KbnJvdyhuY2JpJGNvbXBsZXRlJENPSSkNCmBgYA0KDQojIyMgTWFraW5nIHN1cmUgc2VxdWVuY2VzIGFyZSBhY3R1YWxseSBjb21wbGV0ZQ0KU29tZSBzZXF1ZW5jZXMgd2lsbCBoYXZlIHRoZSBpbmZvcm1hdGlvbiBpbiB0aGUgY29sdW1uICdwYXJ0aWFsJyBidXQgbm90IGFsbCBvZiB0aGVtLg0KVGhlIHN0YXJ0IGFuZCBlbmQgY29kb25zIG1pZ2h0IHZhcnkgZGVwZW5kaW5nIG9uIHRoZSB0YXhhLiBTZWUgOiBodHRwczovL3d3dy5uY2JpLm5sbS5uaWguZ292L1RheG9ub215L1V0aWxzL3dwcmludGdjLmNnaQ0KVGhpcyBleGFtcGxlIHVzZXMgdHJhbnNsX3RhYmxlNS4NCmBgYHtyfQ0Kc3RhcnRfY29kb25zIDwtIGMoIlRURyIsIkFUVCIsIkFUQyIsIkFUQSIsIkFURyIsIkdURyIpDQplbmRfY29kb25zIDwtIGMoIlRBQSIsICJUQUciKQ0KaGFzLnN0YXJ0IDwtIGdyZXAocGFzdGUwKCJeIiwgcGFzdGUoc3RhcnRfY29kb25zLCBjb2xsYXBzZSA9ICJ8XiIpKSwgbmNiaSRjb21wbGV0ZSRDT0kkc2VxLCBpZ25vcmUuY2FzZSA9IFQpDQpoYXMuZW5kIDwtIGdyZXAocGFzdGUwKHBhc3RlKGVuZF9jb2RvbnMsIGNvbGxhcHNlID0gIiR8IiksICIkIiksIG5jYmkkY29tcGxldGUkQ09JJHNlcSwgaWdub3JlLmNhc2UgPSBUKQ0KbmNiaSRjb21wbGV0ZSRDT0kgPC0gbmNiaSRjb21wbGV0ZSRDT0lbaW50ZXJzZWN0KGhhcy5zdGFydCwgaGFzLmVuZCksXQ0KbnJvdyhuY2JpJGNvbXBsZXRlJENPSSkNCmBgYA0KDQpTb21lIGFjY2Vzc2lvbiBudW1iZXJzIG1pZ2h0IGJlIGR1cGxpY2F0ZWQuIFVzdWFsbHkgYmVjYXVzZSB0aGUgZ2VuZSBpcyBwcmVzZW50IHR3aWNlIGluIHRoZSBnZW5vbWUuIFJlY29yZHMgc2hvdWxkIGJlIGNoZWNrZWQgbWFudWFsbHkuDQpJbiB0aGlzIGNhc2UsIHNpbmNlIHNlcXVlbmNlcyB3ZXJlIHRoZSBzYW1lIGZvciBlYWNoIHBhaXIsIGRlbGV0ZWQgdGhlIGR1cGxpY2F0ZXMuDQpgYGB7cn0NCnN1bShkdXBsaWNhdGVkKG5jYmkkY29tcGxldGUkQ09JJGFjY2Vzc2lvbikpDQpuY2JpJGNvbXBsZXRlJENPSVtuY2JpJGNvbXBsZXRlJENPSSRhY2Nlc3Npb24gJWluJSBuY2JpJGNvbXBsZXRlJENPSSRhY2Nlc3Npb25bZHVwbGljYXRlZChuY2JpJGNvbXBsZXRlJENPSSRhY2Nlc3Npb24pXSxdDQpuY2JpJGNvbXBsZXRlJENPSSA8LSBuY2JpJGNvbXBsZXRlJENPSVshZHVwbGljYXRlZChuY2JpJGNvbXBsZXRlJENPSSRhY2Nlc3Npb24pLCBdDQpucm93KG5jYmkkY29tcGxldGUkQ09JKQ0KYGBgDQpUaGVuIHRoZXJlIHdpbGwgYmUgZHVwbGljYXRlZCBzZXF1ZW5jZXMgd2l0aCB0aGUgc2FtZSB0YXhJZCB3aGljaCBzaG91bGQgYmUgcmVtb3ZlZC4NCg0KYGBge3J9DQpuY2JpJGNvbXBsZXRlJENPSSR0YXhJZCA8LSBuY2JpJGNvbXBsZXRlJGRldGFpbHNbbmNiaSRjb21wbGV0ZSRkZXRhaWxzJGFjY2Vzc2lvbiAlaW4lIG5jYmkkY29tcGxldGUkQ09JJGFjY2Vzc2lvbixdJHRheGlkDQojZmluZCB0aGUgcm93IG5hbWVzIG9mIHRoZSBkdXBsaWNhdGVkIHNlcXVlbmNlcyBmb3IgZWFjaCB0YXhJZC4NCmR1cHMgPC0gbGFwcGx5KHVuaXF1ZShuY2JpJGNvbXBsZXRlJENPSSR0YXhJZCksIGZ1bmN0aW9uKGlkKSByb3duYW1lcyhuY2JpJGNvbXBsZXRlJENPSVtuY2JpJGNvbXBsZXRlJENPSSR0YXhJZCA9PSBpZCxdKVtkdXBsaWNhdGVkKG5jYmkkY29tcGxldGUkQ09JW25jYmkkY29tcGxldGUkQ09JJHRheElkID09IGlkLF0kc2VxKV0pDQpsZW5ndGgoZHVwcykNCiNrZWVwIG9ubHkgdGhlIHJvd3Mgbm90IGluIHRoYXQgbGlzdCBvZiBkdXBsaWNhdGVkIHNlcXVlbmNlcy4NCm5jYmkkY29tcGxldGUkQ09JIDwtIG5jYmkkY29tcGxldGUkQ09JWyFyb3duYW1lcyhuY2JpJGNvbXBsZXRlJENPSSkgJWluJSB1bmxpc3QoZHVwcyksXQ0KbnJvdyhuY2JpJGNvbXBsZXRlJENPSSkNCmBgYA0KDQojIyBHZXR0aW5nIHRoZSB0YXhvbm9teSBmb3IgdGhlIHJlbWFpbmluZyBzZXF1ZW5jZXMNCiMjIyBNYWtpbmcgdGhlIHRheG9ub215IHNxbCB0YWJsZQ0KVGhlIGZ1bmN0aW9uIHdpbGwgZG93bmxvYWQgYSB0YXhkdW1wLnRhci5neiBmaWxlIGZyb20gTkNCSSBzZXJ2ZXJzIGFuZCBleHRyYWN0IHRoZSBuYW1lcy5kbXAgYW5kIG5vZGVzLmRtcCBmaWxlcyBmcm9tIGl0Lg0KVGhlbiB0aGVzIGZpbGVzIHdpbGwgYmUgbWVyZ2VkIGludG8gb25lIHRheC5kbXAgZmlsZSBrZWVwaW5nIG9ubHkgdGhlIGNvbHVtbnMgcmVxdWlyZWQgKGlkLCBuYW1lLCByYW5rIGFuZCBwYXJlbnRJZCkNCkZvciBuYW1lcy5kbXAsIGFsc28gb25seSBrZWVwcyB0aGUgcm93cyBjb250YWluaW5nIHRoZSBzY2llbnRpZmljIG5hbWVzIHNvIHRoZXJlJ3Mgb25seSBvbmUgbmFtZSBwZXIgaWQuDQpJdCB3aWxsIHRoZW4gdXNlIHRoYXQgZmlsZSB0byBjcmVhdGUgYSBTUUxpdGUgZGF0YWJhc2UgY29udGFpbmluZyBhIHRheG9ub215IHRhYmxlIGZyb20gd2hpY2ggd2UgY2FuIGdldCB0YXhvbm9taWMgaW5mb3JtYXRpb24gZnJvbSB0YXhJZHMgd2l0aCB0aGUgZ2V0X3RheG9ub215KCkgZnVuY3Rpb24uDQpnZXRfdGF4b25vbXkgZ2V0cyB0aGUgdGhlIHBhcmVudElkIG9mIGFsbCBwYXJlbnRzIG9mIGVhY2ggdGF4SWRzIGFuZCByZXR1cm5zIHRoZSBuYW1lcyBjb3JyZXNwb25kaW5nIHRvIHRoZSByYW5rcyBkZXNpcmVkIGEgZGF0YSBmcmFtZSB3aXRoIHRoZSB0YXhpZHMgYXMgcm93IG5hbWVzIGFuZCByYW5rcyBhcyBjb2x1bW5zLg0KYGBge3J9DQpkYl9wYXRoIDwtIG1rX3RheG9ub215LnRhYmxlKGRiRmlsZSA9IHBhc3RlMCgnLi9uY2JpLWRiXycsIFN5cy5EYXRlKCkpKQ0KbmNiaSRjb21wbGV0ZSR0YXggPC0gZ2V0X3RheG9ub215KG5jYmkkY29tcGxldGUkQ09JJHRheElkLCBzcWxGaWxlID0gZGJfcGF0aCwgcmFua3MgPSBjKCJraW5nZG9tIiwicGh5bHVtIiwiY2xhc3MiLCJvcmRlciIsImZhbWlseSIsImdlbnVzIiwic3BlY2llcyIpKQ0KI3RvIHNlZSB3aGF0IHRheGEgdGhlIGRiIGNvdmVycyA6DQphcHBseShuY2JpJGNvbXBsZXRlJHRheFs0OjddLCAyLCB0YWJsZSkNCmBgYA0KDQojIyBXcml0aW5nIHRoZSBkYWRhMiBmb3JtYXRlZCBmYXN0YSBmaWxlDQpgYGB7cn0NCm5jYmkkY29tcGxldGUkdGF4JGlkIDwtIHBhc3RlMChhcHBseShuY2JpJGNvbXBsZXRlJHRheFsxOjddLCAxLCBwYXN0ZTAsIGNvbGxhcHNlID0gIjsiKSwgIjsiKQ0Kd3JpdGVfZmFzdGEoc2VxdWVuY2VzID0gbmNiaSRjb21wbGV0ZSRDT0kkc2VxLCBpZHMgPSBuY2JpJGNvbXBsZXRlJHRheCRpZCwgb3V0RmlsZSA9ICJuY2JpQ29tcGxldGVDT0lfbmNiaS5mYXN0YSIpDQpgYGANCg0KIyMgVGVzdGluZyB0aGUgZGF0YWJhc2UNCmBgYHtyfQ0KbmNiaSRzZXF0YWIgPC0gYXMubWF0cml4KHJlYWQuY3N2KCIuL2RhdGEvc2VxdGFiLm5vY2hpbV9uY2JpLmNzdiIsIHJvdy5uYW1lcyA9IDEpKQ0KbmNiaSR0YXhhIDwtIGRhZGEyOjphc3NpZ25UYXhvbm9teShlbmEkc2VxdGFiLCAiLi9uY2JpQ29tcGxldGVDT0lfbmNiaS5mYXN0YSIsIHRyeVJDID0gVCkNCm5jYmkkdGF4YS5wID0gYXMuZGF0YS5mcmFtZShuY2JpJHRheGEsIHJvdy5uYW1lcyA9IHNlcV9sZW4obnJvdyhuY2JpJHRheGEpKSkNCg0KIyBUbyBzZWUgaG93IG1hbnkgc2VxdWVuY2VzIGFyZSBhc3NpZ25lZCBwZXIgcmFua3MNCmNvbFN1bXMoIWlzLm5hKG5jYmkkdGF4YS5wKSkNCmBgYA0KDQojIEVOQSBkYXRhYmFzZQ0KRnVuY3Rpb25zIHNwZWNpZmljIHRvIHRoaXMgZGIgYXJlIGhlcmUgOiBodHRwczovL2dpdGh1Yi5jb20vc2FsaXgtZC9jdXN0b21TZXFEQi9ibG9iL21hc3Rlci9SL2VuYS1kYi5SDQojIyBHZXR0aW5nIHRoZSB0YXhJZHMNClRoZSBFTkEgQVBJIGxldHMgeW91IGZpbmQgYWxsIHJlY29yZHMgd2hpY2ggaGF2ZSBzZXF1ZW5jZXMgZm9yIGEgdGF4b25vbWljIHRyZWUuIFNvIHdpdGggYSBwYXJlbnQgdGF4b24geW91IGNhbiBmaW5kIGFsbCBjaGlsZHJlbiB0YXhvbiB3aGljaCBoYXZlIHNlcXVlbmNlcy4gQnV0IHRvIGRvIHNvLCB5b3UgY2FuJ3QgdXNlIHRoZWlyIG5hbWUsIHlvdSBoYXZlIHRvIHVzZSB0aGVpciB0YXhvbm9taWMgaWQuIA0KU2VlIDogaHR0cHM6Ly9lbmEtZG9jcy5yZWFkdGhlZG9jcy5pby9lbi9sYXRlc3QvcmV0cmlldmFsL3Byb2dyYW1tYXRpYy1hY2Nlc3MvdGF4b24tYmFzZWQtc2VhcmNoLmh0bWwNCmBgYHtyfQ0KZW5hIDwtIGxpc3QoaWRzID0gZ2V0X2VuYVRheElkcyhuYW1lcyA9IGMoIk9waWxpb2FjYXJpZGEiLCAiSG9sb3RoeXJpZGEiLCAiSXhvZGlkYSIsICJNZXNvc3RpZ21hdGEiLCAiVHJvbWJpZGlmb3JtZXMiLCAiU2FyY29wdGlmb3JtZXMiKSkpDQplbmEkaWRzDQpgYGANCklnbm9yZSB0aGUgJ2luY29tcGxldGUgZmluYWwgbGluZSBmb3VuZCcsIGl0IGRvZXNuJ3QgYWZmZWN0IGFueXRoaW5nLg0KDQpUaGVuIHdlIGNhbiBnZXQgdGhlIGRldGFpbHMgKEFjY2Vzc2lvbiBudW1iZXJzIGFuZCBkZXNjcmlwdGlvbikgb2YgdGhlIHJlY29yZHMgbWF0Y2hpbmcgdGhlIHRheElkcyBhbmQgYSBzcGVjaWZpZWQgZ2VuZSB0byBwcmUtZmlsdGVyIGZvciB3aGljaCByZWNvcmRzIGhhdmUgY29tcGxldGUgc2VxdWVuY2VzLiBUaGlzIG1heSB0YWtlIGEgd2hpbGUuDQoNCjxpPlRoZSBjb25uZWN0aW9uIG9mdGVuIHRpbWVzIG91dCB0aGUgbW9yZSBjcml0ZXJpYSB5b3UgYWRkLiBTbyBJIG1vZGlmaWVkIHRoZSBmdW5jdGlvbiB0byBkaXJlY3RseSBkb3dubG9hZCB0aGUgZmlsZSBpbnN0ZWFkIG9mIGp1c3QgcmVhZGluZyBpdCB3aXRoIGpzb25saXRlLg0KQW5kIHNpbmNlIGl0IGRvZXNuJ3QgbG9vayBmb3IgdGhlIGdlbmVzIGluIHRoZSByZWNvcmRzIGJ1dCBvbmx5IGluIHRoZSBkZXNjcmlwdGlvbiwgdGhlcmUgd2lsbCBiZSByZWNvcmQgbWlzc2luZyBpZiBvbmx5IGxvb2tpbmcgZm9yIHRoZSBnZW5lIG5hbWUgYmVjYXVzZSBzb21ldGltZXMgaXQncyBub3QgYWJicmV2aWF0ZWQgQU5EIGJlY2F1c2UgaXQgd2lsbCBtaXNzIHRoZSAid2hvbGUgZ2Vub21lIiBhbmQgIm1pdG9jaG9uZHJpYWwgRE5BLCBjb21wbGV0ZSBzZXF1ZW5jZSIgdHlwZSBvZiByZWNvcmRzLg0KQnV0LCBiZWNhdXNlIHRoaXMgcmV0dXJucyBvbmx5IGFjY2Vzc2lvbiBhbmQgZGVzY3JpcHRpb24gcHJldHR5IGZhc3QsIGFsbCByZWNvcmRzIGFzc29jaWF0ZWQgd2l0aCB0aGUgdGF4YSB3aGljaCBoYXZlICJjb21wbGV0ZSIgaW4gdGhlIGRlc2NyaXB0aW9uIGNhbiBiZSBkb3dubG9hZGVkIGFuZCB0aGVuIHNvcnRlZCBmb3IgdGhlIGdlbmUuPC9pPg0KYGBge3J9DQplbmEkZGV0YWlscyA8LSBnZXRfZW5hRGV0YWlscyhlbmEkaWRzJHRheElkLCBkZXNjcmlwdGlvbiA9ICJjb21wbGV0ZSIpDQpucm93KGVuYSRkZXRhaWxzKQ0KYGBgDQoNCmBgYHtyfQ0KaGVhZChlbmEkZGV0YWlscykNCmBgYA0KDQpOb3cgd2UgaGF2ZSB0byBmaWx0ZXIgZm9yIHRoZSByZWNvcmRzIHdpdGggb3VyIGdlbmUuIEVOQSBoYXMgQ09JIHdyaXR0ZW4gYXMgQ09JLCBDT1gxIGFuZCBDTzEuIFdlIGFsc28gd2FudCB0byBrZWVwIHRoZSBjb21wbGV0ZSBnZW5vbWUgYW5kICBtaXRvY2hvbmRyaWFsIEROQS4NCiJbIFs6cHVuY3Q6XV0iIG1lYW5zIGl0IG11c3QgYmUgcHJlY2VkZWQvZm9sbG93ZWQgYnkgYSBzcGFjZSBvciBhIHB1bmN0dWF0aW9uIHNpZ24uIFRoaXMgaXMgdG8gYXZvaWQgdG8gaGF2ZSByZWNvcmRzIHdoZXJlIENPSSBpcyBmb3VuZCBpbiBhIHN0cmluZyBvZiB1cHBlcmNhc2UgbGV0dGVyIChhcyBpbiBzb21lIHZvdWNoZXIvY29kZSBsaWtlIEJYTVNDT0lESkYpIGFuZCB0aGUgc2VxdWVuY2VzIGZvciB0aGUgQ09JSSBhbmQgQ09JSUkgZ2VuZXMuDQpTZWUgaHR0cHM6Ly9yc3R1ZGlvLmNvbS93cC1jb250ZW50L3VwbG9hZHMvMjAxNi8wOS9SZWdFeENoZWF0c2hlZXQucGRmIGZvciBtb3JlIGRldGFpbHMgb24gciByZWdleHAuDQpgYGB7cn0NCmZsdHIgPC0gIlsgWzpwdW5jdDpdXUNPWD9bSTFdWyBbOnB1bmN0Ol1dW1s6YWxudW06XSBcXChcXCk7XSssP1tbOmFsbnVtOl0gXFwoXFwpXSosPyBjb21wbGV0ZXxjb21wbGV0ZSBnZW5vbWV8RE5BLCBjb21wbGV0ZSINCmVuYSRjb21wbGV0ZSRkZXRhaWxzIDwtIGVuYSRkZXRhaWxzW2dyZXAoZmx0ciwgZW5hJGRldGFpbHMkZGVzY3JpcHRpb24sIGlnbm9yZS5jYXNlID0gVCksXQ0KbnJvdyhlbmEkY29tcGxldGUkZGV0YWlscykNCmBgYA0KVGhlcmUgbWlnaHQgc3RpbGwgYmUgZmFsc2UgcG9zaXRpdmVzLCBidXQgdGhleSB3aWxsIGJlIGZpbHRlcmVkIG91dCB3aXRoIHRoZSBuZXh0IHN0ZXAuDQoNClNpbmNlIHRoZSBFTkEgYXBpIGRvZXNuJ3QgcmV0dXJucyBqdXN0IENEUywgdGhlIHJlY29yZHMgd2lsbCBiZSBkb3dubG9hZGVkIGluIGluc2R4bWwgZm9ybWF0IChhIGZvcm1hdCBhbHNvIGF2YWlsYWJsZSBmcm9tIG5jYmkpIGFuZCB0aGVuIHBhcnNlZCB0aGVtIHRvIGdldCB0aGUgYWNjZXNzaW9uIG51bWJlciwgdGhlIHRheGlkIGFuZCB0aGUgQ09JIGdlbmUgc2VxdWVuY2UuIFRvIGdldCB0aGUgc2VxdWVuY2UgaXQgZmluZHMgdGhlIGdlbmUgZmllbGQgd2hpY2ggaGFzIHRoZSBuYW1lIENPSSBhbmQgdGhlbiBnZXRzIHRoZSBsb2NhdGlvbiBpbmZvcm1hdGlvbiB0byBnZXQgdGhlIHJhbmdlIG9mIHRoZSBnZW5lIHdoaWNoIGlzIHVzZWQgdG8gc3Vic3RyaW5nIHRoZSBzdHJpbmcgaW4gdGhlIHNlcXVlbmNlIGZpZWxkLg0KU2luY2UgQ0RTIGhhdmUgcmVhZGluZyBmcmFtZXMsIHRoZSBhcmd1bWVudCBzdGFydF9jb2RvbiBtdXN0IGJlIHNldCB0byBUUlVFIHNvIGl0IGNhbiBhZGp1c3QgdGhlIHN0YXJ0IG9mIGdlbmUgcmFuZ2UgYWNjb3JkaW5nIHRvIHRoZSByZWFkaW5nIGZyYW1lLg0KVGhlIElOU0R4bWwgZmlsZXMgY2FuIG9wdGlvbm5hbHkgYmUgZG93bmxvYWRlZCBpbnN0ZWFkIG9mIHJlYWQgOiBhZGQgYWdydW1lbnRzIHNhdmVYbWwgPSBULiBJdCB3aWxsIGRvd25sb2FkIGFzICcuL2VuYV9kb3dubG9hZHMveG1sL1tTeXMuRGF0ZV1fcmVjb3Jkc19bIyMjXS54bWwuIFRvIHNwZWNpZnkgcGF0aCB1c2UgYXJndWVtZW50IG91dFhtbC4NClRoZSByZXN1bHRpbmcgc2VxdWVuY2UgY2FuIG9wdGlvbm5hbHkgYmUgc2F2ZWQgYXMgZmFzdGEgZmlsZSAodGhlIGlkcyB3aWxsIGJlIHRoZSBpbmZvIG1lcmdlIGluIGEganNvbiBzdHJpbmcgdG8gY29udmVydCBiYWNrIHRvIGRhdGEuZnJhbWUgZWFzaWx5KSA6IGFkZCBhZ3J1bWVudHMgc2F2ZUZhc3RhID0gVC4gSXQgd2lsbCBkb3dubG9hZCBhcyAnLi9lbmFfZG93bmxvYWRzL2Zhc3RhL1tTeXMuRGF0ZV1fc2VxdWVuY2VzX1sjIyNdLnhtbC4gVG8gc3BlY2lmeSBwYXRoIHVzZSBhcmd1ZW1lbnQgb3V0RmFzdGEuDQpgYGB7cn0NCmVuYSRjb21wbGV0ZSRzZXEgPC0gZ2V0X2VuYUZhc3RhKGFjY0xpc3QgPSBlbmEkY29tcGxldGUkZGV0YWlscyRhY2Nlc3Npb24sIGdlbmUgPSAiQ09YP1tJMV1bWzpzcGFjZTpdXSIsIGNvZG9uX3N0YXJ0ID0gVCwgc2F2ZVhNTCA9IFQpDQojZ2V0dGluZyBhbiBlcnJvciBiZWNhdXNlIHNvbWUgYWNjZXNzaW9uIGFyZSBhdmFpbGFibGUgaW4gdGhhdCBmb3JtYXQuDQojIGZpeCA6IA0KYGBgDQoNCmBgYHtiYXNofQ0Kc2VkICcvPElOU0RTZXFfc2VxdWVuY2U+ICAgIDxcL0lOU0RTZXE+L2QnIC4uL2VuYV9kb3dubG9hZHMveG1sLzIwMjAtMTAtMDJfcmVjb3Jkc18wMDEueG1sID4gLi4vZW5hX2Rvd25sb2Fkcy94bWwvMjAyMC0xMC0wMl9yZWNvcmRzXzAwMi54bWwNCmBgYA0KDQpgYGB7cn0NCmVuYSRjb21wbGV0ZSRzZXEgPC0gcGFyc2VfSU5TRHhtbChVUkwgPSAiLi9lbmFfZG93bmxvYWRzL3htbC8yMDIwLTEwLTAyX3JlY29yZHNfMDAyLnhtbCIsIGdlbmUgPSAiQ09YP1tJMV08fGN5dG9jaHJvbWUgYz8gP294aWRhc2UgKHN1YnVuaXQpPyA/W0kxXTwiLCBjb2Rvbl9zdGFydCA9IFQpDQpgYGANCkxOODc0MjY5IGFuZCBMTjg3NDI3MCBhcmUgbWl0b2Nob25kcmlhbCBjb21wbGV0ZSBnZW5vbWUuIFRheElkIDogNTIyODMNCg0KYGBge3J9DQpzdW0oZW5hJGNvbXBsZXRlJHNlcSR0YXhJZCAlaW4lICI1MjI4MyIpDQpgYGANCldlIGhhdmUgMTMgb3RoZXIgc2VxdWVuY2UgZm9yIHRoaXMgdGF4SWQuDQoNCkxldCdzIGNoZWNrIHdoaWNoIGFjY2Vzc2lvbiB3ZXJlbid0IGF2YWlsYWJsZSBpbiB0aGF0IGZvcm1hdCA6DQoNCmBgYHtyfQ0KZW1ibF9hY2MgPC0gZW5hJGNvbXBsZXRlJGRldGFpbHMkYWNjZXNzaW9uWyEgZW5hJGNvbXBsZXRlJGRldGFpbHMkYWNjZXNzaW9uICVpbiUgYyhnc3ViKCJcXC5bMC05XSokIiwgIiIsIGVuYSRjb21wbGV0ZSRzZXEkYWNjZXNzaW9uKSwgIkxOODc0MjY5IiwgIkxOODc0MjcwIildDQplbWJsX2FjYw0KYGBgDQpXZSBjYW4gcGFyc2UgdGhlIHJlc3Qgd2l0aCB0aGUgRU1CTCBmb3JtYXQuIFRoaXMgZm9ybWF0IGlzIGxlc3MgY29uc2lzdGVudCBiZXR3ZWVuIHJlY29yZHMgd2hpY2ggaXMgd2h5IEkgcmF0aGVyIHVzZSBJTlNEeG1sIHdoZW4gcG9zc2libGUuDQpgYGB7cn0NCiMgTWFraW5nIFVSTCBtYW51YWxseQ0KVVJMIDwtIHBhc3RlMCgiaHR0cDovL3d3dy5lYmkuYWMudWsvVG9vbHMvZGJmZXRjaC9kYmZldGNoP2RiPWVuYV9zZXF1ZW5jZTtpZD0iLCBwYXN0ZShlbWJsX2FjYywgY29sbGFwc2UgPSAiLCIpLCI7Zm9ybWF0PWVtYmx4bWwtMS4yIikNCiNwYXJzaW5nIGl0DQojIGVtYmwgaXMgYSBiaXQgZGlmZmVyZW50IHNvIHRoZXJlIGFyZSBzcGFjZSBiZXR3ZWVuIHRleHQgYW5kIG5leHQgJzwnDQplbmEkY29tcGxldGUkc2VxIDwtIHJiaW5kKGVuYSRjb21wbGV0ZSRzZXEsIHBhcnNlX0VNQkx4bWwoVVJMLCBnZW5lID0gIkNPWD9bSTFdW1s6c3BhY2U6XV18Y3l0b2Nocm9tZSBjPyA/b3hpZGFzZSAoc3VidW5pdCk/ID9bSTFdW1s6c3BhY2U6XV0iLCBjb2Rvbl9zdGFydCA9IFQpKQ0KbnJvdyhlbmEkY29tcGxldGUkc2VxKQ0KYGBgDQpobW1tLi4uIEFwcGFyZW50bHkgd2UgY2FuJ3QgZXZlbi4uLiANCmBgYHtyfQ0Kbm9YbWxfYWNjIDwtIGVuYSRjb21wbGV0ZSRkZXRhaWxzJGFjY2Vzc2lvblshIGVuYSRjb21wbGV0ZSRkZXRhaWxzJGFjY2Vzc2lvbiAlaW4lIGMoZ3N1YigiXFwuWzAtOV0qJCIsICIiLCBlbmEkY29tcGxldGUkc2VxJGFjY2Vzc2lvbiksICJMTjg3NDI2OSIsICJMTjg3NDI3MCIpXQ0KYGBgDQpUaGVzZSBqdXN0IGRvbid0IGhhdmUgYW55IHhtbCBmb3JtYSBhdmFpbGFibGUuIEd1ZXNzIHdlJ2xsIGhhdmUgdG8gcGFyc2UgdGhlIGZsYXQgZmlsZXMuLi4NCklmIGl0J3Mgbm90IHNsb3dlciwgd2UgY291bGQgaGF2ZSBwYXJzZSB0aGVtIGFsbCB0aGlzIHdheS4gVG8gdGVzdCBvdXQuDQpGbGF0IGZpbGUgYXJlIGFsc28gZGlmZmVyZW50LCBzbyB0aGUgbGltaXRlciB0byBub3QgZ2V0IENPSUkvQ09JSUkgaXMgIg0KYGBge3J9DQpVUkwgPC0gcGFzdGUwKCJodHRwOi8vd3d3LmViaS5hYy51ay9Ub29scy9kYmZldGNoL2RiZmV0Y2g/ZGI9ZW5hX3NlcXVlbmNlJmlkPSIsIHBhc3RlKG5vWG1sX2FjYywgY29sbGFwc2UgPSAiLCIpLCImZm9ybWF0PWVtYmwmc3R5bGU9cmF3IikNCmVuYSRjb21wbGV0ZSRzZXEgPC0gcmJpbmQoZW5hJGNvbXBsZXRlJHNlcSwgcGFyc2VfZmxhdEZpbGUoVVJMLCBnZW5lID0gIkNPWD9bSTFdXCJ8Y3l0b2Nocm9tZSBjPyA/b3hpZGFzZSAoc3VidW5pdCk/ID9bSTFdXCIiLCBjb2Rvbl9zdGFydCA9IFQpKSANCm5yb3coZW5hJGNvbXBsZXRlJHNlcSkNCmBgYA0KV09PISBub3cgb25seSB0aGUgMiByZWNvcmRzIHdpdGggbm8gQ09JIHJlZ2lvbiBhciBtaXNzaW5nDQpgYGB7cn0NCg0KYGBgDQojIyMgTWFraW5nIHN1cmUgc2VxdWVuY2VzIGFyZSBhY3R1YWxseSBjb21wbGV0ZQ0KVGhlIHN0YXJ0IGFuZCBlbmQgY29kb25zIG1pZ2h0IHZhcnkgZGVwZW5kaW5nIG9uIHRoZSB0YXhhLiBTZWUgOiBodHRwczovL3d3dy5uY2JpLm5sbS5uaWguZ292L1RheG9ub215L1V0aWxzL3dwcmludGdjLmNnaQ0KVGhpcyBleGFtcGxlIHVzZXMgdHJhbnNsX3RhYmxlNS4NCmBgYHtyfQ0Kc3RhcnRfY29kb25zIDwtIGMoIlRURyIsIkFUVCIsIkFUQyIsIkFUQSIsIkFURyIsIkdURyIpDQplbmRfY29kb25zIDwtIGMoIlRBQSIsICJUQUciKQ0KaGFzLnN0YXJ0IDwtIGdyZXAocGFzdGUwKCJeIiwgcGFzdGUoc3RhcnRfY29kb25zLCBjb2xsYXBzZSA9ICJ8XiIpKSwgZW5hJGNvbXBsZXRlJHNlcSRzZXF1ZW5jZSwgaWdub3JlLmNhc2UgPSBUKQ0KaGFzLmVuZCA8LSBncmVwKHBhc3RlMChwYXN0ZShlbmRfY29kb25zLCBjb2xsYXBzZSA9ICIkfCIpLCAiJCIpLCBlbmEkY29tcGxldGUkc2VxJHNlcXVlbmNlLCBpZ25vcmUuY2FzZSA9IFQpDQplbmEkY29tcGxldGUkQ09JIDwtIGVuYSRjb21wbGV0ZSRzZXFbaW50ZXJzZWN0KGhhcy5zdGFydCwgaGFzLmVuZCksXQ0KbnJvdyhlbmEkY29tcGxldGUkQ09JKQ0KYGBgDQpUaGVyZSB3aWxsIGJlIGR1cGxpY2F0ZWQgc2VxdWVuY2VzIHdpdGggdGhlIHNhbWUgdGF4SWQgd2hpY2ggc2hvdWxkIGJlIHJlbW92ZWQuDQoNCmBgYHtyfQ0KI2ZpbmQgdGhlIHJvdyBuYW1lcyBvZiB0aGUgZHVwbGljYXRlZCBzZXF1ZW5jZXMgZm9yIGVhY2ggdGF4SWQuDQpkdXBzIDwtIGxhcHBseSh1bmlxdWUoZW5hJGNvbXBsZXRlJENPSSR0YXhJZCksIGZ1bmN0aW9uKGlkKSByb3duYW1lcyhlbmEkY29tcGxldGUkQ09JW2VuYSRjb21wbGV0ZSRDT0kkdGF4SWQgPT0gaWQsXSlbZHVwbGljYXRlZChlbmEkY29tcGxldGUkQ09JW2VuYSRjb21wbGV0ZSRDT0kkdGF4SWQgPT0gaWQsXSRzZXF1ZW5jZSldKQ0KI2tlZXAgb25seSB0aGUgcm93cyBub3QgaW4gdGhhdCBsaXN0IG9mIGR1cGxpY2F0ZWQgc2VxdWVuY2VzLg0KZW5hJGNvbXBsZXRlJENPSSA8LSBlbmEkY29tcGxldGUkQ09JWyFyb3duYW1lcyhlbmEkY29tcGxldGUkQ09JKSAlaW4lIHVubGlzdChkdXBzKSxdDQpucm93KGVuYSRjb21wbGV0ZSRDT0kpDQpgYGANCg0KIyMgR2V0dGluZyB0aGUgdGF4b25vbXkgZm9yIHRoZSByZW1haW5pbmcgc2VxdWVuY2VzDQoNCmBgYHtyfQ0KZGJfcGF0aCA8LSAiLi4vLi4vTWl0ZXNEQi9uY2JpLWRiXzIwMjAtMDktMjkuc3FsaXRlIg0KZGlyKGRpcm5hbWUoZGJfcGF0aCkpDQplbmEkY29tcGxldGUkdGF4IDwtIGdldF90YXhvbm9teShhcy5udW1lcmljKGVuYSRjb21wbGV0ZSRDT0kkdGF4SWQpLCBzcWxGaWxlID0gZGJfcGF0aCwgcmFua3MgPSBjKCJraW5nZG9tIiwicGh5bHVtIiwiY2xhc3MiLCJvcmRlciIsImZhbWlseSIsImdlbnVzIiwic3BlY2llcyIpKQ0KI3RvIHNlZSB3aGF0IHRheGEgdGhlIGRiIGNvdmVycyA6DQphcHBseShlbmEkY29tcGxldGUkdGF4WzQ6N10sIDIsIHRhYmxlKQ0KYGBgDQoNCiMjIFdyaXRpbmcgdGhlIGRhZGEyIGZvcm1hdGVkIGZhc3RhIGZpbGUNCmBgYHtyfQ0KZW5hJGNvbXBsZXRlJHRheCRpZCA8LSBwYXN0ZTAoYXBwbHkoZW5hJGNvbXBsZXRlJHRheFsxOjddLCAxLCBwYXN0ZTAsIGNvbGxhcHNlID0gIjsiKSwgIjsiKQ0Kd3JpdGVfZmFzdGEoc2VxdWVuY2VzID0gZW5hJGNvbXBsZXRlJENPSSRzZXEsIGlkcyA9IGVuYSRjb21wbGV0ZSR0YXgkaWQsIG91dEZpbGUgPSAiZW5hQ29tcGxldGVDT0lfZW5hLmZhc3RhIikNCmBgYA0KDQojIyBUZXN0aW5nIHRoZSBkYXRhYmFzZQ0KYGBge3J9DQplbmEkc2VxdGFiIDwtIGFzLm1hdHJpeChyZWFkLmNzdigiLi4vLi4vTWl0ZXNEQi9kYXRhL3NlcXRhYi5ub2NoaW1fTUlURVMuY3N2Iiwgcm93Lm5hbWVzID0gMSkpDQplbmEkdGF4YSA8LSBkYWRhMjo6YXNzaWduVGF4b25vbXkoZW5hJHNlcXRhYiwgIi4vZW5hQ29tcGxldGVDT0lfZW5hLmZhc3RhIiwgdHJ5UkMgPSBUKQ0KZW5hJHRheGEucCA9IGFzLmRhdGEuZnJhbWUobmNiaSR0YXhhLCByb3cubmFtZXMgPSBzZXFfbGVuKG5yb3coZW5hJHRheGEpKSkNCiMgVG8gc2VlIGhvdyBtYW55IHNlcXVlbmNlcyBhcmUgYXNzaWduZWQgcGVyIHJhbmtzDQpjb2xTdW1zKCFpcy5uYShlbmEkdGF4YS5wKSkNCmBgYA0KIyMgTUVSR0lORyB0aGUgZGJzDQpgYGB7cn0NCnNhbWVfYWNjIDwtIGludGVyc2VjdChuY2JpJGNvbXBsZXRlJENPSSRhY2Nlc3Npb24sIGVuYSRjb21wbGV0ZSRDT0kkYWNjZXNzaW9uKQ0KbGVuZ3RoKHNhbWVfYWNjKQ0KDQpuY2JpX2VuYSA8LSBuY2JpJGNvbXBsZXRlJENPSVtjKCJhY2Nlc3Npb24iLCAidGF4SWQiLCAic2VxIildDQpjb2xuYW1lcyhuY2JpX2VuYSlbM10gPC0gInNlcXVlbmNlIg0KbmNiaV9lbmEgPC0gcmJpbmQobmNiaV9lbmEsIGVuYSRjb21wbGV0ZSRDT0lbIWVuYSRjb21wbGV0ZSRDT0kkYWNjZXNzaW9uICVpbiUgc2FtZV9hY2MsYygiYWNjZXNzaW9uIiwgInRheElkIiwgInNlcXVlbmNlIildKQ0KbnJvdyhuY2JpX2VuYSkNCm5jYmlfZW5hX2R1cHMgPC0gbGFwcGx5KHVuaXF1ZShuY2JpX2VuYSR0YXhJZCksIGZ1bmN0aW9uKGlkKSByb3duYW1lcyhuY2JpX2VuYVtuY2JpX2VuYSR0YXhJZCA9PSBpZCxdKVtkdXBsaWNhdGVkKG5jYmlfZW5hW25jYmlfZW5hJHRheElkID09IGlkLCAic2VxdWVuY2UiXSldKQ0KbnJvdyhuY2JpX2VuYSkgLSBsZW5ndGgodW5saXN0KG5jYmlfZW5hX2R1cHMpKQ0KbGVuZ3RoKHVubGlzdChuY2JpX2VuYV9kdXBzKSkNCm5jYmlfZW5hIDwtIG5jYmlfZW5hWyEgcm93bmFtZXMobmNiaV9lbmEpICVpbiUgdW5saXN0KG5jYmlfZW5hX2R1cHMpLF0NCm5yb3cobmNiaV9lbmEpDQoNCnN1bShlbmEkY29tcGxldGUkQ09JJGFjY2Vzc2lvbiAlaW4lIG5jYmlfZW5hJGFjY2Vzc2lvbikgLSBzdW0oZW5hJGNvbXBsZXRlJENPSSRhY2Nlc3Npb24gJWluJSBzYW1lX2FjYykNCnN1bShuY2JpJGNvbXBsZXRlJENPSSRhY2Nlc3Npb24gJWluJSBuY2JpX2VuYSRhY2Nlc3Npb24pIC0gc3VtKG5jYmkkY29tcGxldGUkQ09JJGFjY2Vzc2lvbiAlaW4lIHNhbWVfYWNjKQ0KYGBgDQoNCiMjIEdldHRpbmcgdGhlIHRheG9ub215IGZvciB0aGUgcmVtYWluaW5nIHNlcXVlbmNlcw0KDQpgYGB7cn0NCmRiX3BhdGggPC0gIi4uLy4uL01pdGVzREIvbmNiaS1kYl8yMDIwLTA5LTI5LnNxbGl0ZSINCm5jYmlfZW5hLnRheCA8LSBnZXRfdGF4b25vbXkoYXMubnVtZXJpYyhuY2JpX2VuYSR0YXhJZCksIHNxbEZpbGUgPSBkYl9wYXRoLCByYW5rcyA9IGMoImtpbmdkb20iLCJwaHlsdW0iLCJjbGFzcyIsIm9yZGVyIiwiZmFtaWx5IiwiZ2VudXMiLCJzcGVjaWVzIikpDQojdG8gc2VlIHdoYXQgdGF4YSB0aGUgZGIgY292ZXJzIDoNCmFwcGx5KG5jYmlfZW5hLnRheFs0OjVdLCAyLCB0YWJsZSkNCmBgYA0KDQojIyBXcml0aW5nIHRoZSBkYWRhMiBmb3JtYXRlZCBmYXN0YSBmaWxlDQpgYGB7cn0NCm5jYmlfZW5hLnRheCRpZCA8LSBwYXN0ZTAoYXBwbHkobmNiaV9lbmEudGF4WzE6N10sIDEsIHBhc3RlMCwgY29sbGFwc2UgPSAiOyIpLCAiOyIpDQp3cml0ZV9mYXN0YShzZXF1ZW5jZXMgPSBuY2JpX2VuYSRzZXF1ZW5jZSwgaWRzID0gbmNiaV9lbmEudGF4JGlkLCBvdXRGaWxlID0gImNvbXBsZXRlQ09JX25jYmlfZW5hLmZhc3RhIikNCmBgYA0KDQojIyBUZXN0aW5nIHRoZSBkYXRhYmFzZQ0KYGBge3J9DQplbmEkc2VxdGFiIDwtIGFzLm1hdHJpeChyZWFkLmNzdigiLi4vLi4vTWl0ZXNEQi9kYXRhL3NlcXRhYi5ub2NoaW1fTUlURVMuY3N2Iiwgcm93Lm5hbWVzID0gMSkpDQpuY2JpX2VuYS50YXhhIDwtIGRhZGEyOjphc3NpZ25UYXhvbm9teShlbmEkc2VxdGFiLCAiLi9jb21wbGV0ZUNPSV9uY2JpX2VuYS5mYXN0YSIsIHRyeVJDID0gVCkNCm5jYmlfZW5hLnRheGEucCA9IG1rX3ByaW50REYobmNiaV9lbmEudGF4YSwgbmEyY2hhciA9IEYpDQojIFRvIHNlZSBob3cgbWFueSBzZXF1ZW5jZXMgYXJlIGFzc2lnbmVkIHBlciByYW5rcw0KY29sU3VtcyghaXMubmEobmNiaV9lbmEudGF4YS5wKSkNCmBgYA0K</div>
 
 
 

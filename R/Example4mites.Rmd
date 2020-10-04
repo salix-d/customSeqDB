@@ -10,7 +10,7 @@ knitr::opts_chunk$set(echo = TRUE)
 ```
 ## Prep
 These packages will be needed.
-The code of the custom functions I used for this is here : https://github.com/salix-d/customSeqDB
+The code of the custom functions used for this is here : https://github.com/salix-d/customSeqDB
 ```{r}
 if (!requireNamespace("BiocManager", quietly = TRUE))
     install.packages("BiocManager")
@@ -152,7 +152,8 @@ write_fasta(sequences = ncbi$complete$COI$seq, ids = ncbi$complete$tax$id, outFi
 ```{r}
 ncbi$seqtab <- as.matrix(read.csv("./data/seqtab.nochim_ncbi.csv", row.names = 1))
 ncbi$taxa <- dada2::assignTaxonomy(ena$seqtab, "./ncbiCompleteCOI_ncbi.fasta", tryRC = T)
-ncbi$taxa.p = mk_printDF(ncbi$taxa, na2char = F)
+ncbi$taxa.p = as.data.frame(ncbi$taxa, row.names = seq_len(nrow(ncbi$taxa)))
+
 # To see how many sequences are assigned per ranks
 colSums(!is.na(ncbi$taxa.p))
 ```
@@ -288,7 +289,7 @@ write_fasta(sequences = ena$complete$COI$seq, ids = ena$complete$tax$id, outFile
 ```{r}
 ena$seqtab <- as.matrix(read.csv("../../MitesDB/data/seqtab.nochim_MITES.csv", row.names = 1))
 ena$taxa <- dada2::assignTaxonomy(ena$seqtab, "./enaCompleteCOI_ena.fasta", tryRC = T)
-ena$taxa.p = mk_printDF(ena$taxa, na2char = F)
+ena$taxa.p = as.data.frame(ncbi$taxa, row.names = seq_len(nrow(ena$taxa)))
 # To see how many sequences are assigned per ranks
 colSums(!is.na(ena$taxa.p))
 ```
