@@ -90,7 +90,7 @@ write_parsed2csv <- function(parsedInfo, outFile){
 #' @param outFile     character string. The path to the csv file to be written. Optional. If missing, the file will be saved to './db_downloads/records/records_[Sys.Date()]_[###].csv'
 #' @export
 save_records <- function(URL, outFile, ext = c("xml", "txt")){
-  if(missing(outFile)){
+  if(is.null(outFile)){
     mainDir <- "./db_downloads"
     subDir <- "records"
     if(!dir.exists(mainDir)) dir.create(mainDir)
@@ -106,25 +106,6 @@ save_records <- function(URL, outFile, ext = c("xml", "txt")){
     if(!grepl(paste0(".",ext,"$"), outFile)) outFile <- paste0(outFile, ".", ext)
   }
   download.file(URL, destfile = outFile)
+  message("    Records saved to ", outFile, "\n")
   return(outFile)
-}
-
-
-#' Makes the matrix with long row names (like RNA sequences) printable.
-#'
-#' @description
-#' `mk_printDF` returns a data.frame without named rows. Optionally, also replaces NAs for a value.
-#'
-#' @details
-#' Convert matrix to data.frame and remove row names. Can replace the NA by "NA" or custom value make comparison between tables easier.
-#'
-#' @param mat    matrix to be converted. Usually the one returned from dada2::assignedTaxonomy()
-#' @param na2char Weither to convert NAs to a character string or not; Default TRUE
-#' @param naString  String to use to replace the NA if na2char is set to TRUE; Default is "unidentified"
-#' @export
-mk_printDF <- function(mat, na2char = TRUE, naString = "unidentified"){
-  df <- as.data.frame(mat)
-  rownames(df) <- NULL
-  if(na2char) df[is.na(df)] <- naString
-  return(df)
 }
