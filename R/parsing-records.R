@@ -21,7 +21,6 @@ parse_INSDxml <- function(URL, gene, codon_start = F, full_seq = F, save2csv = F
   # function to keep only wanted information from each record
   parse_INSDSeq <- function(INSDSeq, gene, codon_start, full_seq){
     AC <- xml2::xml_contents(xml2::xml_find_all(INSDSeq, "./INSDSeq_accession-version"))
-    print(AC)
     DE <- xml2::xml_contents(xml2::xml_find_all(INSDSeq, "./INSDSeq_definition"))
     SQ <- xml2::xml_contents(xml2::xml_find_all(INSDSeq, "./INSDSeq_sequence"))
     FT <- xml2::xml_find_all(INSDSeq,"./INSDSeq_feature-table/INSDFeature")
@@ -52,7 +51,7 @@ parse_INSDxml <- function(URL, gene, codon_start = F, full_seq = F, save2csv = F
     fields <- c("gene","product","proteinId","transl_except","note")
     for(f in fields){
       i <- grep(f, GENE)
-      out[,f] <- ifelse(length(i)==0, NA, gsub("^.*<INSDQualifier_value>([^<]*)<.*$", "\\1", GENE[i[1]]))
+      GENE_info[,f] <- ifelse(length(i)==0, NA, gsub("^.*<INSDQualifier_value>([^<]*)<.*$", "\\1", GENE[i[1]]))
     }
 
     GENE_location <- lapply(c("from>", "to>"), function(x) as.numeric(gsub("^.*from>([0-9]*)<.*$", "\\1", GENE[grep(x, GENE)][1]))) #sometimes is in field gene and field cds. both are the same, use the first.
@@ -120,7 +119,7 @@ parse_EMBLxml <- function(URL, gene, codon_start = F, full_seq = F, save2csv = F
     fields <- c("gene","product","proteinId","transl_except","note")
     for(f in fields){
       i <- grep(f, GENE)
-      out[,f] <- ifelse(length(i)==0, NA, gsub("^.*<value>\\s*(\\S*)\\s.*$", "\\1", GENE[i[1]]))
+      GENE_info[,f] <- ifelse(length(i)==0, NA, gsub("^.*<value>\\s*(\\S*)\\s.*$", "\\1", GENE[i[1]]))
     }
 
     GENE_loc <- xml2::xml_attr(FT[whichIsGene][1], "location")
@@ -158,15 +157,17 @@ parse_EMBLxml <- function(URL, gene, codon_start = F, full_seq = F, save2csv = F
 #' @export
 #' @seealso \code{\link{parse_INSDxml}}, \code{\link{parse_EMBLxml}}, \code{\link{get_enaFasta}}
 parse_flatFile <- function(URL, gene, codon_start = F, full_seq = F, save2csv = F, outCsv = NULL){
-
+  message("    Reading ", URL, "\n")
   records <- readLines(URL)
-  rec_end <- grep("//", records)
+  rec_end <- grep("^//$", records)
   rec_start <- c(0, rec_end[-length(rec_end)])+1
   records <- lapply(seq_along(rec_end), function(i) records[rec_start[i]:rec_end[i]])
+  if(length(gene)>1) gene <- paste(gene, collapse = "|")
 
   # function to keep only wanted information from the xml entries
   parse_record <- function(record, gene, full_seq){
-    AC <- gsub("VERSION|ACCESSION|\\s", "", grep("^VERSION\\s|^ACCESSION\\s",record, value=T))
+
+    AC <- gsub("VERSION|ACCESSION|\\s", "", grep("^VERSION\\s|^ACCESSION\\s",record, value=T)[1])
     DE <- gsub("^DEFINITION\\s*|^DE\\s*", "", grep("^DEFINITION\\s*|^DE\\s*", record, value = T))
 
     SQ_start <- grep("^SQ\\s|^ORIGIN\\s", record)
@@ -199,8 +200,8 @@ parse_flatFile <- function(URL, gene, codon_start = F, full_seq = F, save2csv = 
     fields <- c("gene","product","proteinId","transl_except","note")
     GENE <- unlist(FT[whichIsGene])
     for(f in fields){
-      i <- grep(f, GENE)
-      out[,f] <- ifelse(length(i)==0, NA, gsub(paste0('\\s*',f,'="(.*)"$'), "\\1", GENE[i[1]]))
+      i <- grep(paste0('\\s*',f,'='), GENE)
+      GENE_info[,f] <- ifelse(length(i)==0, NA, gsub(paste0('\\s*',f,'="(.*)"$'), "\\1", GENE[i[1]]))
     }
     GENE_loc <- grep("[0-9]\\.\\.>?[0-9]", GENE, value = T)[1]
     GENE_location <- setNames(as.list(as.numeric(gsub("\\D","", strsplit(GENE_loc, "\\.\\.")[[1]]))), c("start","end"))
@@ -208,6 +209,10 @@ parse_flatFile <- function(URL, gene, codon_start = F, full_seq = F, save2csv = 
       # fix the start location depending on the reading frame
       GENE_frame <- as.numeric(gsub("\\D", "", grep("codon_start", GENE, value = T)))
       if(length(GENE_frame)==0) GENE_frame <-  1
+      if(length(GENE_frame)>1){
+        print(GENE)
+        GENE_frame <- GENE_frame[1]
+        }
       if(GENE_frame>1) GENE_location$start <- GENE_location$start + GENE_frame  - 1
     }
     GENE_info$sequence <- substring(SQ, GENE_location$start, GENE_location$end)
