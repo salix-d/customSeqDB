@@ -200,3 +200,39 @@ get_ncbiFasta <- function(idList,
   mapply(utils::download.file, URLs, outFiles)
   return(outFiles)
 }
+
+#' Fetch records and parse them for the required information.
+#'
+#' @description
+#' `fetch_ncbiSeq` returns a data.frame with the accession number, the taxid and the region of the sequence for the specified gene (as columns) for the provided accession numbers (as rows).
+#'
+#' @details
+#' Uses DBFetch to fetch the records for all provided accession numbers in insdxml format and parse them to return the accession number, the taxid and the region of the sequence for the specified gene.
+#'
+#' @param accList     character string, integer or vector of character string or integer. The accession numbers used to fetch the records.
+#' @param gene        character string or vector of character string. The gene for which to find the sequence region.
+#' @param codon_start logical. Must be set to T if the gene has reading frames so it can adjust the region start accordingly. Default is false.
+#' @param full_seq    logical. Whether to fetch the full sequence or only the gene region. Default is FALSE, gets the gene region.
+#' @param format      character string. The format of the fetched file. Supported choice for parsing : 'gb'(flat file) or 'gbc' (INSDSeq XML).
+#' @family ncbi-db
+#' @export
+#' @references \url{https://www.ncbi.nlm.nih.gov/books/NBK25499/#_chapter4_EFetch_}, \url{https://www.ncbi.nlm.nih.gov/books/NBK25499/table/chapter4.T._valid_values_of__retmode_and/?report=objectonly}
+fetch_ncbiSeq <- function(accList, db="nucleotide", rettype = c('gb', 'gbc'), saveRec = F, outRec = NULL, saveParsedRec = F, outParsedRec = NULL){
+  baseURL <- "https://eutils.ncbi.nlm.nih.gov/entrez/eutils/efetch.fcgi?"
+  if(missing(format)) format <- "embl"
+  params <- list(
+    db      = db,
+    id      = paste(accList, collapse = ","),
+    rettype = rettype,
+    retmode = if(format == 'gb') 'text' else 'xml'
+  )
+  URL <- paste0(baseURL, paste(names(params), "=", params), collapse = "&")
+  if(saveRec) URL <- save_records(URL, outFile = outRec, ext = iselse(format=="gb", "txt", "xml"))
+
+  parseFuns <- list(
+    gb  = parse_flatFile,
+    gbc = parse_INSDxml
+  )
+  out <- parseFuns[[format]](URL = URL, gene = gene, codon_start = codon_start, full_seq = full_seq, save2csv = saveParsedRec, outFile = outParsedRec)
+  return(out)
+}

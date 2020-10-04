@@ -86,17 +86,17 @@ get_enaDetails <- function(taxIds,
 #' @param gene        character string or vector of character string. The gene for which to find the sequence region.
 #' @param codon_start logical. Must be set to T if the gene has reading frames so it can adjust the region start accordingly. Default is false.
 #' @param full_seq    logical. Whether to fetch the full sequence or only the gene region. Default is FALSE, gets the gene region.
-#' @param format      character string. The format of the fetched file. Supported choice for parsing : 'flatfile', 'emblxml-1.1' or 'insdseq'.
+#' @param format      character string. The format of the fetched file. Supported choice for parsing : 'embl' (flat file), 'emblxml-1.1' (EMBL XML) or 'insdxml' (INSDSeq XML).
 #' @family ena-db
 #' @export
 #' @references \url{http://www.ebi.ac.uk/Tools/dbfetch/dbfetch/dbfetch.databases#ena_sequence}, \url{http://www.ebi.ac.uk/Tools/dbfetch/dbfetch/dbfetch}
-get_enaFasta <- function(accList, db="ena_sequence", format = c('embl', 'emblxml-1.1', 'insdseq'), style = "raw", saveRec = F, outRec = NULL, saveParsedRec = F, outParsedRec = NULL){
+fetch_enaSeq <- function(accList, db="ena_sequence", format = c('embl', 'emblxml-1.1', 'insdxml'), saveRec = F, outRec = NULL, saveParsedRec = F, outParsedRec = NULL){
   baseURL <- "http://www.ebi.ac.uk/Tools/dbfetch/dbfetch?"
   if(missing(format)) format <- "embl"
   params <- list(
-    db     = "ena_sequence",
+    db     = db,
     id     = paste(accList, collapse = ","),
-    format = "indsxml",
+    format = format,
     style  = "raw"
   )
   URL <- paste0(baseURL, paste(names(params), "=", params), collapse = "&")
