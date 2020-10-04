@@ -50,8 +50,8 @@ get_ncbiAcc <- function(taxa,
 
   #' parsing the data for the accList (accessions) -------------------------------------------------------------------
   dat <- jsonlite::fromJSON(URL)
-  out <- list(accession  = dat$esearchresult$accList,
-              WebEnv = dat$esearchresult$webenv,
+  out <- list(accession = dat$esearchresult$idlist,
+              WebEnv    = dat$esearchresult$webenv,
               Query_key = dat$esearchresult$querykey)
 
   #' printing number of results -------------------------------------------------------------------------------------
@@ -85,7 +85,7 @@ get_ncbiAcc <- function(taxa,
 get_ncbiDetails <-function(taxa,
                        gene = "",
                        customTerm = "",
-                       db="nucleotide",
+                       db = "nucleotide",
                        retmode = "json",
                        retmax = "100000",
                        query = NULL){
@@ -94,7 +94,6 @@ get_ncbiDetails <-function(taxa,
   if(missing(query)){
     if(missing(taxa)) stop("Error : taxa argument missing")
     if(missing(gene) & missing(customTerm)) warning("Only taxa was used for the search")
-
     #' getting the records and history server info
     query <- get_ncbiAcc(taxa = taxa,
                         gene = gene,
@@ -217,40 +216,69 @@ get_ncbiFasta <- function(accList,
 #' @family ncbi-db
 #' @export
 #' @references \url{https://www.ncbi.nlm.nih.gov/books/NBK25499/#_chapter4_EFetch_}, \url{https://www.ncbi.nlm.nih.gov/books/NBK25499/table/chapter4.T._valid_values_of__retmode_and/?report=objectonly}
-fetch_ncbiSeq <- function(accList, gene = gene, codon_start = codon_start, full_seq = F, db="nucleotide", rettype = c('gb', 'gbc'), saveRec = F, outRec = NULL, saveParsedRec = F, outParsedRec = NULL){
-  if(missing(rettype)) rettype <- "gb"
-  retmode = ifelse(rettype=="gb", "txt", "xml")
+fetch_ncbiSeq <- function(accList = NULL, query = NULL, gene, codon_start = F, full_seq = F, db="nucleotide", rettype = c('gb', 'gbc'), saveRec = F, outRec = NULL, saveParsedRec = F, outParsedRec = NULL){
+  if(missing(accList) & missing(query)) stop("A list of accession numbers (accList) or a named list containing the WebEnv and Query_key to use with the history server (query) must be provided.")
+  if(missing(rettype)) rettype <- "gbwithparts"
+  if(rettype == "gb") rettype <- "gbwithparts"
+  retmode = ifelse(rettype=="gbwithparts", "txt", "xml")
+  baseURL <- "https://eutils.ncbi.nlm.nih.gov/entrez/eutils/efetch.fcgi?"
+  if(!missing(accList) & missing(query)){
 
-  # Separating the accLi in groups of 200 so the URLs can be opened.
-  len <- length(accList)
-  if(len > 200){
-    n <- floor(len/200)
-    r = list(start = 0:n * 200 + 1, end = c(1:n * 200, len))
-    ranges <- lapply(seq_along(r$start), function(i) c(r$start[i]:r$end[i]))
+    # Separating the accLi in groups of 200 so the URLs can be opened.
+    len <- length(accList)
+    if(len > 200){
+      n <- floor(len/200)
+      r = list(start = 0:n * 200 + 1, end = c(1:n * 200, len))
+      ranges <- lapply(seq_along(r$start), function(i) c(r$start[i]:r$end[i]))
+    } else {
+      ranges <- list(1:len)
+    }
+
+    # make a list of URL to EFetch the files
+    URLs <- sapply(ranges, function(r){
+      params <- list(
+        db      = db,
+        id      = paste(accList[r], collapse = ","),
+        rettype = rettype,
+        retmode = retmode
+      )
+      return(paste0(baseURL, paste(paste0(names(params), "=", params), collapse = "&")))
+    })
   } else {
-    ranges <- list(1:len)
+    if(length(query)<3) stop("Error : missing values in query")
+    if(! all(names(query) %in% c("WebEnv", "Query_key", "accession"))) stop("Invalid query list, must contain $WebEnv, $Query_key, $accession")
+
+    baseURL <- "https://eutils.ncbi.nlm.nih.gov/entrez/eutils/efetch.fcgi?"
+    len <- length(query$accession)
+    if(len > 10000){
+      n <- floor(len/10000)
+      retstart <- 0:n * 10000 + 1
+    } else {
+      retstart <- 0
+    }
+
+    # make a list of URL to EFetch the files
+    URLs <- sapply(retstart, function(i){
+      params <- list(
+        db = db,
+        rettype = rettype,
+        retmode = retmode,
+        WebEnv    = query$WebEnv,
+        Query_key = query$Query_key,
+        retmax = "10000",
+        retstart = i
+      )
+      return(paste0(baseURL, paste(paste0(names(params), "=", params), collapse = "&")))
+    })
   }
 
-  # make a list of URL to EFetch the fasta files
-  baseURL <- "https://eutils.ncbi.nlm.nih.gov/entrez/eutils/efetch.fcgi?"
-  URLs <- sapply(ranges, function(r){
-    params <- list(
-      db      = db,
-      id      = paste(accList[r], collapse = ","),
-      rettype = rettype,
-      retmode = retmode
-    )
-    return(paste0(baseURL, paste(paste0(names(params), "=", params), collapse = "&")))
-    })
-
   if(saveRec){
-    print(T)
     URLs <- sapply(URLs, save_records, outFile = outRec, ext = retmode)}
-
   parseFuns <- list(
-    gb  = parse_flatFile,
+    gbwithparts  = parse_flatFile,
     gbc = parse_INSDxml
   )
+
   out <- do.call(rbind, lapply(URLs, function(URL) parseFuns[[rettype]](URL = URL, gene = gene, codon_start = codon_start, full_seq = full_seq, save2csv = saveParsedRec, outCsv = outParsedRec)))
   return(out)
 }

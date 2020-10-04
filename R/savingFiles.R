@@ -1,10 +1,4 @@
-#'=================================================================================
-#' Misc functions
-#'=================================================================================
-#'
-#'--------------------------------------------------------------------------------
 #' Write a fasta file from sequences and their names
-#'--------------------------------------------------------------------------------
 #'
 #' @param sequences vector or named list of character string. The sequences to be writen in the file.
 #' @param ids       vector of character string. The ids for the sequences; Optional if a named list is provided
@@ -66,14 +60,15 @@ write_parsed2csv <- function(parsedInfo, outFile){
     pattern <- paste0("pasredRecords.", Sys.Date(), ".")
     outFile <- file.path(mainDir, subDir, paste0(pattern, "001.csv"))
     if(file.exists(outFile)){
-      n <- length(dir(subDir, pattern = pattern))
+      n <- length(dir(file.path(mainDir, subDir), pattern = pattern))
       outFile <- file.path(mainDir, subDir, paste0(pattern, sprintf("%03d", n+1), ".csv"))
     }
   } else {
     if(!grepl(".csv$", outFile)) outFile <- paste0(outFile, ".csv")
   }
+  outFile <- normalizePath(outFile)
   write.csv(pasredInfo, outFile)
-  return(normalizePath(outFile))
+  return(outFile)
 }
 
 #' Download the fetched records instead of reading them directly
@@ -83,24 +78,30 @@ write_parsed2csv <- function(parsedInfo, outFile){
 #'
 #' @details
 #' Downloads a file from a URL and returns a character string of its path.
-#' If no path provided for outFile, file will be saved to "./db_downloads/records/records.[Sys.Date()].csv"
+#' If no path provided for outFile, file will be saved to "./db_downloads/records/records.Sys.Date.###.csv"
 #' Is used by  \code{\link{parse_EMBLxml}}, \code{\link{parse_flatFile}}, \code{\link{parse_INSDxml}} when save2csv is set to TRUE.
 #'
-#' @param parsedInfo  data.frame. The data.frame returned from \code{\link{parse_EMBLxml}}, \code{\link{parse_flatFile}} or \code{\link{parse_INSDxml}}.
-#' @param outFile     character string. The path to the csv file to be written. Optional. If missing, the file will be saved to './db_downloads/records/records_[Sys.Date()]_[###].csv'
+#' @param URL       url. Url of the data to save.
+#' @param outFile   character string. The path to where the file should be saved. Optional. If missing, the file will be saved to './db_downloads/records/records_[Sys.Date()]_[###].csv'
+#' @param ext       character string. The extension of the file to save. Chosen depending on format by the fetch function calling it.
 #' @export
-save_records <- function(URL, outFile, ext = c("xml", "txt")){
+save_records <- function(URL, outFile = NULL, ext = c("xml", "txt")){
+  if(missing(ext)) ext <- "txt"
   if(is.null(outFile)){
-    mainDir <- "./db_downloads"
-    subDir <- "records"
-    if(!dir.exists(mainDir)) dir.create(mainDir)
-    if(!dir.exists(file.path(mainDir, subDir))) dir.create(file.path(mainDir, subDir))
-
+    #dir <- "./db_downloads"
+    outDir <- file.path(normalizePath(".", winslash = "/"), "db_downloads")
+    if(!dir.exists(outDir)){
+      dir.create(outDir)
+    }
+    outDir <- file.path(outDir, "records")
+    if(!dir.exists(outDir)){
+      dir.create(outDir)
+    }
     pattern = paste0("records.", Sys.Date(), ".")
-    outFile <- file.path(mainDir, subDir, paste0(pattern, "001.", ext))
+    outFile <- file.path(outDir, paste0(pattern, "001.", ext))
     if(file.exists(outFile)){
-      n <- length(dir(subDir, pattern = pattern))
-      outFile <- file.path(mainDir, subDir, paste0(pattern, sprintf("%03d", n+1), ".", ext))
+      n <- length(dir(outDir, pattern = pattern))
+      outFile <- file.path(outDir, paste0(pattern, sprintf("%03d", n+1), ".", ext))
     }
   } else {
     if(!grepl(paste0(".",ext,"$"), outFile)) outFile <- paste0(outFile, ".", ext)
@@ -109,3 +110,4 @@ save_records <- function(URL, outFile, ext = c("xml", "txt")){
   message("    Records saved to ", outFile, "\n")
   return(outFile)
 }
+
