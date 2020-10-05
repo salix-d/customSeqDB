@@ -43,7 +43,7 @@ parse_INSDxml <- function(URL, gene, codon_start = F, full_seq = F, save2csv = F
 
     whichIsGene <- grep(gene, FT, ignore.case = T, perl = T)
     if(length(whichIsGene)==0){
-      warning("    Warning : ", AC, " has no COI gene and will be ignored.\n")
+      message("    Warning : ", AC, " has no COI gene and will be ignored.\n")
       return()
     }
     GENE <- xml2::xml_children(xml2::xml_children(FT[whichIsGene]))
@@ -156,7 +156,7 @@ parse_EMBLxml <- function(URL, gene, codon_start = F, full_seq = F, save2csv = F
 #' @param outFile     character string. The path to the csv file to be written. Optional. If save2csv is set to TRUE and outFile is missing, the file will be saved to './db_downloads/parsedRecords/parsedRecords.Sys.Date.###.csv'
 #' @export
 #' @seealso \code{\link{parse_INSDxml}}, \code{\link{parse_EMBLxml}}, \code{\link{get_enaFasta}}
-parse_flatFile <- function(URL, gene, codon_start = F, full_seq = F, save2csv = F, outCsv = NULL){
+parse_flatFile <- function(URL, gene, gene_type, codon_start = F, full_seq = F, save2csv = F, outCsv = NULL){
   message("    Reading ", URL, "\n")
   records <- readLines(URL)
   rec_end <- grep("^//$", records)
@@ -168,6 +168,11 @@ parse_flatFile <- function(URL, gene, codon_start = F, full_seq = F, save2csv = 
   parse_record <- function(record){
 
     AC <- gsub("^AC\\s+(\\S.*)|^ACCESSION\\s*(\\S.*)$", "\\1\\2", grep("^AC\\s|^ACCESSION\\s",record, value=T))
+    if(length(strsplit(AC, " ")[[1]])>1){
+      x <- strsplit(AC, " ")[[1]][1]
+      message("    ", x, "is a part of a set : ", AC)
+      AC <- x
+    }
     DE <- gsub("^DEFINITION\\s*|^DE\\s*", "", grep("^DEFINITION\\s*|^DE\\s*", record, value = T))
 
     SQ_start <- grep("^SQ\\s|^ORIGIN\\s", record)
@@ -196,51 +201,65 @@ parse_flatFile <- function(URL, gene, codon_start = F, full_seq = F, save2csv = 
       return(GENE_info)
     }
 
-    whichIsGene <- which(sapply(FT, function(ft) any(grepl(gene, ft, ignore.case = T))))
-    if(length(whichIsGene) == 0){
+    whichIsType <- grep(gene_type, FT)
+    if(length(whichIsType) == 0) whichIsType <- grep("gene", FT)
+    whichIsGene <- which(sapply(FT, function(x) any(grepl(gene, x, ignore.case = T))))
+    isGeneType <- intersect(whichIsGene, whichIsType)
+    if(length(isGeneType) == 0){
       warning("    Warning : ", AC, " has no COI gene and will be ignored.\n")
       return()
-    } else if(length(whichIsGene) == 4 | (length(whichIsGene) > 2 & length(grep("product", unlist(FT[whichIsGene])))==2)){ #if there's a gene duplicate
-      GENE_info <- rbind(GENE_info, GENE_info) #will return 2 rows, just in case there's a variation
-    } else if(length(whichIsGene) > 5){
-      warning("    Warning : problem reading ", AC, "'s gene. Record will be ignored and should be checked manually.\n")
+    }
+    if(length(isGeneType) > 2){
+      warning("    Warning : problem reading gene of", AC, ". Record will be ignored and shoud be checked manually.\n")
       return()
     }
+    if(length(isGeneType) == 2){
+      if(any(grepl("gap", FT[isGeneType[1]:isGeneType[2]]))){
+        isGeneType <- isGeneType[1]:isGeneType[2]
+        gap <- T
+      }
+    }
 
-    GENE <- unlist(FT[whichIsGene])
+    GENE <- unlist(FT[isGeneType])
     fields <- c("gene","product","proteinId","transl_except","note")
     for(f in fields){
       i <- grep(paste0('\\s*',f,'='), GENE)
       GENE_info[,f] <- ifelse(length(i)==0, NA, gsub(paste0('\\s*',f,'="(.*)"$'), "\\1", GENE[i[1]]))
     }
     GENE_location  <- grep("[0-9]\\.\\.>?[0-9]", GENE, value = T)
-
     GENE_location  <- as.numeric(gsub("^(\\d*)$|^\\s*\\S*\\s*(\\d*).*$", "\\1\\2", unlist(strsplit(gsub("<|>", "", GENE_location), "\\.\\."))))
-    if(length(GENE_location)>4){
-      GENE_location <- na.omit(GENE_location) #some NAs can be there if there was an transl_ecept for example
-      if(all(GENE_location >= GENE_location[1]) & all(GENE_location <= GENE_location[2])){
-        GENE_location <- c(GENE_location[1], GENE_location[2])
-      } else{
-        GENE_location <- unique(GENE_location)
-        if(length(GENE_location) == 4 & GENE_location[3] > GENE_location[2]){
-          GENE_info$from <- GENE_location[1:length(GENE_location) %% 2 == 1]
-          GENE_info$to   <- GENE_location[1:length(GENE_location) %% 2 == 0]
-        } else {
-          warning("    Warning : problem reading ", AC, "'s gene location(", paste(GENE_location, collapse = ", "), "). Record will be ignored and should be checked manually.\n")
-          return()
-        }
+    if(length(GENE_location) == 6 & gap){
+      if(GENE_location[2]+1 == GENE_location[3] & GENE_location[4]+1 == GENE_location[5]){
+        GENE_info$from <- GENE_location[1]
+        GENE_info$to   <- GENE_location[6]
       }
-    } else {
-      GENE_location <- unique(GENE_location)
-    }
-    if(length(GENE_location) > 2 & GENE_location[3] > GENE_location[2]){
-      GENE_info$from <- GENE_location[1:length(GENE_location) %% 2 == 1]
-      GENE_info$to   <- GENE_location[1:length(GENE_location) %% 2 == 0]
+      else{
+        warning("    Warning : problem reading gene of", AC, ". Record will be ignored and shoud be checked manually.\n")
+        return()
+      }
     } else {
       GENE_info$from <- GENE_location[1]
       GENE_info$to   <- GENE_location[2]
     }
 
+
+    #if(length(GENE_location)>4){
+    #  GENE_location <- na.omit(GENE_location) #some NAs can be there if there was an transl_ecept for example
+    #  if(all(GENE_location >= GENE_location[1]) & all(GENE_location <= GENE_location[2])){
+    #    GENE_location <- c(GENE_location[1], GENE_location[2])
+    #  } else{
+    #    GENE_location <- unique(GENE_location)
+    #    if(length(GENE_location) == 4 & GENE_location[3] > GENE_location[2]){
+    #      GENE_info$from <- GENE_location[1:length(GENE_location) %% 2 == 1]
+    #      GENE_info$to   <- GENE_location[1:length(GENE_location) %% 2 == 0]
+    #    } else {
+    #      warning("    Warning : problem reading ", AC, "'s gene location(", paste(GENE_location, collapse = ", "), "). Record will be ignored and should be checked manually.\n")
+    #      return()
+    #    }
+    #  }
+    #} else {
+    #  GENE_location <- unique(GENE_location)
+    #}
     if(codon_start){
       # fix the start location depending on the reading frame
       is.codon_start <- grep("codon_start", GENE, value = T)
@@ -249,7 +268,7 @@ parse_flatFile <- function(URL, gene, codon_start = F, full_seq = F, save2csv = 
         GENE_info$note <- paste(na.omit(GENE_info$note),"; record had no codon_start field, assumed reading frame 1")
         message("    ", AC, " had no codon_start field, assumed reading frame 1. This message is also in the 'note' column of the returned dataframe.\n")
       } else {
-        GENE_info$frame <- as.numeric(gsub("\\D", "", is.codon_start))
+        GENE_info$frame <- as.numeric(gsub("\\D", "", is.codon_start))[1]
       }
       if(any(GENE_info$frame>1)) GENE_info$from <- GENE_info$from + GENE_info$frame  - 1
     }
