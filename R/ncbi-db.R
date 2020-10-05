@@ -216,7 +216,7 @@ get_ncbiFasta <- function(accList,
 #' @family ncbi-db
 #' @export
 #' @references \url{https://www.ncbi.nlm.nih.gov/books/NBK25499/#_chapter4_EFetch_}, \url{https://www.ncbi.nlm.nih.gov/books/NBK25499/table/chapter4.T._valid_values_of__retmode_and/?report=objectonly}
-fetch_ncbiSeq <- function(accList = NULL, query = NULL, gene, codon_start = F, full_seq = F, db="nucleotide", rettype = c('gb', 'gbc'), saveRec = F, outRec = NULL, saveParsedRec = F, outParsedRec = NULL){
+fetch_ncbiSeq <- function(accList = NULL, query = NULL, gene, gene_type, codon_start = F, full_seq = F, db="nucleotide", rettype = c('gb', 'gbc'), saveRec = F, outRec = NULL, saveParsedRec = F, outParsedRec = NULL){
   if(missing(accList) & missing(query)) stop("A list of accession numbers (accList) or a named list containing the WebEnv and Query_key to use with the history server (query) must be provided.")
   if(missing(rettype)) rettype <- "gbwithparts"
   if(rettype == "gb") rettype <- "gbwithparts"
@@ -242,7 +242,7 @@ fetch_ncbiSeq <- function(accList = NULL, query = NULL, gene, codon_start = F, f
         rettype = rettype,
         retmode = retmode
       )
-      return(paste0(baseURL, paste(paste0(names(params), "=", params), collapse = "&")))
+      paste0(baseURL, paste(paste0(names(params), "=", params), collapse = "&"))
     })
   } else {
     if(length(query)<3) stop("Error : missing values in query")
@@ -268,7 +268,7 @@ fetch_ncbiSeq <- function(accList = NULL, query = NULL, gene, codon_start = F, f
         retmax = "10000",
         retstart = i
       )
-      return(paste0(baseURL, paste(paste0(names(params), "=", params), collapse = "&")))
+      paste0(baseURL, paste(paste0(names(params), "=", params), collapse = "&"))
     })
   }
 

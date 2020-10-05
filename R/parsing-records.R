@@ -139,10 +139,10 @@ parse_EMBLxml <- function(URL, gene, codon_start = F, full_seq = F, save2csv = F
   return(parsed_entries)
 }
 
-#' Parse records of EMBLxml format for the required information.
+#' Parse records of flat file (emnl, gb) format for the required information.
 #'
 #' @description
-#' `parse_flatFile` parses a EMBLxml file and returns a data.frame with the details of the records (as columns) for the provided accession numbers (as rows).
+#' `parse_flatFile` parses a flat file and returns a data.frame with the details of the records (as columns) for the provided accession numbers (as rows).
 #'
 #' @details
 #' Reads a flat file from a file path or a URL and parse it for the accession number, taxid, description, gene, product, protein id, translation exception, note and sequence fields.
@@ -230,7 +230,10 @@ parse_flatFile <- function(URL, gene, gene_type, codon_start = F, full_seq = F, 
       GENE_info[,f] <- ifelse(length(i)==0, NA, gsub(paste0('\\s*',f,'="(.*)"$'), "\\1", GENE[i[1]]))
     }
     GENE_location  <- grep("[0-9]\\.\\.>?[0-9]", GENE, value = T)
-    GENE_location  <- as.numeric(gsub("^(\\d*)$|^\\s*\\S*\\s*(\\d*).*$", "\\1\\2", unlist(strsplit(gsub("complement|\\(|\\)|<|>", "", GENE_location), "\\.\\."))))
+    GENE_info$complement <- any(grepl("complement", GENE_location))
+    GENE_location  <- gsub("complement|\\(|\\)|<|>", "", GENE_location)
+
+    GENE_location  <- as.numeric(gsub("^(\\d*)$|^\\s*\\S*\\s*(\\d*).*$", "\\1\\2", unlist(strsplit(GENE_location, "\\.\\."))))
     if(length(GENE_location) == 6 & gap){
       if(GENE_location[2]+1 == GENE_location[3] & GENE_location[4]+1 == GENE_location[5]){
         GENE_info$from <- GENE_location[1]
