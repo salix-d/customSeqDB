@@ -5,9 +5,10 @@
 \title{Fetch records and parse them for the required information.}
 \usage{
 fetch_ncbiSeq(
-  accList,
-  gene = gene,
-  codon_start = codon_start,
+  accList = NULL,
+  query = NULL,
+  gene,
+  codon_start = F,
   full_seq = F,
   db = "nucleotide",
   rettype = c("gb", "gbc"),
