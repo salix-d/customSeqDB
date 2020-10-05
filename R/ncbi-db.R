@@ -279,6 +279,6 @@ fetch_ncbiSeq <- function(accList = NULL, query = NULL, gene, codon_start = F, f
     gbc = parse_INSDxml
   )
 
-  out <- do.call(rbind, lapply(URLs, function(URL) parseFuns[[rettype]](URL = URL, gene = gene, codon_start = codon_start, full_seq = full_seq, save2csv = saveParsedRec, outCsv = outParsedRec)))
+  out <- do.call(rbind, lapply(URLs, function(URL) parseFuns[[rettype]](URL = URL, gene = gene, gene_type, codon_start = codon_start, full_seq = full_seq, save2csv = saveParsedRec, outCsv = outParsedRec)))
   return(out)
 }

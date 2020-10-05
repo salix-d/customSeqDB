@@ -15,7 +15,7 @@
 #' @param outFile     character string. The path to the csv file to be written. Optional. If save2csv is set to TRUE and outFile is missing, the file will be saved to './db_downloads/parsedRecords/parsedRecords.Sys.Date.###.csv'
 #' @export
 #' @seealso \code{\link{parse_EMBLxml}}, \code{\link{parse_flatFile}}, \code{\link{get_enaFasta}}
-parse_INSDxml <- function(URL, gene, codon_start = F, full_seq = F, save2csv = F, outCsv = NULL){
+parse_INSDxml <- function(URL, gene, gene_type, codon_start = F, full_seq = F, save2csv = F, outCsv = NULL){
 
   INSDSeqs <- xml2::xml_children(xml2::read_xml(URL))
   # function to keep only wanted information from each record
@@ -167,13 +167,16 @@ parse_flatFile <- function(URL, gene, gene_type, codon_start = F, full_seq = F, 
   # function to keep only wanted information from the xml entries
   parse_record <- function(record){
 
-    AC <- gsub("^AC\\s+(\\S.*)|^ACCESSION\\s*(\\S.*)$", "\\1\\2", grep("^AC\\s|^ACCESSION\\s",record, value=T))
+    isAC <- grep("^AC\\s|^ACCESSION\\s",record)
+    AC <- gsub("^AC\\s+(\\S.*)|^ACCESSION\\s*(\\S.*)$", "\\1\\2", record[isAC])
     if(length(strsplit(AC, " ")[[1]])>1){
       x <- strsplit(AC, " ")[[1]][1]
       message("    ", x, "is a part of a set : ", AC)
       AC <- x
     }
-    DE <- gsub("^DEFINITION\\s*|^DE\\s*", "", grep("^DEFINITION\\s*|^DE\\s*", record, value = T))
+    isDE <- grep("^DEFINITION\\s*|^DE\\s*", record)
+
+    DE <- gsub("^DEFINITION\\s*|^DE\\s*", "", paste(record[isDE:(isAC-1)], collapse = " "))
 
     SQ_start <- grep("^SQ\\s|^ORIGIN\\s", record)
     if(length(SQ_start)==0){
@@ -227,7 +230,7 @@ parse_flatFile <- function(URL, gene, gene_type, codon_start = F, full_seq = F, 
       GENE_info[,f] <- ifelse(length(i)==0, NA, gsub(paste0('\\s*',f,'="(.*)"$'), "\\1", GENE[i[1]]))
     }
     GENE_location  <- grep("[0-9]\\.\\.>?[0-9]", GENE, value = T)
-    GENE_location  <- as.numeric(gsub("^(\\d*)$|^\\s*\\S*\\s*(\\d*).*$", "\\1\\2", unlist(strsplit(gsub("<|>", "", GENE_location), "\\.\\."))))
+    GENE_location  <- as.numeric(gsub("^(\\d*)$|^\\s*\\S*\\s*(\\d*).*$", "\\1\\2", unlist(strsplit(gsub("complement|\\(|\\)|<|>", "", GENE_location), "\\.\\."))))
     if(length(GENE_location) == 6 & gap){
       if(GENE_location[2]+1 == GENE_location[3] & GENE_location[4]+1 == GENE_location[5]){
         GENE_info$from <- GENE_location[1]
@@ -264,13 +267,13 @@ parse_flatFile <- function(URL, gene, gene_type, codon_start = F, full_seq = F, 
       # fix the start location depending on the reading frame
       is.codon_start <- grep("codon_start", GENE, value = T)
       if(length(is.codon_start)==0){
-        GENE_info$frame <- 1
+        GENE_info$frame <- NA
         GENE_info$note <- paste(na.omit(GENE_info$note),"; record had no codon_start field, assumed reading frame 1")
         message("    ", AC, " had no codon_start field, assumed reading frame 1. This message is also in the 'note' column of the returned dataframe.\n")
       } else {
         GENE_info$frame <- as.numeric(gsub("\\D", "", is.codon_start))[1]
       }
-      if(any(GENE_info$frame>1)) GENE_info$from <- GENE_info$from + GENE_info$frame  - 1
+      if(!is.na(GENE_info$frame)) if(GENE_info$frame>1) GENE_info$from <- GENE_info$from + GENE_info$frame  - 1
     }
     GENE_info$sequence <- substring(SQ, GENE_info$from, GENE_info$to)
 

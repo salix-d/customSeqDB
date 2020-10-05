@@ -7,6 +7,7 @@
 parse_flatFile(
   URL,
   gene,
+  gene_type,
   codon_start = F,
   full_seq = F,
   save2csv = F,
