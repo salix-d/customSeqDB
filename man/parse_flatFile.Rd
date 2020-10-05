@@ -2,7 +2,7 @@
 % Please edit documentation in R/parsing-records.R
 \name{parse_flatFile}
 \alias{parse_flatFile}
-\title{Parse records of EMBLxml format for the required information.}
+\title{Parse records of flat file (emnl, gb) format for the required information.}
 \usage{
 parse_flatFile(
   URL,
@@ -28,7 +28,7 @@ parse_flatFile(
 \item{outFile}{character string. The path to the csv file to be written. Optional. If save2csv is set to TRUE and outFile is missing, the file will be saved to './db_downloads/parsedRecords/parsedRecords.Sys.Date.###.csv'}
 }
 \description{
-`parse_flatFile` parses a EMBLxml file and returns a data.frame with the details of the records (as columns) for the provided accession numbers (as rows).
+`parse_flatFile` parses a flat file and returns a data.frame with the details of the records (as columns) for the provided accession numbers (as rows).
 }
 \details{
 Reads a flat file from a file path or a URL and parse it for the accession number, taxid, description, gene, product, protein id, translation exception, note and sequence fields.

@@ -8,6 +8,7 @@ fetch_ncbiSeq(
   accList = NULL,
   query = NULL,
   gene,
+  gene_type,
   codon_start = F,
   full_seq = F,
   db = "nucleotide",
