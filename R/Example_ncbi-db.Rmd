@@ -72,9 +72,11 @@ Since CDS have reading frame, 'codon_start' is set to true to adjust the beginni
 If the difference between the number of records returned by the search and the number of recoreds filtered isn't big, it's much faster to use the history server to fetch them.
 When using ids to fetch, it can only fetch 200 at a time, with the server it can fetch up to 10k at a time.
 ```{r fetchWithAC}
-#ncbi$complete$files <- fetch_ncbiSeq(accList = ncbi$complete$details$accession, gene = "COX?[I1]\"", gene_type = "CDS", codon_start = T, saveRec = T)
-#nrow(ncbi$complete$files)
-#head(ncbi$complete$files)
+ncbi$complete$filesByAcc <- fetch_ncbiSeq(accList = ncbi$complete$details$accession, gene = "COX?[I1]\"", gene_type = "CDS", codon_start = T, saveRec = T)
+ncbiFiles <- sapply(c("002", "003", "004"), function(i) gsub("001", i, ncbiFile))
+ncbi$complete$filesByAcc <- do.call(rbind, lapply(ncbiFiles, function(file) parse_flatFile(file, gene = "COX?[I1]\"", gene_type = "CDS", codon_start = T)))
+nrow(ncbi$complete$filesByAcc)
+head(ncbi$complete$filesByAcc)
 ```
 
 ```{r fetchWithQ}
@@ -94,15 +96,41 @@ nrow(ncbi$complete$files)
 head(ncbi$complete$files)
 ```
 The number of rows might be smaller than the number of record we fetched :
-- when records are part of a set with identical sequences, only one record is returned.
-- some records may not have had the correct information and were ignored.
+- when records are part of a 'popset', only one record is returned. To get all of them, the missing accession can be refetched.
+- some records may not have had the correct information and were ignored. (there will be a warning. They should be remove from the missing acc to be refetched, or else they will be parse for nothing and be ignored again)
+
+*If you don't want all records of the popsets, skip to next step (filtering description). If you are going to merge this db with another one, I would keep track of the popsets' accession number. Other db might give you the whole set, so you could remove the ones you don't want to keep.*
+```{r}
+ncbi$complete$details$accession <- gsub("\\.\\d*$", "", ncbi$complete$details$accession)
+tmp.accList <- ncbi$complete$details$accession[!ncbi$complete$details$accession %in% ncbi$complete$files$accession]
+I <- length(tmp.accList)
+i <- 0
+tmp.accList <- tmp.accList[!tmp.accList %in% c(tmp$accession, "AH011506")]
+while(length(tmp.accList)!=0){
+  tmp.accList <- tmp.accList[!tmp.accList %in% tmp$accession]
+  tmp <- rbind(tmp, fetch_ncbiSeq(accList = tmp.accList, gene = "COX?[I1]\"", gene_type = "CDS", codon_start = T, saveRec = T))
+  i <- i + 1
+  if(i>I) break 
+  #bc even if fetchingone by one it shouldn't reach that. this mean there's an acc that just doesn't return anything
+}
+ 
+sum(duplicated(tmp$sequence))
+```
+In 78 records of 2 popset, only 7 sequences are duplicates.
+
+They can be added to the main data.frame, duplicates will be filtered out in next steps.
+```{r}
+ncbi$complete$files <- rbind(ncbi$complete$files, tmp)
+rownames <- NULL
+nrow(ncbi$complete$files)
+```
 
 ## Filtering the description for complete *COI*
 ```{r}
+grep(fltr, tmp$description, value = T, invert = T)
+fltr <- "COX?[I1]\\)?[[:alnum:]\\s\\(\\);]*,?[[:alnum:]\\s\\(\\);]*,\\s*complete|complete\\s*genome|complete\\s*sequence|CoI\\)\\s*gene,\\s*complete"
 #Changing name to do modification and keep a backup
-ncbi$complete$COI <- ncbi$complete$files
-#sum(grepl(fltr, ncbi$complete$COI$description))
-ncbi$complete$COI <- ncbi$complete$COI[grepl(fltr, ncbi$complete$COI$description),]
+ncbi$complete$COI <- ncbi$complete$files[grepl(fltr, ncbi$complete$files$description),]
 rownames(ncbi$complete$COI) <- NULL
 nrow(ncbi$complete$COI)
 ```
@@ -221,12 +249,6 @@ nchar(ncbi$complete$missingFrame$sequence) %% 3
 ```
 Since this returns 0 and the sequence has a start codon, the reading frame is probably right.
 
-```{r}
-transl <- actg2imc(ncbi$complete$missingFrame$sequence, codon_start = 1, removeStop = F)
-grep("\\*", transl)
-```
-The translation doesn't contain a stop codon. So this is a partial CDS. (* is the symbol for stop codon when translating to the Invertebrate Mitochondrion Code(imc))
-
 If we look at other squences for the same taxId...
 ```{r}
 ncbi$complete$missingFrame$taxId %in% ncbi$complete$COI$taxId
@@ -273,18 +295,35 @@ apply(ncbi$complete$tax[4:5], 2, table)
 ## Writing the dada2 formated fasta file
 ```{r}
 ncbi$complete$tax$id <- paste0(apply(ncbi$complete$tax[1:7], 1, paste0, collapse = ";"), ";")
-write_fasta(sequences = ncbi$complete$checked$sequence, ids = ncbi$complete$tax$id, outFile = "completeCOI_ncbi_ff.fasta")
+write_fasta(sequences = ncbi$complete$checked$sequence, ids = ncbi$complete$tax$id, outFile = "completeCOI_ncbi_ff_267seq.fasta")
 ```
 
 ## Testing the database
 ```{r}
 seqtab <- as.matrix(read.csv("../../MitesDB/data/seqtab.nochim_MITES.csv", row.names = 1))
 library(dada2)
-set.seed(2)
+set.seed(20) #this doesn't even work... 
 ncbi$taxa <- dada2::assignTaxonomy(seqtab, "./completeCOI_ncbi_ff.fasta", tryRC = T, outputBootstraps = T)
-sapply(names(ncbi$taxa), function(name) write.csv(ncbi$taxa[[name]], paste0("completeCOI_ncbi_ff_", name, ".csv")))
+#sapply(names(ncbi$taxa), function(name) write.csv(ncbi$taxa[[name]], paste0("completeCOI_ncbi_ff_", name, ".csv")))
 ncbi$taxa.p = as.data.frame(ncbi$taxa$tax, row.names = seq_len(nrow(ncbi$taxa$tax)))
 ncbi$boot.p = as.data.frame(ncbi$taxa$boot, row.names = seq_len(nrow(ncbi$taxa$boot)))
+
+ncbi$taxa2 <- dada2::assignTaxonomy(seqtab, "completeCOI_ncbi_ff_267seq.fasta", tryRC = T, outputBootstraps = T)
+#sapply(names(ncbi$taxa2), function(name) write.csv(ncbi$taxa2[[name]], paste0("completeCOI_ncbi_ff_267seq_", name, ".csv")))
+ncbi$taxa2.p = as.data.frame(ncbi$taxa2$tax, row.names = seq_len(nrow(ncbi$taxa2$tax)))
+ncbi$boot2.p = as.data.frame(ncbi$taxa2$boot, row.names = seq_len(nrow(ncbi$taxa2$boot)))
 # To see how many sequences are assigned per ranks
 colSums(!is.na(ncbi$taxa.p))
+colSums(!is.na(ncbi$taxa2.p))
+
+sum(is.na(ncbi$taxa.p$Family) != is.na(ncbi$taxa2.p$Family))
+#same number of families but not the same sequences
+orderNAs <- which(is.na(ncbi$taxa2.p$Order))[which(!which(is.na(ncbi$taxa2.p$Order)) %in% which(is.na(ncbi$taxa.p$Order)))]
+cbind(
+  ncbi$taxa.p$Order[orderNAs],
+  ncbi$boot.p$Order[orderNAs],
+  ncbi$taxa2.p$Order[orderNAs],
+  ncbi$boot2.p$Order[orderNAs]
+  )[c(1,3,26,27,2,4:25,28),]
+#the boot confidences doesn't change that much for the order rep by only one sequence, but it changes for the one that got the popset sequences.
 ```
