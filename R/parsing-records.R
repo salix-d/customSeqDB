@@ -216,6 +216,7 @@ parse_flatFile <- function(URL, gene, gene_type, codon_start = F, full_seq = F, 
       warning("    Warning : problem reading gene of", AC, ". Record will be ignored and shoud be checked manually.\n")
       return()
     }
+    gap <- F
     if(length(isGeneType) == 2){
       if(any(grepl("gap", FT[isGeneType[1]:isGeneType[2]]))){
         isGeneType <- isGeneType[1]:isGeneType[2]
